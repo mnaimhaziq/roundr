@@ -4,7 +4,7 @@ import com.game.roundr.App;
 import java.io.IOException;
 import javafx.fxml.FXML;
 
-public class JoinLobbyController {
+public class CreateLobbyController {
 
     @FXML
     private void handleMainMenuButtonClick() throws IOException {
