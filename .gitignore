@@ -22,6 +22,8 @@ target/
 .sts4-cache
 
 ### NetBeans ###
+/src/test/
+/nbactions.xml
 /nbproject/private/
 /nbbuild/
 /dist/
