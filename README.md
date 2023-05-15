@@ -10,6 +10,7 @@
 6. Once the query has been executed successfully, the project is good to go.
 7. Happy Coding!
 
+![](src/main/resources/com/game/roundr/assets/DB_game_ERD.png)
 ## Before You Code...
 
 1. Create a new folder with your module name under the `src/main/java/com/game/roundr` directory.
