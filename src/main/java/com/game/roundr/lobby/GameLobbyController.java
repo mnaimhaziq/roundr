@@ -7,7 +7,7 @@ import javafx.fxml.FXML;
 public class GameLobbyController {
 
     @FXML
-    public void handleLeaveLobbyButtonClick() throws IOException {
+    private void handleLeaveLobbyButtonClick() throws IOException {
         App.setScene("MainMenu");
     }
     

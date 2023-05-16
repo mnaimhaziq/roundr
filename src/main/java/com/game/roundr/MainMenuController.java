@@ -14,12 +14,14 @@ public class MainMenuController {
     @FXML
     private TextField inputNameTextField;
 
-    public void handleCreateLobbyButtonClick() throws IOException {
+    @FXML
+    private void handleCreateLobbyButtonClick() throws IOException {
         if (checkIsValidInputName())
             App.setScene("lobby/CreateLobby");
     }
 
-    public void handleJoinLobbyButtonClick() throws IOException {
+    @FXML
+    private void handleJoinLobbyButtonClick() throws IOException {
         if (checkIsValidInputName())
             App.setScene("lobby/JoinLobby");
     }
