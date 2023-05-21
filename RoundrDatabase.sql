@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS `chat` (
   KEY `FK_chat_player` (`player_id`),
   CONSTRAINT `FK_chat_game` FOREIGN KEY (`game_id`) REFERENCES `game` (`game_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `FK_chat_player` FOREIGN KEY (`player_id`) REFERENCES `player` (`player_id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Dumping data for table game.chat: ~0 rows (approximately)
 DELETE FROM `chat`;
@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS `game` (
   `turn_time_limit` int NOT NULL DEFAULT '0',
   `word_limit` int NOT NULL DEFAULT '0',
   PRIMARY KEY (`game_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Dumping data for table game.game: ~0 rows (approximately)
 DELETE FROM `game`;
@@ -52,7 +52,7 @@ CREATE TABLE IF NOT EXISTS `player` (
   `player_id` int NOT NULL AUTO_INCREMENT,
   `username` varchar(50) NOT NULL,
   PRIMARY KEY (`player_id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Dumping data for table game.player: ~0 rows (approximately)
 DELETE FROM `player`;
@@ -73,7 +73,7 @@ CREATE TABLE IF NOT EXISTS `player_game` (
   KEY `FK_player_game_player` (`player_id`),
   CONSTRAINT `FK_player_game_game` FOREIGN KEY (`game_id`) REFERENCES `game` (`game_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `FK_player_game_player` FOREIGN KEY (`player_id`) REFERENCES `player` (`player_id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Dumping data for table game.player_game: ~0 rows (approximately)
 DELETE FROM `player_game`;
@@ -87,7 +87,7 @@ CREATE TABLE IF NOT EXISTS `round` (
   PRIMARY KEY (`round_id`),
   KEY `FK_round_game` (`game_id`),
   CONSTRAINT `FK_round_game` FOREIGN KEY (`game_id`) REFERENCES `game` (`game_id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Dumping data for table game.round: ~0 rows (approximately)
 DELETE FROM `round`;
@@ -106,7 +106,7 @@ CREATE TABLE IF NOT EXISTS `turn` (
   KEY `FK__player` (`player_id`),
   CONSTRAINT `FK__player` FOREIGN KEY (`player_id`) REFERENCES `player` (`player_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `FK__round` FOREIGN KEY (`round_id`) REFERENCES `round` (`round_id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Dumping data for table game.turn: ~0 rows (approximately)
 DELETE FROM `turn`;
