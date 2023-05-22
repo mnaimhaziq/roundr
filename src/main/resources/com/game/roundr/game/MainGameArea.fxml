@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<HBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <VBox alignment="CENTER" prefHeight="700.0" prefWidth="500.0">
+         <children>
+            <HBox alignment="CENTER" prefHeight="71.0" prefWidth="354.0">
+               <children>
+                  <Label graphicTextGap="3.0" text="ROUND">
+                     <font>
+                        <Font name="Berlin Sans FB Demi Bold" size="36.0" />
+                     </font>
+                  </Label>
+                  <Label alignment="CENTER" text="1">
+                     <font>
+                        <Font name="Berlin Sans FB Demi Bold" size="36.0" />
+                     </font>
+                     <HBox.margin>
+                        <Insets left="20.0" />
+                     </HBox.margin>
+                  </Label>
+               </children>
+               <VBox.margin>
+                  <Insets bottom="100.0" />
+               </VBox.margin>
+            </HBox>
+            <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="46.0" prefWidth="400.0" text="RANDOM WORD">
+               <font>
+                  <Font size="30.0" />
+               </font>
+               <VBox.margin>
+                  <Insets bottom="100.0" />
+               </VBox.margin>
+            </Label>
+            <Label alignment="CENTER" prefWidth="400.0" text="PLEASE TYPE THE WORD ABOVE">
+               <font>
+                  <Font name="Inter Semi Bold" size="20.0" />
+               </font>
+               <VBox.margin>
+                  <Insets />
+               </VBox.margin>
+            </Label>
+            <HBox alignment="CENTER" prefHeight="60.0" prefWidth="354.0">
+               <children>
+                  <TextField alignment="CENTER" promptText="Enter your answer">
+                     <font>
+                        <Font name="Inter Regular" size="18.0" />
+                     </font></TextField>
+                  <Button alignment="CENTER_RIGHT" mnemonicParsing="false" style="-fx-background-color: lightblue;" text="Submit" textFill="WHITE">
+                     <font>
+                        <Font name="Inter Regular" size="18.0" />
+                     </font></Button>
+               </children>
+            </HBox>
+            <HBox alignment="CENTER" prefHeight="28.0" prefWidth="354.0">
+               <children>
+                  <Label text="Time Left:  ">
+                     <font>
+                        <Font name="Inter Regular" size="12.0" />
+                     </font>
+                  </Label>
+                  <Label text="8">
+                     <font>
+                        <Font name="Inter Regular" size="12.0" />
+                     </font>
+                  </Label>
+                  <Label text="s">
+                     <font>
+                        <Font name="Inter Regular" size="12.0" />
+                     </font>
+                  </Label>
+               </children>
+            </HBox>
+            <HBox alignment="CENTER" prefHeight="42.0" prefWidth="354.0">
+               <children>
+                  <Button mnemonicParsing="false" style="-fx-background-color: D9D9D9;" text="Leave Game">
+                     <font>
+                        <Font name="Inter Regular" size="16.0" />
+                     </font>
+                     <HBox.margin>
+                        <Insets right="10.0" />
+                     </HBox.margin>
+                  </Button>
+                  <Button mnemonicParsing="false" style="-fx-background-color: D9D9D9;" text="End Game">
+                     <font>
+                        <Font name="Inter Regular" size="16.0" />
+                     </font>
+                  </Button>
+               </children>
+            </HBox>
+         </children></VBox>
+      <VBox alignment="CENTER" prefHeight="700.0" prefWidth="500.0">
+         <children>
+            <HBox alignment="CENTER" prefHeight="250.0" prefWidth="200.0">
+               <children>
+                  <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
+                     <children>
+                        <Label text="Ranking" />
+                        <ListView prefHeight="200.0" prefWidth="200.0" />
+                     </children>
+                  </VBox>
+                  <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
+                     <children>
+                        <Label text="Score" />
+                        <ListView prefHeight="200.0" prefWidth="200.0" />
+                     </children>
+                  </VBox>
+               </children>
+            </HBox>
+            <VBox alignment="CENTER" prefHeight="350.0" prefWidth="500.0">
+               <children>
+                  <ScrollPane prefHeight="200.0" prefWidth="200.0">
+                    <content>
+                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="200.0" prefWidth="200.0" />
+                    </content>
+                  </ScrollPane>
+                  <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
+                     <children>
+                        <TextField promptText="Enter your message">
+                           <font>
+                              <Font name="Inter Regular" size="18.0" />
+                           </font></TextField>
+                        <Button mnemonicParsing="false" style="-fx-background-color: lightblue;" text="Send" textFill="WHITE">
+                           <font>
+                              <Font name="Inter Regular" size="18.0" />
+                           </font></Button>
+                     </children>
+                  </HBox>
+               </children></VBox>
+         </children></VBox>
+   </children>
+</HBox>
