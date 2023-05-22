@@ -38,7 +38,7 @@ public class MainMenuController {
         // Check if the input already exists
         try {
             Connection conn = new DatabaseConnection().getConnection();
-            PreparedStatement stmt = conn.prepareStatement("SELECT * FROM users WHERE username = ?");
+            PreparedStatement stmt = conn.prepareStatement("SELECT * FROM player WHERE username = ?");
             stmt.setString(1, inputName);
             ResultSet rs = stmt.executeQuery();
 
