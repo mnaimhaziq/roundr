@@ -7,10 +7,14 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 
 public class App extends Application {
 
     private static Scene scene;
+    public static String username = "";
 
     @Override
     public void start(Stage stage) throws IOException {
@@ -19,6 +23,18 @@ public class App extends Application {
         stage.setTitle("Rounder");
         stage.setScene(scene);
         stage.show();
+    }
+
+    @Override
+    public void stop() {
+        try {
+            Connection conn = new DatabaseConnection().getConnection();
+            PreparedStatement stmt = conn.prepareStatement("DELETE FROM player WHERE username = ?");
+            stmt.setString(1, username);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     // Use to change the scene

@@ -35,7 +35,7 @@
                         <Font name="Inter Bold" size="20.0" />
                      </font>
                   </Label>
-                  <TextField fx:id="inputNameTextField" prefHeight="35.0" prefWidth="265.0">
+                  <TextField fx:id="nameTextField" prefHeight="35.0" prefWidth="265.0">
                      <font>
                         <Font name="Inter Regular" size="18.0" />
                      </font>
