@@ -112,9 +112,9 @@
                         <Insets right="30.0" />
                      </HBox.margin>
                   </Label>
-                  <TextField alignment="CENTER" editable="false" prefHeight="36.0" prefWidth="200.0" style="-fx-background-color: #9DFDCF;" text="U239E93">
+                  <TextField alignment="CENTER" editable="false" prefHeight="36.0" prefWidth="200.0" style="-fx-background-color: #7dddfc;" text="U239E93">
                      <font>
-                        <Font name="Inter Regular" size="18.0" />
+                        <Font name="Berlin Sans FB Demi Bold" size="18.0" />
                      </font>
                   </TextField>
                </children>
