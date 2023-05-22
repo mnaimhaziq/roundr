@@ -5,7 +5,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<HBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1">
+<HBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.game.roundr.game.MainGameAreaController">
    <children>
       <VBox alignment="CENTER" prefHeight="700.0" prefWidth="500.0">
          <children>
@@ -78,7 +78,7 @@
             </HBox>
             <HBox alignment="CENTER" prefHeight="42.0" prefWidth="354.0">
                <children>
-                  <Button mnemonicParsing="false" style="-fx-background-color: D9D9D9;" text="Leave Game">
+                  <Button mnemonicParsing="false" onMouseClicked="#handleLeaveGameButton" style="-fx-background-color: D9D9D9;" text="Leave Game">
                      <font>
                         <Font name="Inter Regular" size="16.0" />
                      </font>
@@ -86,7 +86,7 @@
                         <Insets right="10.0" />
                      </HBox.margin>
                   </Button>
-                  <Button mnemonicParsing="false" style="-fx-background-color: D9D9D9;" text="End Game">
+                  <Button mnemonicParsing="false" onMouseClicked="#handleEndGameButton" style="-fx-background-color: D9D9D9;" text="End Game">
                      <font>
                         <Font name="Inter Regular" size="16.0" />
                      </font>

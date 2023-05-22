@@ -15,6 +15,7 @@ import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
@@ -61,7 +62,11 @@ public class JoinLobbyController implements Initializable {
         // Set styling of the list cells
         lobbyList.setCellFactory((ListView<Game> l) -> new LobbyCell());
     }
-    
+
+    public void handleJoinLobbyButton() throws IOException{
+        App.setScene("game/MainGameArea");
+    }
+
     private class LobbyCell extends ListCell<Game> {
 
         @Override

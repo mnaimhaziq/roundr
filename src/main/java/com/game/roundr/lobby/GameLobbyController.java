@@ -10,5 +10,10 @@ public class GameLobbyController {
     private void handleLeaveLobbyButtonClick() throws IOException {
         App.setScene("MainMenu");
     }
+
+    @FXML
+    private void handleReadyButton() throws IOException{
+        App.setScene("game/MainGameArea");
+    }
     
 }
