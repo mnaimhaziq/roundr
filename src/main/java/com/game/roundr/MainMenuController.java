@@ -68,9 +68,11 @@ public class MainMenuController implements Initializable {
                 PreparedStatement stmt = conn.prepareStatement("UPDATE `player` SET `username` = ? WHERE `username` = ?");
                 stmt.setString(1, inputName);
                 stmt.setString(2, App.username);
-                stmt.executeQuery();
+                stmt.executeUpdate();
                 App.username = inputName;
             } catch (SQLException e) {
+                Alert alert = new Alert(Alert.AlertType.WARNING, "This name is already taken.");
+                alert.showAndWait();
                 return false;
             }
         }
