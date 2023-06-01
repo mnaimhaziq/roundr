@@ -135,19 +135,19 @@
       </VBox>
       <VBox alignment="CENTER_LEFT" prefHeight="370.0" prefWidth="500.0">
          <children>
-            <ScrollPane hbarPolicy="NEVER" maxHeight="525.0" maxWidth="330.0" prefHeight="525.0" prefWidth="330.0">
+            <ScrollPane hbarPolicy="NEVER" maxHeight="525.0" maxWidth="330.0" prefHeight="525.0" prefWidth="330.0" style="-fx-background-color: A8E5F9;">
                <content>
-                  <ListView prefHeight="525.0" prefWidth="330.0" />
+                  <AnchorPane prefHeight="525.0" prefWidth="330.0" style="-fx-background-color: A8E5F9;"/>
                </content>
             </ScrollPane>
             <HBox prefHeight="40.0" prefWidth="200.0">
                <children>
-                  <TextField maxWidth="330.0" prefHeight="40.0" prefWidth="262.0">
+                  <TextField fx:id="messageField" maxWidth="330.0" prefHeight="40.0" prefWidth="262.0" promptText="Enter Your Message" style="-fx-background-color: D9D9D9; -fx-border-radius: 0; -fx-border-color: 000000;">
                      <font>
-                        <Font name="Inter Regular" size="18.0" />
+                        <Font name="Inter Regular" size="14.0" />
                      </font>
                   </TextField>
-                  <Button alignment="CENTER" mnemonicParsing="false" prefHeight="40.0" style="-fx-background-color: #61B3FF;" text="Submit" textFill="WHITE">
+                  <Button fx:id="sendButton" alignment="CENTER" mnemonicParsing="false" prefHeight="40.0" prefWidth="68.0" style="-fx-background-color: #61B3FF; -fx-border-radius: 0; -fx-border-color: 000000;" text="Send" textFill="WHITE">
                      <font>
                         <Font name="Inter Bold" size="14.0" />
                      </font>
