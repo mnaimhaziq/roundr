@@ -19,7 +19,7 @@ public class Game {
         this.playerLimit = playerLimit;
         this.numOfPlayers = numOfPlayers;
     }
-    
+
     public int getGameID() {
         return gameID;
     }

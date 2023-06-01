@@ -1,3 +1,4 @@
+
 package com.game.roundr.lobby;
 
 import com.game.roundr.App;
@@ -8,6 +9,9 @@ import java.net.URL;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ResourceBundle;
+
+import com.game.roundr.networking.Client;
+import com.game.roundr.networking.Server;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -27,12 +31,17 @@ public class JoinLobbyController implements Initializable {
     @FXML
     private ListView<Game> lobbyList;
 
+    private Client client;
+    private Server server;
     ObservableList<Game> gameData = FXCollections.observableArrayList();
-    
+
     @FXML
     private void handleMainMenuButtonClick() throws IOException {
+
         App.setScene("MainMenu");
     }
+
+
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -63,8 +72,21 @@ public class JoinLobbyController implements Initializable {
         lobbyList.setCellFactory((ListView<Game> l) -> new LobbyCell());
     }
 
+
+
     public void handleJoinLobbyButton() throws IOException{
-        App.setScene("game/MainGameArea");
+        App.setRole("Client");
+        createClient("localhost", 9001);
+        App.setScene("lobby/GameLobby");
+
+    }
+
+    private void createClient(String serverAddress, int serverPort) {
+        App.client = new Client( serverAddress, serverPort, App.username);
+        App.server = null;
+        System.out.println("Connected to server: " + serverAddress + ":" + serverPort);
+        System.out.println("App.client: " + App.client);
+
     }
 
     private class LobbyCell extends ListCell<Game> {
@@ -96,8 +118,8 @@ public class JoinLobbyController implements Initializable {
         lobbyName.setFont(new Font("Inter Bold", 18.0));
         lobbyName.setWrappingWidth(320.0);
 
-        Text playerCount = new Text(game.getNumOfPlayers() 
-                + "/" 
+        Text playerCount = new Text(game.getNumOfPlayers()
+                + "/"
                 + game.getPlayerLimit());
         playerCount.setFont(new Font("Inter Bold", 18.0));
 
