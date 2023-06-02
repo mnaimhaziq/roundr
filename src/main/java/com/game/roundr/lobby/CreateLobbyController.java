@@ -39,6 +39,10 @@ public class CreateLobbyController implements Initializable {
             ol.add(i + 1);
         }
         roundsBox.getItems().addAll(ol);
+        ol.clear();
+        for (int i = 1; i < 9; i++) {
+            ol.add(i + 1);
+        }
         wordBox.getItems().addAll(ol);
         ol.clear();
         for (int i = 0; i < 60; i++) {
