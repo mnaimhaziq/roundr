@@ -4,10 +4,22 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
+<<<<<<< HEAD
     <list default="true" id="b0af88c7-7b06-4eb5-a716-af1e9edea658" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/RoundrDatabase.sql" beforeDir="false" afterPath="$PROJECT_DIR$/RoundrDatabase.sql" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/game/roundr/DatabaseConnection.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/game/roundr/DatabaseConnection.java" afterDir="false" />
+=======
+    <list default="true" id="3342c805-5eef-4dc4-b4d6-19836917aa0b" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/runConfigurations/roundr.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/game/roundr/game/EndGamePopupController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/game/roundr/game/LeaveGamePopupController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/com/game/roundr/game/EndGamePopup.fxml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/com/game/roundr/game/LeaveGamePopup.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/game/roundr/game/MainGameAreaController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/game/roundr/game/MainGameAreaController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/game/roundr/game/MainGameArea.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/game/roundr/game/MainGameArea.fxml" afterDir="false" />
+>>>>>>> 3250d76482921653e65878f43ccc9adf25e72490
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -20,7 +32,19 @@
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
+<<<<<<< HEAD
   <component name="ProjectId" id="2Qc35atfD0s10djtBN235IVec42" />
+=======
+  <component name="MavenImportPreferences">
+    <option name="generalSettings">
+      <MavenGeneralSettings>
+        <option name="mavenHome" value="Use Maven wrapper" />
+        <option name="useMavenConfig" value="true" />
+      </MavenGeneralSettings>
+    </option>
+  </component>
+  <component name="ProjectId" id="2QmZ5KqxP66IVf1rREjNkyZ2tzE" />
+>>>>>>> 3250d76482921653e65878f43ccc9adf25e72490
   <component name="ProjectViewState">
     <option name="foldersAlwaysOnTop" value="false" />
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -30,6 +54,7 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+<<<<<<< HEAD
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true"
   }
@@ -53,15 +78,36 @@
         <item itemvalue="Application.App" />
       </list>
     </recent_temporary>
+=======
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "last_opened_file_path": "C:/Users/P_za/Dropbox/My PC (LAPTOP-KU420AAC)/Desktop/Software Engineering/WIF3003 Concurrent Programming/Roundr/roundr/src/main/resources/com/game/roundr/game"
+  }
+}]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\P_za\Dropbox\My PC (LAPTOP-KU420AAC)\Desktop\Software Engineering\WIF3003 Concurrent Programming\Roundr\roundr\src\main\resources\com\game\roundr\game" />
+    </key>
+    <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="com.game.roundr.game" />
+    </key>
+>>>>>>> 3250d76482921653e65878f43ccc9adf25e72490
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
+<<<<<<< HEAD
       <changelist id="b0af88c7-7b06-4eb5-a716-af1e9edea658" name="Changes" comment="" />
       <created>1685638863936</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1685638863936</updated>
+=======
+      <changelist id="3342c805-5eef-4dc4-b4d6-19836917aa0b" name="Changes" comment="" />
+      <created>1685960540594</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1685960540594</updated>
+>>>>>>> 3250d76482921653e65878f43ccc9adf25e72490
     </task>
     <servers />
   </component>
