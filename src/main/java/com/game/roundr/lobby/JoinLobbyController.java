@@ -1,4 +1,3 @@
-
 package com.game.roundr.lobby;
 
 import com.game.roundr.App;
@@ -9,9 +8,7 @@ import java.net.URL;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ResourceBundle;
-
-import com.game.roundr.networking.Client;
-import com.game.roundr.networking.Server;
+import com.game.roundr.network.Client;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -19,7 +16,6 @@ import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.*;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
@@ -31,8 +27,6 @@ public class JoinLobbyController implements Initializable {
     @FXML
     private ListView<Game> lobbyList;
 
-    private Client client;
-    private Server server;
     ObservableList<Game> gameData = FXCollections.observableArrayList();
 
     @FXML
@@ -40,8 +34,14 @@ public class JoinLobbyController implements Initializable {
 
         App.setScene("MainMenu");
     }
-
-
+    
+    public void handleJoinLobbyButton() throws IOException {
+        App.client = new Client("localhost", App.username);
+        App.client.startClient();
+        
+        // Change view
+        App.setScene("lobby/GameLobby");
+    }
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -70,23 +70,6 @@ public class JoinLobbyController implements Initializable {
         lobbyList.setItems(gameData);
         // Set styling of the list cells
         lobbyList.setCellFactory((ListView<Game> l) -> new LobbyCell());
-    }
-
-
-
-    public void handleJoinLobbyButton() throws IOException{
-        App.setRole("Client");
-        createClient("localhost", 9001);
-        App.setScene("lobby/GameLobby");
-
-    }
-
-    private void createClient(String serverAddress, int serverPort) {
-        App.client = new Client( serverAddress, serverPort, App.username);
-        App.server = null;
-        System.out.println("Connected to server: " + serverAddress + ":" + serverPort);
-        System.out.println("App.client: " + App.client);
-
     }
 
     private class LobbyCell extends ListCell<Game> {

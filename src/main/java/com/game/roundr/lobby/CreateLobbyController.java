@@ -1,20 +1,14 @@
-
 package com.game.roundr.lobby;
 
 import com.game.roundr.App;
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.URL;
-import java.net.UnknownHostException;
 import java.util.ResourceBundle;
-
-import com.game.roundr.networking.Client;
-import com.game.roundr.networking.Server;
+import com.game.roundr.network.Server;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Alert;
 import javafx.scene.control.ComboBox;
 
 public class CreateLobbyController implements Initializable {
@@ -28,8 +22,6 @@ public class CreateLobbyController implements Initializable {
     @FXML
     private ComboBox<Integer> wordBox;
 
-
-
     @FXML
     private void handleMainMenuButtonClick() throws IOException {
 
@@ -38,16 +30,14 @@ public class CreateLobbyController implements Initializable {
 
     @FXML
     private void handleCreateLobbyButtonClick() throws IOException {
-        // Create the server when the button is clicked
+        // Create a server when the button is clicked
         App.server = new Server(App.username);
-        App.client = null;// Start the server
-        App.setRole("Server");
-        System.out.println(App.server);
-
+        App.client = null;
+        App.server.startServer(); // start the server
     }
 
     @Override
-    public void initialize(URL url, ResourceBundle rb) {
+    public void initialize(URL url, ResourceBundle rb) { // When setScene
         // Add options to combo boxes
         ObservableList<Integer> ol = FXCollections.observableArrayList();
         for (int i = 0; i < 10; i++) {
@@ -66,6 +56,5 @@ public class CreateLobbyController implements Initializable {
         timeBox.getItems().addAll(ol);
         playerBox.getItems().addAll(2, 3, 4, 5, 6);
     }
-
 
 }

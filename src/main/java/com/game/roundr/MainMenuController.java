@@ -16,9 +16,6 @@ public class MainMenuController implements Initializable {
     @FXML
     private TextField nameTextField;
 
-
-
-
     @FXML
     private void handleCreateLobbyButtonClick() throws IOException {
         if (checkIsValidInputName()) {
