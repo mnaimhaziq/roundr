@@ -3,9 +3,16 @@ package com.game.roundr.game;
 import com.game.roundr.App;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.layout.AnchorPane;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import javafx.util.Duration;
 
 import java.io.IOException;
@@ -20,21 +27,26 @@ public class MainGameAreaController {
 
     @FXML
     private Button endGameButton;
+
     @FXML
     private Button leaveGameButton;
 
     @FXML
     private Button submitButton;
 
+    @FXML
+    private AnchorPane rootPane; // Reference to the root pane of the popup
+
     private int roundCount;
     private int roundLimit;
     private int timeLimit;
     private int currentPlayer = 1;
-    private int totalPlayers = 4; // Change this to the actual number of players
+    final int totalPlayers = 4; // Change this to the actual number of players
 
     private Timeline timer;
 
     public void initialize() {
+        System.out.println("MainGameAreaController initialized");
         // Set initial values for round count, time limit, and word length
         roundCount = 1;
         timeLimit = 10;
@@ -51,10 +63,12 @@ public class MainGameAreaController {
             }
         });
 
+
         // Start the first player's turn
         startPlayerTurn();
 
     }
+
 
     private void updateLabels() {
         roundLabel.setText("ROUND " + roundCount);
@@ -65,13 +79,13 @@ public class MainGameAreaController {
         // Logic to start the current player's turn
         System.out.println("Player " + currentPlayer + "'s turn");
 
-        // Add your code here to generate a random word and display it on the screen for the current player's turn
+        // random word generator
 
         // Start the timer for the player's turn
         startTimer();
     }
 
-    private void startTimer() {
+    void startTimer() {
         AtomicInteger remainingTime = new AtomicInteger(timeLimit);
 
         // Update the UI with the remaining time
@@ -97,14 +111,18 @@ public class MainGameAreaController {
         timer.play();
     }
 
-    private void stopTimer() {
+    void stopTimer() {
         if (timer != null) {
             timer.stop();
         }
     }
 
+    void resumeTimer() {
+        timer.play();
+    }
+
     private void handlePlayerTurnEnd() throws IOException {
-        // Add your logic to handle the end of the player's turn, such as calculating the score and updating game state
+        // calculate score and update game state
 
         // Stop the timer
         stopTimer();
@@ -131,7 +149,7 @@ public class MainGameAreaController {
         roundCount++;
         System.out.println("Round " + roundCount + " started!");
 
-        // Add your code here to reset any necessary game variables or UI elements for the new round
+        // ... codes
 
         updateLabels(); // Update the labels to reflect the new round
 
@@ -139,24 +157,55 @@ public class MainGameAreaController {
         startPlayerTurn();
     }
 
+
     private void endGame() throws IOException {
-        handleEndGameButton();
-    }
+        // calculate final score
 
-
-    @FXML
-    private void handleEndGameButton() throws IOException {
-        // Add your logic to calculate the final score, determine the winner, and perform any necessary actions
-        // For now, let's just print a message
         System.out.println("Game ended!");
         App.setScene("game/Scoreboard");
     }
 
     @FXML
+    private void handleEndGameButton() {
+        // Pause the timer
+        timer.pause();
+
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("EndGamePopup.fxml"));
+            Parent popupRoot = loader.load();
+            EndGamePopupController popupController = loader.getController();
+
+            // Pass the timer and resume function to the popup controller
+            popupController.initData(timer, new Runnable() {
+                @Override
+                public void run() {
+                    resumeTimer();
+                }
+            });
+
+            Stage popupStage = new Stage();
+            popupStage.initModality(Modality.APPLICATION_MODAL);
+            popupStage.initOwner(endGameButton.getScene().getWindow());
+            popupStage.setScene(new Scene(popupRoot));
+            popupStage.showAndWait();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
     private void handleLeaveGameButton() throws IOException {
-        // Add your logic to handle leaving the game, such as cleaning up game data or notifying other players
-        // For now, let's just print a message
-        System.out.println("Left the game!");
-        App.setScene("lobby/JoinLobby");
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("LeaveGamePopup.fxml"));
+            Parent popupRoot = loader.load();
+
+            Stage popupStage = new Stage();
+            popupStage.initModality(Modality.APPLICATION_MODAL);
+            popupStage.initOwner(leaveGameButton.getScene().getWindow());
+            popupStage.setScene(new Scene(popupRoot));
+            popupStage.showAndWait();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
