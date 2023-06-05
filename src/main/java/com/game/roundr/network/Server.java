@@ -37,14 +37,13 @@ public class Server {
 
     public void closeServer() {
         Message msg = new Message(MessageType.DISCONNECT,
-                hostUsername, "Server closed.");
+                hostUsername, "Server closed");
 
-        // send server disconnection message to all players except itself
-        for (int i = 1; i < players.size(); i++) {
-            msg.setSenderName(players.get(i).getUsername());
+        // send server shutdown message to all connected players
+        while (!handlers.isEmpty()) {
             try {
-                handlers.get(i-1).output.writeObject(msg);
-                handlers.get(i-1).closeConnection();
+                handlers.get(0).output.writeObject(msg);
+                handlers.get(0).closeConnection();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -52,6 +51,7 @@ public class Server {
         
         // close server socket
         listener.closeServerSocket();
+        App.server = null;
     }
 
     public String getPlayerList() {

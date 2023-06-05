@@ -31,16 +31,12 @@ public class JoinLobbyController implements Initializable {
 
     @FXML
     private void handleMainMenuButtonClick() throws IOException {
-
         App.setScene("MainMenu");
     }
-    
-    public void handleJoinLobbyButton() throws IOException {
+
+    public void handleJoinLobbyButton() {
         App.client = new Client("localhost", App.username);
         App.client.startClient();
-        
-        // Change view
-        App.setScene("lobby/GameLobby");
     }
 
     @Override
@@ -53,13 +49,14 @@ public class JoinLobbyController implements Initializable {
                     .executeQuery();
             while (rs.next()) {
                 gameData.add(new Game(
-                        rs.getInt(1),
-                        rs.getString(2),
-                        rs.getInt(3),
-                        rs.getInt(4),
-                        rs.getInt(5),
-                        rs.getInt(6),
-                        rs.getInt(7)
+                        rs.getInt("game_id"),
+                        rs.getString("game_status"),
+                        rs.getInt("turn_rounds"),
+                        rs.getInt("turn_time_limit"),
+                        rs.getInt("word_length"),
+                        rs.getInt("player_limit"),
+                        rs.getInt("player_count"),
+                        rs.getString("ip_address")
                 ));
             }
         } catch (SQLException e) {

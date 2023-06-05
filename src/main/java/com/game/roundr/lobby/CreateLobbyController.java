@@ -37,7 +37,6 @@ public class CreateLobbyController implements Initializable {
     private void handleCreateLobbyButtonClick() throws IOException {
         // Create a server when the button is clicked
         App.server = new Server(App.username);
-        App.client = null;
         App.server.startServer(); // start the server
 
         try {

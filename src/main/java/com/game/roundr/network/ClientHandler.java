@@ -49,14 +49,16 @@ public class ClientHandler implements Runnable {
                                 // add the new player
                                 clientUsername = inboundMsg.getSenderName();
                                 server.handlers.add(this);
-                                server.players.add(new Player(inboundMsg.getSenderName(), socket.getInetAddress()));
+                                server.players.add(new Player(
+                                        inboundMsg.getSenderName(), socket.getInetAddress()));
 
                                 // tell other players that a new player have connected
                                 outboundMsg.setMsgType(MessageType.USER_JOINED);
                                 outboundMsg.setSenderName(inboundMsg.getSenderName());
+                                outboundMsg.setContent(server.getPlayerList());
                                 broadcastMessage(outboundMsg);
 
-                                // tell the new player that the connection succedded
+                                // tell the new player that the connection succeeded
                                 outboundMsg.setMsgType(MessageType.CONNECT_OK);
                                 outboundMsg.setSenderName(server.hostUsername);
                                 outboundMsg.setContent(server.getPlayerList());
@@ -72,9 +74,6 @@ public class ClientHandler implements Runnable {
                             // TODO: add the message to the chat areas
                             System.out.println("Chat: " + inboundMsg.getSenderName() + " has left");
 
-                            // tell other players of the disconnection
-                            broadcastMessage(inboundMsg);
-
                             // remove the player from the list
                             for (int i = 0; i < server.players.size(); i++) {
                                 if (server.players.get(i).getUsername().equals(inboundMsg.getSenderName())) {
@@ -82,6 +81,10 @@ public class ClientHandler implements Runnable {
                                     break;
                                 }
                             }
+                            
+                            // tell other players of the disconnection
+                            inboundMsg.setContent(server.getPlayerList());
+                            broadcastMessage(inboundMsg);
 
                             // close socket
                             closeConnection();
@@ -91,7 +94,6 @@ public class ClientHandler implements Runnable {
                             System.out.println("Server: Received unknown message type: " + inboundMsg.getMsgType());
                         }
                     }
-                    // handle based on messageType
                 }
             }
         } catch (SocketException e) {
@@ -99,13 +101,11 @@ public class ClientHandler implements Runnable {
                 System.out.println("Server: Client connection reset");
             }
             else if (e.getMessage().contains("Socket closed")) {
-                System.out.println("Server: Client socket is closed");
+                System.out.println("Server: Client socket closed");
             } else {
                 e.printStackTrace();
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
+        } catch (IOException | ClassNotFoundException e) { // other errs
             e.printStackTrace();
         } finally {
             closeConnection();

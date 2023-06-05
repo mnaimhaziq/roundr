@@ -48,8 +48,6 @@ public class ClientListener implements Runnable {
                         }
                         case CONNECT_OK -> {
                             App.setScene("lobby/GameLobby");
-                            System.out.println("Client: Connected to server at -" + address);
-                            System.out.println("List: " + client.extractUserList(inboundMsg.getContent()).size());
 
                             // TODO: add the message to the chat
                             System.out.println("Chat: " + client.username + " has joined");
@@ -61,14 +59,14 @@ public class ClientListener implements Runnable {
                             break;
                         }
                         case DISCONNECT -> {
-                            if (inboundMsg.getSenderName().equals(client.username)) { // the server's closed
+                            if (inboundMsg.getContent().equals("Server closed")) { // the server has closed
+                                // show alert
+                                System.out.println("Disconnected from server");
+                                App.client = null;
+                                
                                 // switch view
                                 App.setScene("MainMenu");
-
-                                // show alert
-                                System.out.println("Disconnected from server. Message: " + inboundMsg.getContent());
-                                App.client = null;
-                            } else { // a player have disconnected
+                            } else { // a player disconnected
                                 // TODO: add message to the chat
                                 System.out.println("Chat: " + inboundMsg.getSenderName() + " has left");
                             }
@@ -81,16 +79,18 @@ public class ClientListener implements Runnable {
                 }
             }
         } catch (SocketException e) {
-            System.out.println("Socket exception");
             if (e instanceof ConnectException) {
-                System.out.println("Connection failed " + e.getMessage());
-            } else if (e.getMessage().equals("Connection reset")) {
-                System.out.println("Connection closed");
+                System.out.println("Client: Connection failed");
+            } 
+            else if (e.getMessage().equals("Connection reset")) {
+                System.out.println("Client: Connection closed");
             }
-            e.printStackTrace();
         } catch (IOException e) {
-            System.out.println("Connection closed");
+            System.out.println("Client: Connection closed");
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
-        }    }
+        } finally {
+            App.client = null; // remove client socket if there is error
+        }
+    }
 }

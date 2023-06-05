@@ -9,8 +9,9 @@ public class Game {
     private int wordLength;
     private int playerLimit;
     private int numOfPlayers;
+    private String ipAddress;
 
-    public Game(int gameID, String gameStatus, int numOfRounds, int turnTimeLimit, int wordLength, int playerLimit, int numOfPlayers) {
+    public Game(int gameID, String gameStatus, int numOfRounds, int turnTimeLimit, int wordLength, int playerLimit, int numOfPlayers, String ipAddress) {
         this.gameID = gameID;
         this.gameStatus = gameStatus;
         this.numOfRounds = numOfRounds;
@@ -18,6 +19,7 @@ public class Game {
         this.wordLength = wordLength;
         this.playerLimit = playerLimit;
         this.numOfPlayers = numOfPlayers;
+        this.ipAddress = ipAddress;
     }
 
     public int getGameID() {
