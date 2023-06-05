@@ -46,6 +46,8 @@ public class ClientHandler implements Runnable {
                                 outboundMsg.setMsgType(MessageType.CONNECT_FAILED);
                                 outboundMsg.setContent("The lobby is full");
                             } else {
+                                // TODO update the db
+                                
                                 // add the new player
                                 clientUsername = inboundMsg.getSenderName();
                                 server.handlers.add(this);

@@ -16,6 +16,7 @@ import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
@@ -45,7 +46,11 @@ public class JoinLobbyController implements Initializable {
         try {
             ResultSet rs = new DatabaseConnection()
                     .getConnection()
-                    .prepareStatement("SELECT * FROM game LIMIT 10;")
+                    .prepareStatement("""
+                                      SELECT game.*, player.username AS host_name FROM game 
+                                      JOIN player_game ON game.game_id = player_game.game_id
+                                      JOIN player ON player.player_id = player_game.player_id 
+                                      AND player_game.is_host = '1' LIMIT 10;""")
                     .executeQuery();
             while (rs.next()) {
                 gameData.add(new Game(
@@ -56,7 +61,8 @@ public class JoinLobbyController implements Initializable {
                         rs.getInt("word_length"),
                         rs.getInt("player_limit"),
                         rs.getInt("player_count"),
-                        rs.getString("ip_address")
+                        rs.getString("ip_address"),
+                        rs.getString("host_name")
                 ));
             }
         } catch (SQLException e) {
@@ -94,7 +100,7 @@ public class JoinLobbyController implements Initializable {
             circle.setFill(Color.web("#FF7171"));
         }
 
-        Text lobbyName = new Text("Player" + "'s Lobby");
+        Text lobbyName = new Text(game.getHostName() + "'s Lobby");
         lobbyName.setFont(new Font("Inter Bold", 18.0));
         lobbyName.setWrappingWidth(320.0);
 
@@ -104,6 +110,12 @@ public class JoinLobbyController implements Initializable {
         playerCount.setFont(new Font("Inter Bold", 18.0));
 
         hBox.getChildren().addAll(circle, lobbyName, playerCount);
+
+        hBox.setOnMouseClicked((MouseEvent e) -> {
+            App.client = new Client(game.getIpAddress(), App.username);
+            App.client.startClient();
+        });
+
         return hBox;
     }
 

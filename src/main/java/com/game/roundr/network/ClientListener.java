@@ -61,7 +61,7 @@ public class ClientListener implements Runnable {
                         case DISCONNECT -> {
                             if (inboundMsg.getContent().equals("Server closed")) { // the server has closed
                                 // show alert
-                                System.out.println("Disconnected from server");
+                                System.out.println("Disconnected from server.");
                                 App.client = null;
                                 
                                 // switch view

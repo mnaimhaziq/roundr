@@ -10,8 +10,19 @@ public class Game {
     private int playerLimit;
     private int numOfPlayers;
     private String ipAddress;
+    private String hostName;
 
-    public Game(int gameID, String gameStatus, int numOfRounds, int turnTimeLimit, int wordLength, int playerLimit, int numOfPlayers, String ipAddress) {
+    public Game(
+            int gameID,
+            String gameStatus,
+            int numOfRounds,
+            int turnTimeLimit,
+            int wordLength,
+            int playerLimit,
+            int numOfPlayers,
+            String ipAddress,
+            String hostName
+    ) {
         this.gameID = gameID;
         this.gameStatus = gameStatus;
         this.numOfRounds = numOfRounds;
@@ -20,6 +31,7 @@ public class Game {
         this.playerLimit = playerLimit;
         this.numOfPlayers = numOfPlayers;
         this.ipAddress = ipAddress;
+        this.hostName = hostName;
     }
 
     public int getGameID() {
@@ -30,12 +42,32 @@ public class Game {
         return gameStatus;
     }
 
+    public int getNumOfRounds() {
+        return numOfRounds;
+    }
+
+    public int getTurnTimeLimit() {
+        return turnTimeLimit;
+    }
+
+    public int getWordLength() {
+        return wordLength;
+    }
+
     public int getPlayerLimit() {
         return playerLimit;
     }
 
     public int getNumOfPlayers() {
         return numOfPlayers;
+    }
+
+    public String getIpAddress() {
+        return ipAddress;
+    }
+
+    public String getHostName() {
+        return hostName;
     }
 
 }
