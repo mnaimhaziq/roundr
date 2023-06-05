@@ -39,7 +39,6 @@ DELETE FROM `chat`;
 -- Dumping structure for table game.game
 CREATE TABLE IF NOT EXISTS `game` (
   `game_id` int NOT NULL AUTO_INCREMENT,
-  `games_status` varchar(50) NOT NULL,
   `turn_rounds` int NOT NULL DEFAULT '0',
   `turn_time_limit` int NOT NULL DEFAULT '0',
   `word_length` int NOT NULL DEFAULT '0',
@@ -57,10 +56,10 @@ DELETE FROM `game`;
 CREATE TABLE IF NOT EXISTS `player` (
   `player_id` int NOT NULL AUTO_INCREMENT,
   `username` varchar(50) NOT NULL,
-  `ip_address` varchar(50) NOT NULL,
+  `ip_address` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
   PRIMARY KEY (`player_id`) USING BTREE,
   UNIQUE KEY `username` (`username`)
-) ENGINE=InnoDB AUTO_INCREMENT=31 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=33 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Dumping data for table game.player: ~0 rows (approximately)
 DELETE FROM `player`;
@@ -71,7 +70,7 @@ CREATE TABLE IF NOT EXISTS `player_game` (
   `game_id` int NOT NULL DEFAULT '0',
   `player_id` int NOT NULL DEFAULT '0',
   `is_host` tinyint NOT NULL DEFAULT '0',
-  `player_color` int NOT NULL DEFAULT '0',
+  `player_color` varchar(7) NOT NULL DEFAULT '0',
   `final_score` int NOT NULL DEFAULT '0',
   `status` enum('ready','not_ready') DEFAULT 'not_ready',
   PRIMARY KEY (`player_game_id`),
