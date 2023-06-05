@@ -3,6 +3,7 @@ package com.game.roundr.network;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 
 public class ServerListener implements Runnable {
 
@@ -24,6 +25,8 @@ public class ServerListener implements Runnable {
                 // create a new thread to handle the player connection
                 new Thread(new ClientHandler(socket, server)).start();
             }
+        } catch (SocketException e) {
+            System.out.println("Server: Server socket closed");
         } catch (IOException e) {
             System.out.println("Server: Unable to accept the new connection");
         } finally {

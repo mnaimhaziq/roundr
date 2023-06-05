@@ -96,10 +96,10 @@ public class ClientHandler implements Runnable {
             }
         } catch (SocketException e) {
             if (e.getMessage().contains("Connection reset")) {
-                System.out.println("Connection closed");
+                System.out.println("Server: Client connection reset");
             }
             else if (e.getMessage().contains("Socket closed")) {
-                System.out.println("Socket closed");
+                System.out.println("Server: Client socket is closed");
             } else {
                 e.printStackTrace();
             }
