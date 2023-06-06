@@ -16,7 +16,7 @@
 
 
 -- Dumping database structure for game
-CREATE DATABASE IF NOT EXISTS `game` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
+CREATE DATABASE IF NOT EXISTS `game` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
 USE `game`;
 
 -- Dumping structure for table game.chat
@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS `chat` (
   KEY `FK_chat_player` (`player_id`),
   CONSTRAINT `FK_chat_game` FOREIGN KEY (`game_id`) REFERENCES `game` (`game_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `FK_chat_player` FOREIGN KEY (`player_id`) REFERENCES `player` (`player_id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Dumping data for table game.chat: ~0 rows (approximately)
 DELETE FROM `chat`;
@@ -44,10 +44,10 @@ CREATE TABLE IF NOT EXISTS `game` (
   `word_length` int NOT NULL DEFAULT '0',
   `player_limit` int NOT NULL DEFAULT '0',
   `player_count` int NOT NULL DEFAULT '0',
-  `game_status` enum('ready','not_ready') CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT 'not_ready',
+  `game_status` enum('ready','not_ready') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'not_ready',
   `ip_address` varchar(50) NOT NULL,
   PRIMARY KEY (`game_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Dumping data for table game.game: ~0 rows (approximately)
 DELETE FROM `game`;
@@ -59,7 +59,11 @@ CREATE TABLE IF NOT EXISTS `player` (
   `ip_address` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
   PRIMARY KEY (`player_id`) USING BTREE,
   UNIQUE KEY `username` (`username`)
+<<<<<<< HEAD
+) ENGINE=InnoDB AUTO_INCREMENT=31 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+=======
 ) ENGINE=InnoDB AUTO_INCREMENT=33 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+>>>>>>> 4ca29b21ce2babb96b19325d2cbcfe5c912c8dad
 
 -- Dumping data for table game.player: ~0 rows (approximately)
 DELETE FROM `player`;
@@ -78,7 +82,7 @@ CREATE TABLE IF NOT EXISTS `player_game` (
   KEY `FK_player_game_player` (`player_id`),
   CONSTRAINT `FK_player_game_game` FOREIGN KEY (`game_id`) REFERENCES `game` (`game_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `FK_player_game_player` FOREIGN KEY (`player_id`) REFERENCES `player` (`player_id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Dumping data for table game.player_game: ~0 rows (approximately)
 DELETE FROM `player_game`;
@@ -91,7 +95,7 @@ CREATE TABLE IF NOT EXISTS `round` (
   PRIMARY KEY (`round_id`),
   KEY `FK_round_game` (`game_id`),
   CONSTRAINT `FK_round_game` FOREIGN KEY (`game_id`) REFERENCES `game` (`game_id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Dumping data for table game.round: ~0 rows (approximately)
 DELETE FROM `round`;
@@ -109,7 +113,7 @@ CREATE TABLE IF NOT EXISTS `turn` (
   KEY `FK__player` (`player_id`),
   CONSTRAINT `FK__player` FOREIGN KEY (`player_id`) REFERENCES `player` (`player_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `FK__round` FOREIGN KEY (`round_id`) REFERENCES `round` (`round_id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Dumping data for table game.turn: ~0 rows (approximately)
 DELETE FROM `turn`;
