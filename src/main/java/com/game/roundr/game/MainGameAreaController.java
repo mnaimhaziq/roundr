@@ -11,6 +11,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -23,10 +24,24 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import java.io.BufferedReader;
+import com.google.gson.Gson;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+
 public class MainGameAreaController {
 
     @FXML
     private Label roundLabel;
+
+    @FXML
+    private Label randomWord;
+
+    @FXML
+    private TextField submitText;
+
     @FXML
     private Label timeLimitLabel;
 
@@ -102,9 +117,62 @@ public class MainGameAreaController {
         return playerLimit;
     }
 
+    // Check if matched?
+    private void isMatched(){
+        if(submitText.equals(randomWord.getText())){
+            System.out.println("correct");
+        } else {
+            System.out.println("incorrect");
+        }
+    }
+
     private void updateLabels() {
         roundLabel.setText("ROUND " + roundCount);
         timeLimitLabel.setText("Time Limit: " + timeLimit + " seconds");
+    }
+
+    private String getRandomWord(){
+        try {
+            // Create URL object with the API endpoint
+            URL url = new URL("https://random-word-api.vercel.app/api?words=1&length=" + wordLength + "");
+
+            // Create HttpURLConnection object and open connection
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
+            // Set request method to GET
+            connection.setRequestMethod("GET");
+
+            // Get the response code
+            int responseCode = connection.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                // Create BufferedReader to read the response
+                BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+
+                // Read the response line by line
+                String line;
+                StringBuilder response = new StringBuilder();
+                while ((line = reader.readLine()) != null) {
+                    response.append(line);
+                }
+                reader.close();
+
+                // Parse the JSON response using Gson
+                Gson gson = new Gson();
+                String[] words = gson.fromJson(response.toString(), String[].class);
+
+                // Extract the word from the array
+                String word = words[0];
+
+                // Print and return the word
+                System.out.println(word);
+                return word;
+            } else {
+                System.out.println("GET request failed. Response Code: " + responseCode);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     private void startPlayerTurn() {
@@ -112,6 +180,7 @@ public class MainGameAreaController {
         System.out.println("Player " + playerCount + "'s turn");
 
         // random word generator
+        randomWord.setText(getRandomWord());
 
         // Start the timer for the player's turn
         startTimer();
