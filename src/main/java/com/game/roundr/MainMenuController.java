@@ -1,7 +1,9 @@
 package com.game.roundr;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -15,9 +17,6 @@ public class MainMenuController implements Initializable {
 
     @FXML
     private TextField nameTextField;
-
-
-
 
     @FXML
     private void handleCreateLobbyButtonClick() throws IOException {
@@ -54,13 +53,16 @@ public class MainMenuController implements Initializable {
             // Try insert in the db
             try {
                 Connection conn = new DatabaseConnection().getConnection();
-                PreparedStatement stmt = conn.prepareStatement("INSERT INTO player(username) VALUES(?)");
+                PreparedStatement stmt = conn.prepareStatement("INSERT INTO player(username, ip_address) VALUES(?, ?)");
                 stmt.setString(1, inputName);
+                stmt.setString(2, InetAddress.getLocalHost().getHostAddress());
                 stmt.executeUpdate();
             } catch (SQLException e) {
                 Alert alert = new Alert(Alert.AlertType.WARNING, "This name is already taken.");
                 alert.showAndWait();
                 return false;
+            } catch (UnknownHostException e) { 
+                e.printStackTrace();
             }
             App.username = inputName;
         // Check if the name is changed

@@ -1,4 +1,3 @@
-
 package com.game.roundr.lobby;
 
 import com.game.roundr.App;
@@ -9,9 +8,7 @@ import java.net.URL;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ResourceBundle;
-
-import com.game.roundr.networking.Client;
-import com.game.roundr.networking.Server;
+import com.game.roundr.network.Client;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -19,7 +16,6 @@ import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.*;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
@@ -31,17 +27,17 @@ public class JoinLobbyController implements Initializable {
     @FXML
     private ListView<Game> lobbyList;
 
-    private Client client;
-    private Server server;
     ObservableList<Game> gameData = FXCollections.observableArrayList();
 
     @FXML
     private void handleMainMenuButtonClick() throws IOException {
-
         App.setScene("MainMenu");
     }
 
-
+    public void handleJoinLobbyButton() {
+        App.client = new Client("localhost", App.username);
+        App.client.startClient();
+    }
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -53,13 +49,14 @@ public class JoinLobbyController implements Initializable {
                     .executeQuery();
             while (rs.next()) {
                 gameData.add(new Game(
-                        rs.getInt(1),
-                        rs.getString(2),
-                        rs.getInt(3),
-                        rs.getInt(4),
-                        rs.getInt(5),
-                        rs.getInt(6),
-                        rs.getInt(7)
+                        rs.getInt("game_id"),
+                        rs.getString("game_status"),
+                        rs.getInt("turn_rounds"),
+                        rs.getInt("turn_time_limit"),
+                        rs.getInt("word_length"),
+                        rs.getInt("player_limit"),
+                        rs.getInt("player_count"),
+                        rs.getString("ip_address")
                 ));
             }
         } catch (SQLException e) {
@@ -70,23 +67,6 @@ public class JoinLobbyController implements Initializable {
         lobbyList.setItems(gameData);
         // Set styling of the list cells
         lobbyList.setCellFactory((ListView<Game> l) -> new LobbyCell());
-    }
-
-
-
-    public void handleJoinLobbyButton() throws IOException{
-        App.setRole("Client");
-        createClient("localhost", 9001);
-        App.setScene("lobby/GameLobby");
-
-    }
-
-    private void createClient(String serverAddress, int serverPort) {
-        App.client = new Client( serverAddress, serverPort, App.username);
-        App.server = null;
-        System.out.println("Connected to server: " + serverAddress + ":" + serverPort);
-        System.out.println("App.client: " + App.client);
-
     }
 
     private class LobbyCell extends ListCell<Game> {
