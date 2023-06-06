@@ -4,6 +4,7 @@ import com.game.roundr.App;
 import javafx.animation.Timeline;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.stage.Stage;
 import com.game.roundr.game.MainGameAreaController;
 
@@ -12,9 +13,10 @@ import java.io.IOException;
 public class EndGamePopupController {
     @FXML
     private Button yesButton;
-
     @FXML
     private Button cancelButton;
+    @FXML
+    private Label playersLabel;
 
     private Timeline timer;
     private Runnable resumeFunction;
@@ -23,6 +25,18 @@ public class EndGamePopupController {
         this.timer = timer;
         this.resumeFunction = resumeFunction;
     }
+
+    public void initialize(){
+        updateLabel();
+    }
+
+    private void updateLabel(){
+        // Get number of votes
+        MainGameAreaController mgac = new MainGameAreaController();
+        int totalPlayers = mgac.getPlayers();
+        playersLabel.setText(totalPlayers + " players voted");
+    }
+
     @FXML
     private void handleYesButton() throws IOException {
 

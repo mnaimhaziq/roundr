@@ -19,6 +19,10 @@ public class LeaveGamePopupController {
         // Close the popup
         Stage popupStage = (Stage) yesButton.getScene().getWindow();
         popupStage.close();
+
+//        App.client.closeClient();
+//        App.client = null;
+
         System.out.println("Successfully Leave the game!");
         App.setScene("lobby/JoinLobby");
     }

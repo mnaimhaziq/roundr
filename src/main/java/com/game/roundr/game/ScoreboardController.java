@@ -35,11 +35,24 @@ public class ScoreboardController {
     @FXML
     private void redirectToMainMenu() {
         try {
+            // Handle server disconnection
+            if (App.server != null) {
+                App.server.closeServer();
+                App.server = null;
+            }
+            // Handle client disconnection
+            else if (App.client != null) {
+                App.client.closeClient();
+                App.client = null;
+            }
             App.setScene("MainMenu");
+
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
+
+
 
     @FXML
     private void startTimer() {
