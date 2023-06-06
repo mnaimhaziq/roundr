@@ -2,41 +2,29 @@ package com.game.roundr.lobby;
 
 import com.game.roundr.App;
 import java.io.IOException;
-
-import com.game.roundr.networking.Client;
-import com.game.roundr.networking.Server;
 import javafx.fxml.FXML;
 
 public class GameLobbyController {
 
-
-
     @FXML
     private void handleLeaveLobbyButtonClick() throws IOException {
-        // Disconnect the server or client based on the role
-        System.out.println("client" + App.client);
-        if (App.playerRole.equals("Server")) {
-            App.server.CloseServer();
+        // Handle server disconnection
+        if (App.server != null) {
+            App.server.closeServer();
             App.server = null;
-            App.setScene("MainMenu");
         }
-
-        else if (App.playerRole.equals("Client")) {
-            App.client.CloseClient();
+        // Handle client disconnection
+        else if (App.client != null) {
+            App.client.closeClient();
             App.client = null;
-            App.setScene("MainMenu");
         }
+        App.setScene("MainMenu");
     }
-
-
-
 
     @FXML
     private void handleReadyButton() throws IOException{
         App.setScene("game/MainGameArea");
     }
-
-
 
 }
 
