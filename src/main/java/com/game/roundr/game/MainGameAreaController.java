@@ -1,6 +1,7 @@
 package com.game.roundr.game;
 
 import com.game.roundr.App;
+import com.game.roundr.DatabaseConnection;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
@@ -16,6 +17,10 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class MainGameAreaController {
@@ -34,23 +39,49 @@ public class MainGameAreaController {
     @FXML
     private Button submitButton;
 
-    @FXML
-    private AnchorPane rootPane; // Reference to the root pane of the popup
-
-    private int roundCount;
+    private int roundCount = 1;
     private int roundLimit;
     private int timeLimit;
-    private int currentPlayer = 1;
-    final int totalPlayers = 4; // Change this to the actual number of players
+    private int wordLength;
+    private int playerCount; // Turn order of players
+    private int playerLimit; // Total number of players
+    private int gameId;
 
     private Timeline timer;
 
     public void initialize() {
-        System.out.println("MainGameAreaController initialized");
-        // Set initial values for round count, time limit, and word length
-        roundCount = 1;
-        timeLimit = 10;
-        roundLimit = 5;
+
+        try {
+            Connection conn = new DatabaseConnection().getConnection();
+
+            // Get game information from database
+            PreparedStatement stmt = conn.prepareStatement("SELECT turn_rounds, turn_time_limit, " +
+                    "word_length, player_limit, player_count " +
+                    "FROM game " +
+                    "JOIN player_game ON game.game_id = player_game.game_id");
+
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+
+                // Set initial values for round count, time limit, and word length
+
+                roundLimit = rs.getInt("turn_rounds");
+                timeLimit = rs.getInt("turn_time_limit");
+                wordLength = rs.getInt("word_length");
+                playerLimit = rs.getInt("player_limit");
+                playerCount = rs.getInt("player_count");
+
+            }
+
+            // Close the result set, statement, and connection
+            rs.close();
+            stmt.close();
+            conn.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
 
         // Update UI labels with initial values
         updateLabels();
@@ -63,12 +94,13 @@ public class MainGameAreaController {
             }
         });
 
-
         // Start the first player's turn
         startPlayerTurn();
-
     }
 
+    int getPlayers(){
+        return playerLimit;
+    }
 
     private void updateLabels() {
         roundLabel.setText("ROUND " + roundCount);
@@ -77,7 +109,7 @@ public class MainGameAreaController {
 
     private void startPlayerTurn() {
         // Logic to start the current player's turn
-        System.out.println("Player " + currentPlayer + "'s turn");
+        System.out.println("Player " + playerCount + "'s turn");
 
         // random word generator
 
@@ -117,10 +149,6 @@ public class MainGameAreaController {
         }
     }
 
-    void resumeTimer() {
-        timer.play();
-    }
-
     private void handlePlayerTurnEnd() throws IOException {
         // calculate score and update game state
 
@@ -128,15 +156,15 @@ public class MainGameAreaController {
         stopTimer();
 
         // Increment the currentPlayer for the next turn
-        currentPlayer++;
+        playerCount++;
 
-        if (roundCount == roundLimit && currentPlayer > totalPlayers) {
+        if (roundCount == roundLimit && playerCount > playerLimit) {
             // All players have finished their turns and all rounds have finished
             endGame();
 
-        } else if (currentPlayer > totalPlayers){
+        } else if (playerCount > playerLimit){
             // All players have finished their turns
-            currentPlayer = 1;
+            playerCount = 1;
             startNextRound();
         } else {
             // Start the next player's turn
@@ -156,7 +184,6 @@ public class MainGameAreaController {
         // Start the first player's turn for the new round
         startPlayerTurn();
     }
-
 
     private void endGame() throws IOException {
         // calculate final score
@@ -191,6 +218,10 @@ public class MainGameAreaController {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    void resumeTimer() {
+        timer.play();
     }
 
     @FXML
