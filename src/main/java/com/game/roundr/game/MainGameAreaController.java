@@ -22,6 +22,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import java.io.BufferedReader;
@@ -60,6 +62,8 @@ public class MainGameAreaController {
     private int wordLength;
     private int playerCount; // Turn order of players
     private int playerLimit; // Total number of players
+    private Map<String, Integer> playerScore;
+    private long startTime;
     private int gameId;
 
     private Timeline timer;
@@ -70,10 +74,15 @@ public class MainGameAreaController {
             Connection conn = new DatabaseConnection().getConnection();
 
             // Get game information from database
-            PreparedStatement stmt = conn.prepareStatement("SELECT turn_rounds, turn_time_limit, " +
-                    "word_length, player_limit, player_count " +
-                    "FROM game " +
-                    "JOIN player_game ON game.game_id = player_game.game_id");
+//            PreparedStatement stmt = conn.prepareStatement("SELECT turn_rounds, turn_time_limit, " +
+//                    "word_length, player_limit, player_count " +
+//                    "FROM game " +
+//                    "JOIN player_game ON game.game_id = player_game.game_id");
+
+            PreparedStatement stmt = conn.prepareStatement("SELECT game.turn_rounds, game.turn_time_limit, game.word_length, game.player_limit, game.player_count, player.username\n" +
+                    "FROM game\n" +
+                    "JOIN player_game ON game.game_id = player_game.game_id\n" +
+                    "JOIN player ON player.player_id = player_game.player_id");
 
             ResultSet rs = stmt.executeQuery();
 
@@ -81,11 +90,12 @@ public class MainGameAreaController {
 
                 // Set initial values for round count, time limit, and word length
 
-                roundLimit = rs.getInt("turn_rounds");
-                timeLimit = rs.getInt("turn_time_limit");
-                wordLength = rs.getInt("word_length");
-                playerLimit = rs.getInt("player_limit");
-                playerCount = rs.getInt("player_count");
+                roundLimit = rs.getInt("game.turn_rounds");
+                timeLimit = rs.getInt("game.turn_time_limit");
+                wordLength = rs.getInt("game.word_length");
+                playerLimit = rs.getInt("game.player_limit");
+                playerCount = rs.getInt("game.player_count");
+                App.username = rs.getString("player.username");
 
             }
 
@@ -98,15 +108,18 @@ public class MainGameAreaController {
             throw new RuntimeException(e);
         }
 
+        // Initialize Player - Score Map
+        playerScore = new HashMap<>();
+
+        // Initialize score
+        playerScore.put(App.username, 0);
+
         // Update UI labels with initial values
         updateLabels();
 
+        // Handle submit button click action
         submitButton.setOnAction(event -> {
-            try {
-                handlePlayerTurnEnd();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            clickSubmitButton();
         });
 
         // Start the first player's turn
@@ -117,12 +130,35 @@ public class MainGameAreaController {
         return playerLimit;
     }
 
-    // Check if matched?
-    private void isMatched(){
-        if(submitText.equals(randomWord.getText())){
-            System.out.println("correct");
+    private double calculateScore(){
+        // score = configured time limit - time taken by the player to write the correct word
+        long currentTime = System.currentTimeMillis();
+        long timeTaken = (currentTime - startTime) / 1000; // Convert to seconds
+        return timeLimit - timeTaken;
+    }
+
+    // Handle submit button
+    private void clickSubmitButton(){
+        if(isMatched()){
+            System.out.println("Point Up");
+            try {
+                handlePlayerTurnEnd();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         } else {
-            System.out.println("incorrect");
+            System.out.println("Try Again");
+        }
+    }
+
+    // Check if matched?
+    private boolean isMatched(){
+        if(submitText.getText().equals(randomWord.getText())){
+//            System.out.println("correct");
+            return true;
+        } else {
+//            System.out.println("incorrect");
+            return false;
         }
     }
 
@@ -199,7 +235,7 @@ public class MainGameAreaController {
 
             if (remainingTime.get() <= 0) {
                 // Time is up, end the player's turn
-                stopTimer();
+//                stopTimer();
                 try {
                     handlePlayerTurnEnd();
                 } catch (IOException e) {
@@ -210,11 +246,13 @@ public class MainGameAreaController {
 
         timer.setCycleCount(timeLimit);
         timer.play();
+        startTime = System.currentTimeMillis();
     }
 
     void stopTimer() {
         if (timer != null) {
             timer.stop();
+            System.out.println("Score: " + calculateScore());
         }
     }
 
