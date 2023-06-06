@@ -56,10 +56,18 @@ DELETE FROM `game`;
 CREATE TABLE IF NOT EXISTS `player` (
   `player_id` int NOT NULL AUTO_INCREMENT,
   `username` varchar(50) NOT NULL,
+<<<<<<< HEAD
  `ip_address` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
+=======
+  `ip_address` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+>>>>>>> master
   PRIMARY KEY (`player_id`) USING BTREE,
   UNIQUE KEY `username` (`username`)
+<<<<<<< HEAD
 ) ENGINE=InnoDB AUTO_INCREMENT=31 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+=======
+) ENGINE=InnoDB AUTO_INCREMENT=33 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+>>>>>>> 4ca29b21ce2babb96b19325d2cbcfe5c912c8dad
 
 -- Dumping data for table game.player: ~0 rows (approximately)
 DELETE FROM `player`;
