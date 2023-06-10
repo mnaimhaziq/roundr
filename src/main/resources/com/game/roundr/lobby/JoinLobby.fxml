@@ -1,11 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Circle?>
+<?import javafx.scene.text.Font?>
 
-<BorderPane prefHeight="700.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.game.roundr.lobby.JoinLobbyController">
+<BorderPane prefHeight="700.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.game.roundr.lobby.JoinLobbyController">
    <center>
       <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
          <children>
@@ -13,10 +23,27 @@
                <font>
                   <Font name="Berlin Sans FB Demi Bold" size="35.0" />
                </font>
-               <padding>
-                  <Insets bottom="40.0" />
-               </padding>
             </Label>
+            <Pane maxWidth="570.0" nodeOrientation="RIGHT_TO_LEFT">
+               <children>
+                  <StackPane alignment="TOP_RIGHT" maxWidth="570.0" onMouseClicked="#handleRefreshButtonClick">
+                     <children>
+                        <Circle fill="#d9d9d9" radius="15.0" stroke="#d9d9d9" strokeType="INSIDE" />
+                        <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../assets/refresh-arrow.png" />
+                           </image>
+                           <StackPane.margin>
+                              <Insets right="5.0" top="5.0" />
+                           </StackPane.margin>
+                        </ImageView>
+                     </children>
+                     <padding>
+                        <Insets bottom="15.0" />
+                     </padding>
+                  </StackPane>
+               </children>
+            </Pane>
             <ListView fx:id="lobbyList" focusTraversable="false" maxWidth="570.0" minHeight="332.0" prefHeight="332.0" prefWidth="570.0" />
             <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
                <children>
@@ -33,7 +60,7 @@
                         <Font name="Inter Regular" size="18.0" />
                      </font>
                   </TextField>
-                  <Button alignment="CENTER" mnemonicParsing="false" onMouseClicked="#handleJoinLobbyButton" prefHeight="36.0" prefWidth="60.0" style="-fx-background-color: #61B3FF;" text="Join" textFill="WHITE">
+                  <Button alignment="CENTER" mnemonicParsing="false" onMouseClicked="#handleJoinLobbyButtonClick" prefHeight="36.0" prefWidth="60.0" style="-fx-background-color: #61B3FF;" text="Join" textFill="WHITE">
                      <font>
                         <Font name="Inter Bold" size="14.0" />
                      </font>
