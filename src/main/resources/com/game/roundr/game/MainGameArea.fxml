@@ -5,7 +5,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<HBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.game.roundr.game.MainGameAreaController">
+<HBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.game.roundr.game.MainGameAreaController">
    <children>
       <VBox alignment="CENTER" prefHeight="700.0" prefWidth="500.0">
          <children>
@@ -21,6 +21,11 @@
                   <Insets bottom="100.0" />
                </VBox.margin>
             </HBox>
+            <Label fx:id="playerLabel" text="Player" translateY="-100.0">
+               <font>
+                  <Font name="Inter Semi Bold" size="24.0" />
+               </font>
+            </Label>
             <Label fx:id="randomWord" alignment="CENTER" contentDisplay="CENTER" prefHeight="46.0" prefWidth="400.0" text="RANDOM WORD">
                <font>
                   <Font size="30.0" />

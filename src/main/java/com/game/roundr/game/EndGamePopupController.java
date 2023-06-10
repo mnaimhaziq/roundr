@@ -26,16 +26,16 @@ public class EndGamePopupController {
         this.resumeFunction = resumeFunction;
     }
 
-    public void initialize(){
-        updateLabel();
-    }
-
-    private void updateLabel(){
-        // Get number of votes
-        MainGameAreaController mgac = new MainGameAreaController();
-        int totalPlayers = mgac.getPlayers();
-        playersLabel.setText(totalPlayers + " players voted");
-    }
+//    public void initialize(){
+//        updateLabel();
+//    }
+//
+//    private void updateLabel(){
+//        // Get number of votes
+//        MainGameAreaController mgac = new MainGameAreaController(timer);
+//        int totalPlayers = mgac.getPlayers();
+//        playersLabel.setText(totalPlayers + " players voted");
+//    }
 
     @FXML
     private void handleYesButton() throws IOException {

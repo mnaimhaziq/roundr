@@ -5,6 +5,7 @@ import com.game.roundr.models.Player;
 import com.game.roundr.models.Message;
 import com.game.roundr.models.MessageType;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.net.BindException;
 import java.util.ArrayList;
 
@@ -15,6 +16,7 @@ public class Server {
     private ServerListener listener;
     protected ArrayList<Player> players = new ArrayList<>();
     protected ArrayList<ClientHandler> handlers = new ArrayList<>();
+    protected ObjectOutputStream output;
 
     public Server(String username) {
         this.hostUsername = username;
@@ -66,6 +68,20 @@ public class Server {
             }
         }
         return list.toString();
+    }
+
+    public void sendEndGameRequest() {
+        Message message = new Message(MessageType.END_GAME, hostUsername, "");
+        sendMessage(message);
+    }
+
+    private void sendMessage(Message message) {
+        try {
+            output.writeObject(message);
+            output.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 }
