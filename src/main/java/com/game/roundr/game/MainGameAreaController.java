@@ -75,10 +75,11 @@ public class MainGameAreaController {
         try {
             Connection conn = new DatabaseConnection().getConnection();
 
-            PreparedStatement stmt = conn.prepareStatement("SELECT game.turn_rounds, game.turn_time_limit, game.word_length, game.player_limit, game.player_count, player.username\n" +
-                    "FROM game\n" +
-                    "JOIN player_game ON game.game_id = player_game.game_id\n" +
-                    "JOIN player ON player.player_id = player_game.player_id");
+            // Get game information from database
+            PreparedStatement stmt = conn.prepareStatement("SELECT turn_rounds, turn_time_limit, " +
+                    "word_length, player_limit, player_count " +
+                    "FROM game " +
+                    "JOIN player_game ON game.game_id = player_game.game_id");
 
             ResultSet rs = stmt.executeQuery();
 
@@ -86,12 +87,11 @@ public class MainGameAreaController {
 
                 // Set initial values for round count, time limit, and word length
 
-                roundLimit = rs.getInt("game.turn_rounds");
-                timeLimit = rs.getInt("game.turn_time_limit");
-                wordLength = rs.getInt("game.word_length");
-                playerLimit = rs.getInt("game.player_limit");
-                playerCount = rs.getInt("game.player_count");
-                App.username = rs.getString("player.username");
+                roundLimit = rs.getInt("turn_rounds");
+                timeLimit = rs.getInt("turn_time_limit");
+                wordLength = rs.getInt("word_length");
+                playerLimit = rs.getInt("player_limit");
+                playerCount = rs.getInt("player_count");
 
             }
 
@@ -103,6 +103,8 @@ public class MainGameAreaController {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+
+        System.out.println(App.username);
 
         // Initialize Player - Score Map
         playerScore = new HashMap<>();
@@ -307,9 +309,27 @@ public class MainGameAreaController {
 
     private void endGame() throws IOException {
         // calculate final score
-
         System.out.println("Game ended!");
-        App.setScene("game/Scoreboard");
+
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("Scoreboard.fxml"));
+            Parent toScoreboard = loader.load();
+            ScoreboardController toScoreboardController = loader.getController();
+
+            // Pass the playerScore data to the ScoreboardController
+            toScoreboardController.initData(playerScore);
+
+            // Assuming you have a reference to the current Scene
+            Scene currentScene = playerNameList.getScene();
+
+            // Replace the root node of the current Scene with the Scoreboard view
+            currentScene.setRoot(toScoreboard);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+//        App.setScene("game/Scoreboard");
     }
 
     @FXML
