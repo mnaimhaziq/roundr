@@ -4,9 +4,21 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="cb574f54-b554-4e38-bc79-0b92904265d3" name="Changes" comment="">
+    <list default="true" id="1e3021fd-8b8a-4376-9201-594b78d60b83" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/runConfigurations/App.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/game/roundr/App.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/game/roundr/App.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/game/roundr/game/EndGamePopupController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/game/roundr/game/EndGamePopupController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/game/roundr/game/MainGameAreaController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/game/roundr/game/MainGameAreaController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/game/roundr/lobby/GameLobbyController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/game/roundr/lobby/GameLobbyController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/game/roundr/lobby/JoinLobbyController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/game/roundr/lobby/JoinLobbyController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/game/roundr/models/MessageType.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/game/roundr/models/MessageType.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/game/roundr/network/Client.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/game/roundr/network/Client.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/game/roundr/network/ClientHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/game/roundr/network/ClientHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/game/roundr/network/ClientListener.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/game/roundr/network/ClientListener.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/game/roundr/network/Server.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/game/roundr/network/Server.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/game/roundr/network/ServerListener.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/game/roundr/network/ServerListener.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/game/roundr/game/MainGameArea.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/game/roundr/game/MainGameArea.fxml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -27,7 +39,7 @@
       </MavenGeneralSettings>
     </option>
   </component>
-  <component name="ProjectId" id="2QpguIS75VVrO04gZUyeANJbFzv" />
+  <component name="ProjectId" id="2R0w3NiFHGvCQ8OkpFUN1uzKY9Z" />
   <component name="ProjectViewState">
     <option name="foldersAlwaysOnTop" value="false" />
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -37,13 +49,23 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "project.structure.last.edited": "Project",
-    "project.structure.proportion": "0.0",
-    "project.structure.side.proportion": "0.0"
+    "RunOnceActivity.ShowReadmeOnStart": "true"
   }
 }]]></component>
   <component name="RunManager">
+    <configuration name="App" type="Application" factoryName="Application" singleton="false" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="com.game.roundr.App" />
+      <module name="roundr" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.game.roundr.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <recent_temporary>
       <list>
         <item itemvalue="Application.App" />
@@ -53,11 +75,11 @@
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="cb574f54-b554-4e38-bc79-0b92904265d3" name="Changes" comment="" />
-      <created>1686056165370</created>
+      <changelist id="1e3021fd-8b8a-4376-9201-594b78d60b83" name="Changes" comment="" />
+      <created>1686400115273</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
-      <updated>1686056165370</updated>
+      <updated>1686400115273</updated>
     </task>
     <servers />
   </component>

@@ -16,6 +16,7 @@ public class App extends Application {
     public static Server server;
     public static Client client;
 
+
     @Override
     public void start(Stage stage) throws IOException {
         scene = new Scene(loadFXML("MainMenu"));

@@ -2,6 +2,8 @@ package com.game.roundr.game;
 
 import com.game.roundr.App;
 import com.game.roundr.DatabaseConnection;
+import com.game.roundr.network.Client;
+import com.game.roundr.network.ClientListener;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
@@ -15,6 +17,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.Window;
 import javafx.util.Duration;
 
 import java.io.IOException;
@@ -37,7 +40,8 @@ public class MainGameAreaController {
 
     @FXML
     private Label roundLabel;
-
+    @FXML
+    private Label playerLabel;
     @FXML
     private Label randomWord;
 
@@ -48,7 +52,7 @@ public class MainGameAreaController {
     private Label timeLimitLabel;
 
     @FXML
-    private Button endGameButton;
+    public Button endGameButton;
 
     @FXML
     private Button leaveGameButton;
@@ -62,11 +66,37 @@ public class MainGameAreaController {
     private int wordLength;
     private int playerCount; // Turn order of players
     private int playerLimit; // Total number of players
+    private int gameId;
+    private int roundId;
+    private int playerId;
     private Map<String, Integer> playerScore;
     private long startTime;
-    private int gameId;
 
-    private Timeline timer;
+    public Timeline timer;
+
+
+
+    // Constructor
+    public MainGameAreaController() {
+        // Initialize the timer
+        this.timer = new Timeline(new KeyFrame(Duration.seconds(1), event -> {
+            // Code to update the timer label or perform actions every second
+        }));
+        this.timer.setCycleCount(Timeline.INDEFINITE); // Set the cycle count or use a specific value
+    }
+
+    // Setter method for MainGameAreaController instance
+    public void setMainGameAreaController(Timeline timer) {
+        this.timer = timer;
+    }
+
+    // Getter for the timer
+    public Timeline getTimer() {
+        return timer;
+    }
+    public void pauseTimer(){
+        timer.pause();
+    }
 
     public void initialize() {
 
@@ -79,7 +109,8 @@ public class MainGameAreaController {
 //                    "FROM game " +
 //                    "JOIN player_game ON game.game_id = player_game.game_id");
 
-            PreparedStatement stmt = conn.prepareStatement("SELECT game.turn_rounds, game.turn_time_limit, game.word_length, game.player_limit, game.player_count, player.username\n" +
+            PreparedStatement stmt = conn.prepareStatement("SELECT game.game_id, game.turn_rounds, game.turn_time_limit," +
+                    " game.word_length, game.player_limit, game.player_count, player.username \n" +
                     "FROM game\n" +
                     "JOIN player_game ON game.game_id = player_game.game_id\n" +
                     "JOIN player ON player.player_id = player_game.player_id");
@@ -96,6 +127,7 @@ public class MainGameAreaController {
                 playerLimit = rs.getInt("game.player_limit");
                 playerCount = rs.getInt("game.player_count");
                 App.username = rs.getString("player.username");
+                gameId = rs.getInt("game.game_id");
 
             }
 
@@ -122,7 +154,14 @@ public class MainGameAreaController {
             clickSubmitButton();
         });
 
+        // Handle end game button
+        endGameButton.setOnAction(event -> {
+            App.client.sendEndGameRequest();
+            handleEndGameButton();
+        });
+
         // Start the first player's turn
+        updateRoundTable();
         startPlayerTurn();
     }
 
@@ -154,16 +193,15 @@ public class MainGameAreaController {
     // Check if matched?
     private boolean isMatched(){
         if(submitText.getText().equals(randomWord.getText())){
-//            System.out.println("correct");
             return true;
         } else {
-//            System.out.println("incorrect");
             return false;
         }
     }
 
     private void updateLabels() {
         roundLabel.setText("ROUND " + roundCount);
+        playerLabel.setText("Player " + playerCount + "'s turn");
         timeLimitLabel.setText("Time Limit: " + timeLimit + " seconds");
     }
 
@@ -214,6 +252,9 @@ public class MainGameAreaController {
     private void startPlayerTurn() {
         // Logic to start the current player's turn
         System.out.println("Player " + playerCount + "'s turn");
+
+        // update players turn
+        updateLabels();
 
         // random word generator
         randomWord.setText(getRandomWord());
@@ -272,10 +313,66 @@ public class MainGameAreaController {
         } else if (playerCount > playerLimit){
             // All players have finished their turns
             playerCount = 1;
+            updateRoundTable(); // Update the round table with the current round information
             startNextRound();
         } else {
             // Start the next player's turn
             startPlayerTurn();
+        }
+
+        // Update the database with turn data
+        try {
+            Connection conn = new DatabaseConnection().getConnection();
+
+            // Get round_id from database
+            PreparedStatement statement = conn.prepareStatement("SELECT round.round_id, player_game.player_id " +
+                    "FROM round " +
+                    "JOIN player_game " +
+                    "ON round.game_id = player_game.game_id");
+
+            ResultSet rs = statement.executeQuery();
+
+            while (rs.next()) {
+                roundId = rs.getInt("round.round_id");
+                playerId = rs.getInt("player_game.player_id");
+            }
+
+            // Insert the turn data into the database
+            String query = "INSERT INTO turn (round_id, player_id, words, time_taken, score) " +
+                    "VALUES (?, ?, ?, ?, ?)";
+            PreparedStatement stmt = conn.prepareStatement(query);
+            stmt.setInt(1, roundId);
+            stmt.setInt(2, playerId);
+            stmt.setString(3, submitText.getText());
+            stmt.setLong(4, (System.currentTimeMillis() - startTime) / 1000);
+            stmt.setDouble(5, calculateScore());
+            stmt.executeUpdate();
+
+            // Close the statement and connection
+            stmt.close();
+            conn.close();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void updateRoundTable() {
+        try {
+            Connection conn = new DatabaseConnection().getConnection();
+
+            // Insert the round data into the database
+            String query = "INSERT INTO round (game_id, round_number) " +
+                    "VALUES (?, ?)";
+            PreparedStatement stmt = conn.prepareStatement(query);
+            stmt.setInt(1, gameId); // Replace 'gameId' with the actual game ID
+            stmt.setInt(2, roundCount);
+            stmt.executeUpdate();
+
+            // Close the statement and connection
+            stmt.close();
+            conn.close();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -300,7 +397,7 @@ public class MainGameAreaController {
     }
 
     @FXML
-    private void handleEndGameButton() {
+    public void handleEndGameButton() {
         // Pause the timer
         timer.pause();
 

@@ -1,8 +1,11 @@
 package com.game.roundr.network;
 
+import com.game.roundr.game.MainGameAreaController;
 import com.game.roundr.models.Player;
 import com.game.roundr.models.Message;
 import com.game.roundr.models.MessageType;
+import javafx.application.Platform;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -17,9 +20,10 @@ public class Client {
     protected final String username;
     private final int PORT = 9001;
 
-    public Client(String address, String username) {
+
+    public Client(String address, String username, MainGameAreaController mgac) {
         this.username = username;
-        this.listener = new ClientListener(address, PORT, this);
+        this.listener = new ClientListener(address, PORT, this, mgac);
     }
 
     public void startClient() {
@@ -55,5 +59,27 @@ public class Client {
 
         return list;
     }
+
+    public void sendEndGameRequest() {
+        Message message = new Message(MessageType.END_GAME, username, "");
+        sendMessage(message);
+    }
+
+    private void handleIncomingMessage(Message message) {
+        // Handle different types of messages
+//        switch (message.getMsgType()) {
+//            case END_GAME:
+//                // Handle end game message
+//                // Pause the timer and show the popup
+//                Platform.runLater(() -> {
+//                    mgac.timer.pause();
+//                    mgac.showEndGamePopup();
+//                });
+//                break;
+//            // Handle other message types as needed
+//        }
+    }
+
+
 
 }

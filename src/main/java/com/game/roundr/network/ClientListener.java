@@ -1,8 +1,22 @@
 package com.game.roundr.network;
 
 import com.game.roundr.App;
+import com.game.roundr.game.EndGamePopupController;
+import com.game.roundr.game.MainGameAreaController;
 import com.game.roundr.models.Message;
 import com.game.roundr.models.MessageType;
+import javafx.animation.Animation;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.application.Platform;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import javafx.stage.Window;
+import javafx.util.Duration;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -17,10 +31,21 @@ public class ClientListener implements Runnable {
     private final Client client;
     private final int port;
 
-    public ClientListener(String address, int port, Client client) {
+    private MainGameAreaController mgac;
+    private boolean isTimerRunning = true;
+    private Timeline timer;
+
+
+    public ClientListener(String address, int port, Client client, MainGameAreaController mgac) {
         this.address = address;
         this.client = client;
         this.port = port;
+        this.mgac = mgac;
+    }
+
+    // Method to set MainGameAreaController instance
+    public void setMainGameAreaController(MainGameAreaController mgac) {
+        this.mgac = mgac;
     }
 
     @Override
@@ -72,6 +97,35 @@ public class ClientListener implements Runnable {
                             }
                             break;
                         }
+
+                        case END_GAME -> {
+//                            // Handle end game message
+//                            System.out.println("Requested to end the game");
+//                            // Pause the timer and show the popup
+//                            Platform.runLater(() -> {
+//                                mgac.pauseTimer();
+//                                showEndGamePopup();
+//                            });
+//                            break;
+
+                            // Handle end game message
+                            System.out.println("Requested to end the game");
+
+//                            // Update the shared variable based on the timer state
+//                            boolean timerRunning = mgac.timer.getStatus() == Animation.Status.RUNNING;
+//                            isTimerRunning = timerRunning;
+//
+//                            // Pause or resume the timer based on the updated state
+//                            if (timerRunning) {
+//                                mgac.getTimer().play();
+//                            } else {
+//                                mgac.getTimer().pause();
+//                            }
+
+                            // Show the end game popup
+                            Platform.runLater(this::showEndGamePopup);
+                            break;
+                        }
                         default -> {
                             System.out.println("Client: Received unknown message type: " + inboundMsg.toString());
                         }
@@ -92,5 +146,61 @@ public class ClientListener implements Runnable {
         } finally {
             App.client = null; // remove client socket if there is error
         }
+    }
+
+    private void showEndGamePopup() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/game/roundr/game/EndGamePopup.fxml"));
+            Parent popupRoot = loader.load();
+            EndGamePopupController popupController = loader.getController();
+
+            // Pass the timer from MainGameAreaController to EndGamePopupController
+            popupController.initData(mgac.getTimer(), this::resumeTimer);
+
+            // Update the shared variable based on the timer state
+            boolean timerRunning = mgac.timer.getStatus() == Animation.Status.RUNNING;
+            isTimerRunning = timerRunning;
+
+            System.out.println(timerRunning);
+            System.out.println(mgac.getTimer());
+            // Pause or resume the timer based on the updated state
+            if (isTimerRunning) {
+                mgac.getTimer().pause();
+            }
+
+            Stage popupStage = new Stage();
+            popupStage.initModality(Modality.APPLICATION_MODAL);
+            popupStage.setScene(new Scene(popupRoot));
+
+            // Create a new stage as the owner of the popup stage
+            Stage ownerStage = new Stage();
+
+            // Set the owner of the popup stage
+            popupStage.initOwner(ownerStage);
+
+            popupStage.showAndWait();
+
+            // After the popup is closed, update the timer state based on the shared variable
+            if (isTimerRunning) {
+                mgac.getTimer().play();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void setTimer(Timeline timer) {
+        this.timer = timer;
+    }
+
+    public void resumeTimer() {
+        // Initialize the timer
+        timer = new Timeline(new KeyFrame(Duration.seconds(1), event -> {
+            // Timer logic here
+        }));
+
+        // Call the play() method
+        timer.play();
+        isTimerRunning = true;
     }
 }
