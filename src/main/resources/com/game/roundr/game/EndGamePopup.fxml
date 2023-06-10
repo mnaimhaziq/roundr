@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane fx:id="rootPane" prefHeight="126.0" prefWidth="300.0" style="-fx-background-color: lightpink;" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.game.roundr.game.EndGamePopupController">
+    <children>
+        <Label layoutX="81.0" layoutY="22.0" prefHeight="26.0" prefWidth="137.0" text="Vote for End Game!">
+         <font>
+            <Font name="Inter Semi Bold" size="14.0" />
+         </font></Label>
+        <Button fx:id="yesButton" layoutX="62.0" layoutY="93.0" minWidth="70.0" onAction="#handleYesButton" style="-fx-background-color: D9D9D9;" text="Yes">
+         <font>
+            <Font name="Inter Semi Bold" size="12.0" />
+         </font></Button>
+        <Button fx:id="cancelButton" layoutX="167.0" layoutY="93.0" minWidth="70.0" onAction="#handleCancelButton" style="-fx-background-color: D9D9D9;" text="Cancel">
+         <font>
+            <Font name="Inter Semi Bold" size="12.0" />
+         </font></Button>
+      <Label fx:id="playersLabel" layoutX="102.0" layoutY="53.0" prefHeight="18.0" prefWidth="95.0" text="Players voted">
+         <font>
+            <Font name="Inter Semi Bold" size="14.0" />
+         </font>
+      </Label>
+    </children>
+</AnchorPane>

@@ -26,6 +26,7 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
@@ -137,9 +138,9 @@ public class GameLobbyController implements Initializable {
 
     // Server Chatbox
     @FXML
-    private VBox chatS; 
+    private VBox chatS;
     @FXML
-    private ScrollPane spChatS; 
+    private ScrollPane spChatS;
     @FXML
     private TextField textFieldChatS;
     @FXML
@@ -148,7 +149,6 @@ public class GameLobbyController implements Initializable {
     private Button buttonChatSendS;
     private ArrayList<Label> listNicknameS;
     private ArrayList<Label> listReadyS;
-    
 
     // Client Chatbox
     @FXML
@@ -163,11 +163,10 @@ public class GameLobbyController implements Initializable {
     private Button buttonChatSendC;
     private ArrayList<Label> listNicknameC;
     private ArrayList<Label> listReadyC;
- 
 
     // lobby
     @FXML
-    private GridPane gridPaneUsers; 
+    private GridPane gridPaneUsers;
     @FXML
     private Button readyButton;
     @FXML
@@ -193,24 +192,24 @@ public class GameLobbyController implements Initializable {
 
         this.listNicknameS = new ArrayList<Label>();
         this.listNicknameC = new ArrayList<Label>();
-		this.listReadyS = new ArrayList<Label>();
+        this.listReadyS = new ArrayList<Label>();
         this.listReadyC = new ArrayList<Label>();
 
         // To automatically resize and scroll to the latest chat (server)
-       chatS.heightProperty().addListener(new ChangeListener<Number>() {
-        @Override
-        public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue){
-        spChatS.setVvalue((Double) newValue);
-        }
+        chatS.heightProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                spChatS.setVvalue((Double) newValue);
+            }
         });
 
         // To automatically resize and scroll to the latest chat (client)
         chatC.heightProperty().addListener(new ChangeListener<Number>() {
             @Override
-            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue){
-            spChatC.setVvalue((Double) newValue);
+            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                spChatC.setVvalue((Double) newValue);
             }
-            });
+        });
 
         // popolate the GridPane with HBox and set them not visible
         for (int i = 0; i < ROOM_CAPACITY; i++) {
@@ -249,13 +248,13 @@ public class GameLobbyController implements Initializable {
                         this.listNicknameC.add(label);
                     }
                 }
-        
+
                 username = new Label("");
                 username.setPrefSize(25, 25);
-    			username.setStyle("-fx-background-color: #D3D3D3");
-    			username.setVisible(i == 0 ? false : true);
-    			hbox.getChildren().add(username);
-    			this.listReadyC.add(username);
+                username.setStyle("-fx-background-color: #D3D3D3");
+                username.setVisible(i == 0 ? false : true);
+                hbox.getChildren().add(username);
+                this.listReadyC.add(username);
 
                 // Add HBox to the GridPane
                 this.gridPaneUsers.add(hbox, colIndex, rowIndex);
@@ -291,13 +290,13 @@ public class GameLobbyController implements Initializable {
                         this.listNicknameS.add(label);
                     }
                 }
-        
+
                 username = new Label("");
                 username.setPrefSize(25, 25);
-    			username.setStyle(i == 0 ? "-fx-background-color: #00FF00" : "-fx-background-color: #D3D3D3");
-    			username.setVisible(i == 0 ? false : true);
-    			hbox.getChildren().add(username);
-    			this.listReadyS.add(username);
+                username.setStyle(i == 0 ? "-fx-background-color: #00FF00" : "-fx-background-color: #D3D3D3");
+                username.setVisible(i == 0 ? false : true);
+                hbox.getChildren().add(username);
+                this.listReadyS.add(username);
 
                 // Add HBox to the GridPane
                 this.gridPaneUsers.add(hbox, colIndex, rowIndex);
@@ -324,31 +323,33 @@ public class GameLobbyController implements Initializable {
     private String assignColor() {
         String color = null;
         Connection conn = new DatabaseConnection().getConnection();
-        
+
         try {
             // Statement to select the player_color column
-            PreparedStatement selectStatement = conn.prepareStatement("SELECT pg.player_color FROM player_game pg JOIN player p ON pg.player_id = p.player_id WHERE p.username = ?");
+            PreparedStatement selectStatement = conn.prepareStatement(
+                    "SELECT pg.player_color FROM player_game pg JOIN player p ON pg.player_id = p.player_id WHERE p.username = ?");
             selectStatement.setString(1, App.username);
-            
+
             // Execute the select query and retrieve the result
             ResultSet resultSet = selectStatement.executeQuery();
-            
+
             if (resultSet.next()) {
                 // Check if the player_color column is empty
                 String playerColor = resultSet.getString("player_color");
-                
+
                 if (playerColor == null || playerColor.isEmpty()) {
                     // Generate a random color
                     color = randomColors();
-                    
+
                     // Try to insert the color into the database
-                    PreparedStatement insertStatement = conn.prepareStatement("UPDATE player_game pg JOIN player p ON pg.player_id = p.player_id SET pg.player_color = ? WHERE p.username = ?");
+                    PreparedStatement insertStatement = conn.prepareStatement(
+                            "UPDATE player_game pg JOIN player p ON pg.player_id = p.player_id SET pg.player_color = ? WHERE p.username = ?");
                     insertStatement.setString(1, color);
                     insertStatement.setString(2, App.username);
-                    
+
                     // Execute the update statement
                     int rowsAffected = insertStatement.executeUpdate();
-                    
+
                     if (rowsAffected == 1) {
                         // Color successfully assigned
                         App.playerColor = color;
@@ -366,7 +367,7 @@ public class GameLobbyController implements Initializable {
                 Alert alert = new Alert(Alert.AlertType.WARNING, "Player not found.");
                 alert.showAndWait();
             }
-            
+
             resultSet.close();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -379,10 +380,10 @@ public class GameLobbyController implements Initializable {
                 e.printStackTrace();
             }
         }
-        
+
         return color;
     }
-    
+
     // Allow player to toggle the Not Ready button
     // By default the player is not ready
     @FXML
@@ -406,27 +407,27 @@ public class GameLobbyController implements Initializable {
     @FXML
     public void handleSendMessageButtonS(ActionEvent event) throws IOException {
         String msg = this.textFieldChatS.getText();
-        if (!msg.isEmpty() && !msg.isBlank()){
-        HBox hBox = new HBox();
-        hBox.setAlignment(Pos.CENTER_RIGHT);
-        hBox.setPadding(new Insets(5,5,5,10));    
-        
-        Text t = new Text(msg);
-        TextFlow textFlow = new TextFlow(t);
+        if (!msg.isEmpty() && !msg.isBlank()) {
+            HBox hBox = new HBox();
+            hBox.setAlignment(Pos.CENTER_RIGHT);
+            hBox.setPadding(new Insets(5, 5, 5, 10));
 
-        textFlow.setStyle("-fx-color: rgb(239,242,255)" +
-                            "-fx-background-color: rgb(15,125,242)" +
-                            "-fx-background-radius: 20px");
+            Text t = new Text(msg);
+            TextFlow textFlow = new TextFlow(t);
 
-        textFlow.setPadding(new Insets(5,10,5,10));
-        t.setFill(Color.color(0.934,0.945,0.996));
+            textFlow.setStyle("-fx-color: rgb(239,242,255)" +
+                    "-fx-background-color: rgb(15,125,242)" +
+                    "-fx-background-radius: 20px");
 
-        hBox.getChildren().add(textFlow);
-        chatS.getChildren().add(hBox);
+            textFlow.setPadding(new Insets(5, 10, 5, 10));
+            t.setFill(Color.color(0.934, 0.945, 0.996));
 
-        this.server.sendChatMessage(msg);
-        this.textFieldChatS.setText("");
-        this.textFieldChatS.clear();
+            hBox.getChildren().add(textFlow);
+            chatS.getChildren().add(hBox);
+
+            this.server.sendChatMessage(msg);
+            this.textFieldChatS.setText("");
+            this.textFieldChatS.clear();
         }
 
     }
@@ -443,57 +444,56 @@ public class GameLobbyController implements Initializable {
     }
 
     // chat bubble for client (display from server)
-    public static void addChatBubbleS(String msg, VBox vbox ){
-        
+    public static void addChatBubbleS(String msg, VBox vbox) {
+
         HBox hBox = new HBox();
         hBox.setAlignment(Pos.CENTER_LEFT);
-        hBox.setPadding(new Insets(5,5,5,10));    
-        
+        hBox.setPadding(new Insets(5, 5, 5, 10));
+
         Text text = new Text(msg);
         TextFlow textFlow = new TextFlow(text);
 
         textFlow.setStyle("-fx-background-color: rgb(1233,233,235)" +
-                            "-fx-background-radius: 20px");
+                "-fx-background-radius: 20px");
 
-        textFlow.setPadding(new Insets(5,10,5,10));
-        text.setFill(Color.color(0.934,0.945,0.996));
+        textFlow.setPadding(new Insets(5, 10, 5, 10));
+        text.setFill(Color.color(0.934, 0.945, 0.996));
 
         hBox.getChildren().add(textFlow);
 
         Platform.runLater(new Runnable() {
             @Override
-            public void run(){
+            public void run() {
                 vbox.getChildren().add(hBox);
             }
         });
     }
 
-    
     // send message from Client
     @FXML
     public void handleSendMessageButtonC(ActionEvent event) {
         String msg = this.textFieldChatC.getText();
-        if (!msg.isEmpty() && !msg.isBlank()){
-        HBox hBox = new HBox();
-        hBox.setAlignment(Pos.CENTER_RIGHT);
-        hBox.setPadding(new Insets(5,5,5,10));    
-        
-        Text t = new Text(msg);
-        TextFlow textFlow = new TextFlow(t);
+        if (!msg.isEmpty() && !msg.isBlank()) {
+            HBox hBox = new HBox();
+            hBox.setAlignment(Pos.CENTER_RIGHT);
+            hBox.setPadding(new Insets(5, 5, 5, 10));
 
-        textFlow.setStyle("-fx-color: rgb(239,242,255)" +
-                            "-fx-background-color: rgb(15,125,242)" +
-                            "-fx-background-radius: 20px");
+            Text t = new Text(msg);
+            TextFlow textFlow = new TextFlow(t);
 
-        textFlow.setPadding(new Insets(5,10,5,10));
-        t.setFill(Color.color(0.934,0.945,0.996));
+            textFlow.setStyle("-fx-color: rgb(239,242,255)" +
+                    "-fx-background-color: rgb(15,125,242)" +
+                    "-fx-background-radius: 20px");
 
-        hBox.getChildren().add(textFlow);
-        chatS.getChildren().add(hBox);
+            textFlow.setPadding(new Insets(5, 10, 5, 10));
+            t.setFill(Color.color(0.934, 0.945, 0.996));
 
-        this.client.sendChatMessage(msg);
-        this.textFieldChatC.setText("");
-        this.textFieldChatC.clear();
+            hBox.getChildren().add(textFlow);
+            chatS.getChildren().add(hBox);
+
+            this.client.sendChatMessage(msg);
+            this.textFieldChatC.setText("");
+            this.textFieldChatC.clear();
         }
     }
 
@@ -515,52 +515,51 @@ public class GameLobbyController implements Initializable {
         return timestamp;
     }
 
-    	public void switchToServerRoom()
-	{
-		this.chatS.setVisible(true);		
-		this.state = NavState.MP_SERVER;
-	}
-	public void switchToClientRoom()
-	{
-		this.chatC.setVisible(true);	
-		this.state = NavState.MP_CLIENT;
-	}
+    public void switchToServerRoom() {
+        this.chatS.setVisible(true);
+        this.state = NavState.MP_SERVER;
+    }
+
+    public void switchToClientRoom() {
+        this.chatC.setVisible(true);
+        this.state = NavState.MP_CLIENT;
+    }
 
     // chat bubble for server (display from client)
-    public static void addChatBubbleC(String msgFromServer, VBox vBox ){
+    public static void addChatBubbleC(String msgFromServer, VBox vBox) {
         HBox hBox = new HBox();
         hBox.setAlignment(Pos.CENTER_LEFT);
-        hBox.setPadding(new Insets(5,5,5,10));    
-        
+        hBox.setPadding(new Insets(5, 5, 5, 10));
+
         Text text = new Text(msgFromServer);
         TextFlow textFlow = new TextFlow(text);
 
         textFlow.setStyle("-fx-background-color: rgb(1233,233,235)" +
-                            "-fx-background-radius: 20px");
+                "-fx-background-radius: 20px");
 
-        textFlow.setPadding(new Insets(5,10,5,10));
-        text.setFill(Color.color(0.934,0.945,0.996));
+        textFlow.setPadding(new Insets(5, 10, 5, 10));
+        text.setFill(Color.color(0.934, 0.945, 0.996));
 
         hBox.getChildren().add(textFlow);
 
         Platform.runLater(new Runnable() {
             @Override
-            public void run(){
+            public void run() {
                 vBox.getChildren().add(hBox);
             }
         });
     }
 
-    //method ni tak siap lagi
+    // method ni tak siap lagi
     public void addToChatBox(String txt) {
         // client
         if (this.state == NavState.MP_CLIENT) {
-            if (chatS.getChildren().stream().anyMatch(node -> node instanceof HBox)){
+            if (chatS.getChildren().stream().anyMatch(node -> node instanceof HBox)) {
                 // this.chatS.getChildren(Text).setText(txt);
                 addChatBubbleC(txt, chatC);
-                
-            }else
-                {this.textAreaChat.setText(this.textAreaChat.getText() + "\n" + text);
+
+            } else {
+                this.textAreaChat.setText(this.textAreaChat.getText() + "\n" + text);
                 // addChatBubbleS(txt, chatS);
             }
         }
@@ -718,26 +717,34 @@ public class GameLobbyController implements Initializable {
         // }
         // } else {
         // System.out.println("No players in the lobby.");
-
-        // Disconnect the server or client based on the role
-        System.out.println("client" + App.client);
-        if (App.playerRole.equals("Server")) {
-            App.server.CloseServer();
+        if (App.server != null) {
+            App.server.closeServer();
             App.server = null;
-            App.setScene("MainMenu");
         }
-
-        else if (App.playerRole.equals("Client")) {
-            App.client.CloseClient();
+        // Handle client disconnection
+        else if (App.client != null) {
+            App.client.closeClient();
             App.client = null;
-            App.setScene("MainMenu");
         }
+        App.setScene("MainMenu");
+        decrementTemp();
     }
 
     @FXML
     private void handleReadyButton() throws IOException {
         App.setScene("game/MainGameArea");
 
+    }
+
+    private void decrementTemp() {
+        try {
+            Connection conn = new DatabaseConnection().getConnection();
+            PreparedStatement stmt = conn.prepareStatement(
+                    "UPDATE game SET player_count = player_count - 1 WHERE game_id = (SELECT MAX(game_id) FROM game)");
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
 }

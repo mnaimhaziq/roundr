@@ -1,19 +1,47 @@
 package com.game.roundr.models;
 
-public class Player extends User {
-	private int turn;
-	// private String playerStatus;
+import java.net.InetAddress;
 
-	public Player(String nickname, int turn) {
-		super(nickname);
-		this.turn = turn;
-		// this.playerStatus = playerStatus;
+public class Player {
 
-	}
+    private String username;
+    private boolean isReady;
+    private InetAddress address;
 
-	// public String getPlayerStatus() {
-	// return playerStatus;
-	// }
+    public Player(String username) {
+        this.username = username;
+        this.isReady = false;
+    }
+
+    public Player(String username, InetAddress address) {
+        this.username = username;
+        this.address = address;
+        this.isReady = false;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public boolean isReady() {
+        return isReady;
+    }
+
+    public void setIsReady(boolean isReady) {
+        this.isReady = isReady;
+    }
+
+    public InetAddress getAddress() {
+        return address;
+    }
+
+    public void setAddress(InetAddress address) {
+        this.address = address;
+    }
 
 }
 
