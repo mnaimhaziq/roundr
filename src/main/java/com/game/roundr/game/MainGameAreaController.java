@@ -4,15 +4,14 @@ import com.game.roundr.App;
 import com.game.roundr.DatabaseConnection;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.AnchorPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Duration;
@@ -22,13 +21,13 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import java.io.BufferedReader;
 import com.google.gson.Gson;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -55,6 +54,10 @@ public class MainGameAreaController {
 
     @FXML
     private Button submitButton;
+    @FXML
+    private ListView playerNameList;
+    @FXML
+    private ListView scoreList;
 
     private int roundCount = 1;
     private int roundLimit;
@@ -65,19 +68,12 @@ public class MainGameAreaController {
     private Map<String, Integer> playerScore;
     private long startTime;
     private int gameId;
-
     private Timeline timer;
 
     public void initialize() {
 
         try {
             Connection conn = new DatabaseConnection().getConnection();
-
-            // Get game information from database
-//            PreparedStatement stmt = conn.prepareStatement("SELECT turn_rounds, turn_time_limit, " +
-//                    "word_length, player_limit, player_count " +
-//                    "FROM game " +
-//                    "JOIN player_game ON game.game_id = player_game.game_id");
 
             PreparedStatement stmt = conn.prepareStatement("SELECT game.turn_rounds, game.turn_time_limit, game.word_length, game.player_limit, game.player_count, player.username\n" +
                     "FROM game\n" +
@@ -112,7 +108,12 @@ public class MainGameAreaController {
         playerScore = new HashMap<>();
 
         // Initialize score
-        playerScore.put(App.username, 0);
+        for (int i=1; i <= playerLimit; i++) {
+            playerScore.put(Integer.toString(i), 0);
+        }
+
+        //render in-match scoreboard
+        renderLiveScoreboard();
 
         // Update UI labels with initial values
         updateLabels();
@@ -162,6 +163,16 @@ public class MainGameAreaController {
         }
     }
 
+    //render in-match scoreboard
+    void renderLiveScoreboard(){
+        // clear score in scoreboard
+        playerNameList.getItems().clear();
+        scoreList.getItems().clear();
+        // add new score in scoreboard
+        playerNameList.getItems().addAll(new ArrayList(playerScore.keySet()));
+        scoreList.getItems().addAll(new ArrayList(playerScore.values()));
+    };
+
     private void updateLabels() {
         roundLabel.setText("ROUND " + roundCount);
         timeLimitLabel.setText("Time Limit: " + timeLimit + " seconds");
@@ -199,8 +210,6 @@ public class MainGameAreaController {
                 // Extract the word from the array
                 String word = words[0];
 
-                // Print and return the word
-                System.out.println(word);
                 return word;
             } else {
                 System.out.println("GET request failed. Response Code: " + responseCode);
@@ -253,6 +262,10 @@ public class MainGameAreaController {
         if (timer != null) {
             timer.stop();
             System.out.println("Score: " + calculateScore());
+            //increment score
+            playerScore.put(Integer.toString(playerCount), playerScore.get(Integer.toString(playerCount))+(int)calculateScore());
+            //reload scoreboard
+            renderLiveScoreboard();
         }
     }
 
