@@ -3,24 +3,24 @@ package com.game.roundr.lobby;
 import com.game.roundr.App;
 import com.game.roundr.DatabaseConnection;
 import com.game.roundr.models.Game;
+import com.game.roundr.network.Client;
 import java.io.IOException;
 import java.net.URL;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ResourceBundle;
-import com.game.roundr.network.Client;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.util.Random;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
+import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
@@ -35,10 +35,12 @@ public class JoinLobbyController implements Initializable {
 
     @FXML
     private ListView<Game> lobbyList;
+    
+    ObservableList<Game> games = FXCollections.observableArrayList();
 
     @FXML
     private void handleRefreshButtonClick() throws IOException {
-        lobbyList.getItems().clear();
+        games.clear();
         getLobbies();
     }
 
@@ -48,65 +50,46 @@ public class JoinLobbyController implements Initializable {
     }
 
     @FXML
-    private void handleJoinLobbyButtonClick() {
+    private void handleJoinLobbyButtonClick() throws IOException {
         // get the game code
         String gameCode = codeTextField.getText();
 
-        // if game code exists, get its IP address
+        // if the game exists, get game IP address and connect to lobby
         try {
             Connection conn = new DatabaseConnection().getConnection();
-            PreparedStatement stmt = conn.prepareStatement("SELECT ip_address FROM game WHERE game_id = ?");
+            PreparedStatement stmt = conn.prepareStatement(
+                    "SELECT * FROM game WHERE game_id = ?");
             stmt.setString(1, gameCode);
             ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                App.client = new Client(rs.getString("ip_address"), App.username); // con
-                App.client.startClient();
 
-                // Create player_game entry in the db
-                stmt = conn.prepareStatement("INSERT INTO player_game (game_id,"
-                        + "player_id, is_host, player_color, final_score) "
-                        + "SELECT game.game_id, player.player_id, '1', ?, '0' "
-                        + "FROM game "
-                        + "JOIN player ON game.ip_address = player.ip_address "
-                        + "WHERE game.ip_address = ? "
-                        + "AND player.username = ?");
-                stmt.setString(1, getHexColorCode());
-                stmt.setString(2, InetAddress.getLocalHost().getHostAddress()); // Sets private IP
-                stmt.setString(3, App.username);
-                stmt.executeUpdate();
+            if (rs.next()) {
+                if (rs.getInt(6) < rs.getInt(5)) {
+                    joinLobby(gameCode, rs.getString(8));
+                } else {
+                    Alert alert = new Alert(Alert.AlertType.WARNING,
+                            "The lobby is full.");
+                    alert.showAndWait();
+                }
             }
-        } catch (SQLException | UnknownHostException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
-    }
-
-    private String getHexColorCode() {
-        // Colour in the pastel range (120-230)
-        Random random = new Random();
-        int r = random.nextInt(111) + 120;
-        int g = random.nextInt(111) + 120;
-        int b = random.nextInt(111) + 120;
-
-        return String.format("#%02X%02X%02X", r, g, b);
     }
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         getLobbies();
-        // Cell style
         lobbyList.setCellFactory((ListView<Game> l) -> new LobbyCell());
     }
 
     private class LobbyCell extends ListCell<Game> {
 
-        @Override
         protected void updateItem(Game item, boolean empty) {
             super.updateItem(item, empty);
             if (item != null) {
                 setGraphic(createGraphic(item));
             }
         }
-
     }
 
     // Generate lobby list cell nodes
@@ -133,26 +116,15 @@ public class JoinLobbyController implements Initializable {
 
         hBox.getChildren().addAll(circle, lobbyName, playerCount);
 
-        hBox.setOnMouseClicked((MouseEvent event) -> {
-            App.client = new Client(game.getIpAddress(), App.username);
-            App.client.startClient();
+        hBox.setOnMouseClicked((MouseEvent e) -> {
+            String gameCode = Integer.toString(game.getGameID());
 
-            try {
-                // Create player_game entry in the db
-                Connection conn = new DatabaseConnection().getConnection();
-                PreparedStatement stmt = conn.prepareStatement("INSERT INTO player_game (game_id,"
-                        + "player_id, is_host, player_color, final_score) "
-                        + "SELECT game.game_id, player.player_id, '1', ?, '0' "
-                        + "FROM game "
-                        + "JOIN player ON game.ip_address = player.ip_address "
-                        + "WHERE game.ip_address = ? "
-                        + "AND player.username = ?");
-                stmt.setString(1, getHexColorCode());
-                stmt.setString(2, InetAddress.getLocalHost().getHostAddress()); // Sets to private IP
-                stmt.setString(3, App.username);
-                stmt.executeUpdate();
-            } catch (SQLException | UnknownHostException e) {
-                e.printStackTrace();
+            if (game.getNumOfPlayers() < game.getPlayerLimit()) {
+                joinLobby(gameCode, game.getIpAddress());
+            } else {
+                Alert alert = new Alert(Alert.AlertType.WARNING,
+                        "The lobby is full.");
+                alert.showAndWait();
             }
         });
 
@@ -161,18 +133,16 @@ public class JoinLobbyController implements Initializable {
 
     private void getLobbies() {
         try {
-            ObservableList<Game> gameData = FXCollections.observableArrayList();
-
             ResultSet rs = new DatabaseConnection()
                     .getConnection()
                     .prepareStatement("""
-                                      SELECT game.*, player.username AS host_name FROM `game` 
-                                      JOIN player_game ON game.game_id = player_game.game_id
-                                      JOIN player ON player.player_id = player_game.player_id 
-                                      AND player_game.is_host = '1' LIMIT 10;""")
+                        SELECT game.*, player.username AS `host_name` FROM game 
+                        JOIN player_game ON game.game_id = player_game.game_id
+                        JOIN player ON player.player_id = player_game.player_id 
+                        AND player_game.is_host = '1' LIMIT 10;""")
                     .executeQuery();
             while (rs.next()) {
-                gameData.add(new Game(
+                games.add(new Game(
                         rs.getInt("game_id"),
                         rs.getString("game_status"),
                         rs.getInt("turn_rounds"),
@@ -184,8 +154,34 @@ public class JoinLobbyController implements Initializable {
                         rs.getString("host_name")
                 ));
             }
-            // Set the lobbies into the list
-            lobbyList.setItems(gameData);
+            lobbyList.setItems(games);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void joinLobby(String gameCode, String gameAddress) {
+        App.client = new Client(gameAddress, App.username);
+        App.client.startClient();
+
+        // update database tables
+        try {
+            // create player_game entry in the db
+            Connection conn = new DatabaseConnection().getConnection();
+            PreparedStatement stmt = conn.prepareStatement("INSERT INTO player_game"
+                    + "(game_id, player_id, is_host, player_color, final_score) "
+                    + "SELECT game.game_id, player.player_id, 0, ?, 0 FROM game "
+                    + "JOIN player WHERE game.game_id = ? AND player.username = ?");
+            stmt.setString(1, App.getHexColorCode());
+            stmt.setString(2, gameCode);
+            stmt.setString(3, App.username); // game and player details
+            stmt.executeUpdate();
+
+            // update number of players in lobby
+            stmt = conn.prepareStatement("UPDATE game "
+                    + "SET player_count = player_count + 1 WHERE game_id = ?"); // +
+            stmt.setString(1, gameCode);
+            stmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
         }

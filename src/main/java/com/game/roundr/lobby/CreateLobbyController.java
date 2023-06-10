@@ -10,7 +10,6 @@ import java.net.InetAddress;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.Random;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -35,14 +34,14 @@ public class CreateLobbyController implements Initializable {
 
     @FXML
     private void handleCreateLobbyButtonClick() throws IOException {
-        // Create a server when the button is clicked
         App.server = new Server(App.username);
-        App.server.startServer(); // start the server
+        App.server.startServer();
 
+        // update database tables
         try {
             Connection conn = new DatabaseConnection().getConnection();
 
-            // Create game entry in the database
+            // create game entry in the database
             PreparedStatement stmt = conn.prepareStatement("INSERT INTO game"
                     + "(turn_rounds, "
                     + "turn_time_limit, "
@@ -57,35 +56,25 @@ public class CreateLobbyController implements Initializable {
             stmt.setInt(4, playerBox.getValue());
             stmt.setInt(5, 1);
             stmt.setString(6,
-                    InetAddress.getLocalHost().getHostAddress()); // local
+                    InetAddress.getLocalHost().getHostAddress());
             stmt.executeUpdate();
 
-            // Create player_game entry in the db
-            stmt = conn.prepareStatement("INSERT INTO player_game (game_id,"
+            // create player_game entry for host
+            stmt = conn.prepareStatement("INSERT INTO player_game(game_id,"
                     + "player_id, is_host, player_color, final_score) "
-                    + "SELECT game.game_id, player.player_id, '1', ?, '0' "
+                    + "SELECT MAX(game.game_id), player.player_id, 1,?, 0 "
                     + "FROM game "
                     + "JOIN player ON game.ip_address = player.ip_address "
                     + "WHERE game.ip_address = ? "
                     + "AND player.username = ?");
-            stmt.setString(1,getHexColorCode()); // playerColor
+            stmt.setString(1, App.getHexColorCode());
             stmt.setString(2,
-                    InetAddress.getLocalHost().getHostAddress()); // local
+                    InetAddress.getLocalHost().getHostAddress());
             stmt.setString(3, App.username);
             stmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
         }
-    }
-
-    private String getHexColorCode() {
-        // Colour in the pastel range (120-230)
-        Random random = new Random();
-        int r = random.nextInt(111) + 120;
-        int g = random.nextInt(111) + 120;
-        int b = random.nextInt(111) + 120;
-        
-        return String.format("#%02X%02X%02X", r, g, b);
     }
 
     @Override
