@@ -6,15 +6,14 @@ import com.game.roundr.network.Client;
 import com.game.roundr.network.ClientListener;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.AnchorPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.Window;
@@ -25,13 +24,13 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import java.io.BufferedReader;
 import com.google.gson.Gson;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -59,6 +58,10 @@ public class MainGameAreaController {
 
     @FXML
     private Button submitButton;
+    @FXML
+    private ListView playerNameList;
+    @FXML
+    private ListView scoreList;
 
     private int roundCount = 1;
     private int roundLimit;
@@ -71,10 +74,7 @@ public class MainGameAreaController {
     private int playerId;
     private Map<String, Integer> playerScore;
     private long startTime;
-
     public Timeline timer;
-
-
 
     // Constructor
     public MainGameAreaController() {
@@ -104,23 +104,19 @@ public class MainGameAreaController {
             Connection conn = new DatabaseConnection().getConnection();
 
             // Get game information from database
-//            PreparedStatement stmt = conn.prepareStatement("SELECT turn_rounds, turn_time_limit, " +
-//                    "word_length, player_limit, player_count " +
-//                    "FROM game " +
-//                    "JOIN player_game ON game.game_id = player_game.game_id");
-
             PreparedStatement stmt = conn.prepareStatement("SELECT game.game_id, game.turn_rounds, game.turn_time_limit," +
                     " game.word_length, game.player_limit, game.player_count, player.username \n" +
                     "FROM game\n" +
                     "JOIN player_game ON game.game_id = player_game.game_id\n" +
                     "JOIN player ON player.player_id = player_game.player_id");
 
+
+
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
 
                 // Set initial values for round count, time limit, and word length
-
                 roundLimit = rs.getInt("game.turn_rounds");
                 timeLimit = rs.getInt("game.turn_time_limit");
                 wordLength = rs.getInt("game.word_length");
@@ -128,6 +124,8 @@ public class MainGameAreaController {
                 playerCount = rs.getInt("game.player_count");
                 App.username = rs.getString("player.username");
                 gameId = rs.getInt("game.game_id");
+
+
 
             }
 
@@ -140,11 +138,18 @@ public class MainGameAreaController {
             throw new RuntimeException(e);
         }
 
+        System.out.println(App.username);
+
         // Initialize Player - Score Map
         playerScore = new HashMap<>();
 
         // Initialize score
-        playerScore.put(App.username, 0);
+        for (int i=1; i <= playerLimit; i++) {
+            playerScore.put(Integer.toString(i), 0);
+        }
+
+        //render in-match scoreboard
+        renderLiveScoreboard();
 
         // Update UI labels with initial values
         updateLabels();
@@ -199,6 +204,16 @@ public class MainGameAreaController {
         }
     }
 
+    //render in-match scoreboard
+    void renderLiveScoreboard(){
+        // clear score in scoreboard
+        playerNameList.getItems().clear();
+        scoreList.getItems().clear();
+        // add new score in scoreboard
+        playerNameList.getItems().addAll(new ArrayList(playerScore.keySet()));
+        scoreList.getItems().addAll(new ArrayList(playerScore.values()));
+    };
+
     private void updateLabels() {
         roundLabel.setText("ROUND " + roundCount);
         playerLabel.setText("Player " + playerCount + "'s turn");
@@ -237,8 +252,6 @@ public class MainGameAreaController {
                 // Extract the word from the array
                 String word = words[0];
 
-                // Print and return the word
-                System.out.println(word);
                 return word;
             } else {
                 System.out.println("GET request failed. Response Code: " + responseCode);
@@ -294,6 +307,10 @@ public class MainGameAreaController {
         if (timer != null) {
             timer.stop();
             System.out.println("Score: " + calculateScore());
+            //increment score
+            playerScore.put(Integer.toString(playerCount), playerScore.get(Integer.toString(playerCount))+(int)calculateScore());
+            //reload scoreboard
+            renderLiveScoreboard();
         }
     }
 
@@ -391,9 +408,27 @@ public class MainGameAreaController {
 
     private void endGame() throws IOException {
         // calculate final score
-
         System.out.println("Game ended!");
-        App.setScene("game/Scoreboard");
+
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("Scoreboard.fxml"));
+            Parent toScoreboard = loader.load();
+            ScoreboardController toScoreboardController = loader.getController();
+
+            // Pass the playerScore data to the ScoreboardController
+            toScoreboardController.initData(playerScore);
+
+            // Assuming you have a reference to the current Scene
+            Scene currentScene = playerNameList.getScene();
+
+            // Replace the root node of the current Scene with the Scoreboard view
+            currentScene.setRoot(toScoreboard);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+//        App.setScene("game/Scoreboard");
     }
 
     @FXML

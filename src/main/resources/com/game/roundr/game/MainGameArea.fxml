@@ -88,13 +88,13 @@
                   <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
                      <children>
                         <Label text="Ranking" />
-                        <ListView prefHeight="200.0" prefWidth="200.0" />
+                        <ListView fx:id="playerNameList" prefHeight="200.0" prefWidth="200.0" />
                      </children>
                   </VBox>
                   <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
                      <children>
                         <Label text="Score" />
-                        <ListView prefHeight="200.0" prefWidth="200.0" />
+                        <ListView fx:id="scoreList" prefHeight="200.0" prefWidth="200.0" />
                      </children>
                   </VBox>
                </children>

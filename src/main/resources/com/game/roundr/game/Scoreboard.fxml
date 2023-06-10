@@ -1,16 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.image.Image?>
-<?import javafx.scene.image.ImageView?>
-<?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Font?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.game.roundr.game.ScoreboardController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.game.roundr.game.ScoreboardController">
    <center>
       <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="30.0" BorderPane.alignment="CENTER">
          <children>
@@ -33,7 +29,7 @@
                                     <Image url="@../assets/goldmedal.png" />
                                  </image>
                               </ImageView>
-                              <Label text="Player 1" textAlignment="CENTER">
+                              <Label fx:id="firstPlayer" text="Player 1" textAlignment="CENTER">
                                  <font>
                                     <Font name="Berlin Sans FB Demi Bold" size="35.0" />
                                  </font>
@@ -47,7 +43,7 @@
                                     <Font name="Berlin Sans FB Demi Bold" size="25.0" />
                                  </font>
                               </Label>
-                              <Label alignment="CENTER" contentDisplay="CENTER" layoutX="42.0" layoutY="32.0" prefHeight="18.0" prefWidth="38.0" text="20" textAlignment="CENTER" textFill="#00000099">
+                              <Label fx:id="firstScore" alignment="CENTER" contentDisplay="CENTER" layoutX="42.0" layoutY="32.0" prefHeight="18.0" prefWidth="38.0" text="20" textAlignment="CENTER" textFill="#00000099">
                                  <font>
                                     <Font name="Berlin Sans FB Demi Bold" size="30.0" />
                                  </font>
@@ -74,7 +70,7 @@
                                     <Insets />
                                  </HBox.margin>
                               </ImageView>
-                              <Label text="Player 2" textAlignment="CENTER">
+                              <Label fx:id="secondPlayer" text="Player 2" textAlignment="CENTER">
                                  <font>
                                     <Font name="Berlin Sans FB Demi Bold" size="35.0" />
                                  </font>
@@ -88,7 +84,7 @@
                                     <Font name="Berlin Sans FB Demi Bold" size="25.0" />
                                  </font>
                               </Label>
-                              <Label alignment="CENTER" contentDisplay="CENTER" layoutX="42.0" layoutY="32.0" prefHeight="14.0" prefWidth="38.0" text="20" textAlignment="CENTER" textFill="#00000099">
+                              <Label fx:id="secondScore" alignment="CENTER" contentDisplay="CENTER" layoutX="42.0" layoutY="32.0" prefHeight="14.0" prefWidth="38.0" text="20" textAlignment="CENTER" textFill="#00000099">
                                  <font>
                                     <Font name="Berlin Sans FB Demi Bold" size="30.0" />
                                  </font>
@@ -109,7 +105,7 @@
                                     <Image url="@../assets/bronzemedal.png" />
                                  </image>
                               </ImageView>
-                              <Label text="Player 3" textAlignment="CENTER">
+                              <Label fx:id="thirdPlayer" text="Player 3" textAlignment="CENTER">
                                  <font>
                                     <Font name="Berlin Sans FB Demi Bold" size="35.0" />
                                  </font>
@@ -123,7 +119,7 @@
                                     <Font name="Berlin Sans FB Demi Bold" size="25.0" />
                                  </font>
                               </Label>
-                              <Label alignment="CENTER" contentDisplay="CENTER" layoutX="42.0" layoutY="32.0" prefHeight="14.0" prefWidth="38.0" text="20" textAlignment="CENTER" textFill="#00000099">
+                              <Label fx:id="thirdScore" alignment="CENTER" contentDisplay="CENTER" layoutX="42.0" layoutY="32.0" prefHeight="14.0" prefWidth="38.0" text="20" textAlignment="CENTER" textFill="#00000099">
                                  <font>
                                     <Font name="Berlin Sans FB Demi Bold" size="30.0" />
                                  </font>
@@ -145,7 +141,7 @@
                   <Font name="Berlin Sans FB" size="20.0" />
                </font>
             </Label>
-            <Button mnemonicParsing="false" onMouseClicked="#redirectToMainMenu" prefHeight="30.0" prefWidth="160.0" style="-fx-background-color: D9D9D9;" text="Main Menu" textAlignment="CENTER">
+            <Button mnemonicParsing="false" onMouseClicked="#handleToMainMenuButton" prefHeight="30.0" prefWidth="160.0" style="-fx-background-color: D9D9D9;" text="Main Menu" textAlignment="CENTER">
                <font>
                   <Font name="Inter Bold" size="18.0" />
                </font>
