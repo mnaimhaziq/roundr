@@ -2,6 +2,7 @@ package com.game.roundr.lobby;
 
 import com.game.roundr.App;
 import com.game.roundr.DatabaseConnection;
+import com.game.roundr.game.MainGameAreaController;
 import com.game.roundr.models.Game;
 import com.game.roundr.network.Client;
 import java.io.IOException;
@@ -74,6 +75,12 @@ public class JoinLobbyController implements Initializable {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+  
+    public void handleJoinLobbyButton() {
+        MainGameAreaController mgac = new MainGameAreaController();
+        App.client = new Client("localhost", App.username, mgac);
+        App.client.startClient();
     }
 
     @Override

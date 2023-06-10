@@ -10,6 +10,7 @@ import javafx.fxml.FXML;
 
 public class GameLobbyController {
 
+
     @FXML
     private void handleLeaveLobbyButtonClick() throws IOException {
         // Handle server disconnection

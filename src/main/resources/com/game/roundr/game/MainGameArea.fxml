@@ -21,7 +21,12 @@
                   <Insets bottom="100.0" />
                </VBox.margin>
             </HBox>
-            <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="46.0" prefWidth="400.0" text="RANDOM WORD">
+            <Label fx:id="playerLabel" text="Player" translateY="-100.0">
+               <font>
+                  <Font name="Inter Semi Bold" size="24.0" />
+               </font>
+            </Label>
+            <Label fx:id="randomWord" alignment="CENTER" contentDisplay="CENTER" prefHeight="46.0" prefWidth="400.0" text="RANDOM WORD">
                <font>
                   <Font size="30.0" />
                </font>
@@ -39,7 +44,7 @@
             </Label>
             <HBox alignment="CENTER" prefHeight="60.0" prefWidth="354.0">
                <children>
-                  <TextField alignment="CENTER" promptText="Enter your answer">
+                  <TextField fx:id="submitText" alignment="CENTER" promptText="Enter your answer">
                      <font>
                         <Font name="Inter Regular" size="18.0" />
                      </font></TextField>
@@ -83,13 +88,13 @@
                   <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
                      <children>
                         <Label text="Ranking" />
-                        <ListView prefHeight="200.0" prefWidth="200.0" />
+                        <ListView fx:id="playerNameList" prefHeight="200.0" prefWidth="200.0" />
                      </children>
                   </VBox>
                   <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
                      <children>
                         <Label text="Score" />
-                        <ListView prefHeight="200.0" prefWidth="200.0" />
+                        <ListView fx:id="scoreList" prefHeight="200.0" prefWidth="200.0" />
                      </children>
                   </VBox>
                </children>

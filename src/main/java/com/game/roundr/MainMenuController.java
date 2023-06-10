@@ -61,7 +61,7 @@ public class MainMenuController implements Initializable {
                 Alert alert = new Alert(Alert.AlertType.WARNING, "This name is already taken.");
                 alert.showAndWait();
                 return false;
-            } catch (UnknownHostException e) { 
+            } catch (UnknownHostException e) {
                 e.printStackTrace();
             }
             App.username = inputName;

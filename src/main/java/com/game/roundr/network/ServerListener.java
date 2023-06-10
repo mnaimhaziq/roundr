@@ -1,5 +1,8 @@
 package com.game.roundr.network;
 
+import com.game.roundr.models.Message;
+import com.game.roundr.models.MessageType;
+
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -41,6 +44,23 @@ public class ServerListener implements Runnable {
             }
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    public void sendEndGameRequestToClients() {
+        Message message = new Message(MessageType.END_GAME, server.hostUsername, "");
+        broadcastMessageToClients(message);
+    }
+
+    public void broadcastMessageToClients(Message message) {
+        // Send the message to all connected clients
+        for (ClientHandler handler : server.handlers) {
+            try {
+                handler.output.writeObject(message);
+                handler.output.flush();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 }

@@ -18,7 +18,7 @@
          <font>
             <Font name="Inter Semi Bold" size="12.0" />
          </font></Button>
-      <Label layoutX="102.0" layoutY="53.0" prefHeight="18.0" prefWidth="95.0" text="Players voted">
+      <Label fx:id="playersLabel" layoutX="102.0" layoutY="53.0" prefHeight="18.0" prefWidth="95.0" text="Players voted">
          <font>
             <Font name="Inter Semi Bold" size="14.0" />
          </font>
