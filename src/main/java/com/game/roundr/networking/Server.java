@@ -1,28 +1,36 @@
 package com.game.roundr.networking;
 
 import com.game.roundr.App;
+import com.game.roundr.lobby.GameLobbyController;
 import com.game.roundr.models.User;
 import com.game.roundr.models.chat.Message;
 import com.game.roundr.models.chat.MessageType;
+
+import javafx.scene.layout.VBox;
 
 import java.io.*;
 import java.net.*;
 import java.util.ArrayList;
 
-public class Server {
+public class Server implements ServerInt{
     private static final int PORT = 9001;
     private String nickname;
     private int minToStartGame = 2;
     private int maxNumUsers = 6;
+    private GameLobbyController controller;
     private ServerListener serverListener;
 
     private ArrayList<User> users;
     private ArrayList<ObjectOutputStream> writers;
 
-    public Server(String nickname) {
+    public Server(GameLobbyController controller, String nickname, int minUsers, int maxUsers) {
+        this.controller = controller;
         this.nickname = nickname;
+        this.minToStartGame = minUsers;
+        this.maxNumUsers = maxUsers;
         this.users = new ArrayList<>();
         User u = new User(nickname);
+        u.setReady(true);
         this.users.add(u);
         this.writers = new ArrayList<>();
         this.writers.add(null);
@@ -38,7 +46,8 @@ public class Server {
                 try (final DatagramSocket socket = new DatagramSocket()) {
                     socket.connect(InetAddress.getByName("8.8.8.8"), 10002);
                     String privateIP = socket.getLocalAddress().getHostAddress();
-                    System.out.println("Room creation failed. Another socket is already bound to " + privateIP + ":" + PORT);
+                    System.out.println(
+                            "Room creation failed. Another socket is already bound to " + privateIP + ":" + PORT);
                     App.setScene("lobby/CreateLobby");
                 } catch (SocketException ex) {
                     throw new RuntimeException(ex);
@@ -63,6 +72,7 @@ public class Server {
         public void run() {
             try {
                 while (!listener.isClosed()) {
+                    
                     Socket socket = this.listener.accept();
                     new ClientHandler(socket).start();
                 }
@@ -120,6 +130,8 @@ public class Server {
                                 System.out.println("Server: connect message received");
 
                                 Message mReply = new Message();
+                                mReply.setTimestamp(controller.getCurrentTimestamp());
+
 
                                 if (users.size() == maxNumUsers) {
                                     mReply.setMsgType(MessageType.CONNECT_FAILED);
@@ -130,6 +142,7 @@ public class Server {
                                     User u = new User(incomingMsg.getNickname(), this.socket.getInetAddress());
                                     users.add(u);
                                     writers.add(this.output);
+									controller.addUser(u);
 
                                     // forward to other users the new user joined
                                     mReply.setMsgType(MessageType.USER_JOINED);
@@ -142,7 +155,10 @@ public class Server {
                                     mReply.setContent(getUserList());
 
                                     // add the message to the chat textArea
-                                    System.out.println(mReply.getTimestamp() + " " + incomingMsg.getNickname() + " has joined the room");
+                                    System.out.println(mReply.getTimestamp() + " " + incomingMsg.getNickname()
+                                            + " has joined the room");
+									// controller.addToTextArea(mReply.getTimestamp() + " " + incomingMsg.getNickname() + " has joined the room");
+
                                 }
 
                                 this.output.writeObject(mReply);
@@ -150,9 +166,41 @@ public class Server {
                                 break;
                             }
 
+                            case CHAT: {
+                                // add the message to the chatbox
+                                controller.addToTextArea(incomingMsg);
+
+                                // forward the chat message
+                                forwardMessage(incomingMsg);
+
+                                break;
+                            }
+                            case READY: {
+                                // update ready user
+                                controller.updateReady(incomingMsg.getNickname(),
+                                        Boolean.parseBoolean(incomingMsg.getContent()));
+
+                                // update the user
+                                for (User u : users) {
+                                    if (u.getNickname().equals(incomingMsg.getNickname())) {
+                                        u.setReady(Boolean.parseBoolean(incomingMsg.getContent()));
+                                        break;
+                                    }
+                                }
+
+                                // enable start button if everyone is ready & there are enough users
+                                controller.enableStartGame(checkCanStartGame());
+
+                                // forward the ready to other users
+                                forwardMessage(incomingMsg);
+
+                                break;
+                            }
+
                             case DISCONNECT: {
                                 // add the message to the chat textArea
-                                System.out.println(incomingMsg.getTimestamp() + " " + incomingMsg.getNickname() + " has left the room");
+                                System.out.println(incomingMsg.getTimestamp() + " " + incomingMsg.getNickname()
+                                        + " has left the room");
 
                                 // forward disconnection to others
                                 forwardMessage(incomingMsg);
@@ -165,6 +213,8 @@ public class Server {
                                         break;
                                     }
                                 }
+                                controller.enableStartGame(checkCanStartGame());
+
                                 // close the connection
                                 this.socket.close();
 
@@ -181,7 +231,7 @@ public class Server {
                 // "Connection reset" when the other endpoint disconnects
                 if (e.getMessage().contains("Connection reset"))
                     System.out.println("Stream closed");
-                    // "java.net.SocketException: Socket closed" - received DISCONNECT
+                // "java.net.SocketException: Socket closed" - received DISCONNECT
                 else if (e.getMessage().contains("Socket closed"))
                     System.out.println("Socket closed");
                 else
@@ -221,16 +271,37 @@ public class Server {
         }
     }
 
-    public void CloseServer() {
-        Message msg = new Message(MessageType.DISCONNECT, this.nickname, "Server room closed");
+    public void sendChatMessage(String content) {
+        Message msg = new Message(MessageType.CHAT, this.controller.getCurrentTimestamp(), this.nickname, content);
 
-        // send the message to each user except the server (NB: it's not a normal sendMessage)
+        // send the chat message to everyone
+        this.sendMessage(msg);
+
+        // add the chat message to the textArea
+        // GameLobbyController.addChatBubbleS(msg, vBox);
+        this.controller.addToTextArea(msg);
+    }
+
+
+
+    public boolean checkCanStartGame() {
+        for (User u : this.users) {
+            if (!u.isReady())
+                return false;
+        }
+        return this.users.size() >= this.minToStartGame ? true : false;
+    }
+
+    public void CloseServer() {
+        Message msg = new Message(MessageType.DISCONNECT, controller.getCurrentTimestamp(), this.nickname, "Server room closed");
+
+        // send the message to each user except the server (NB: it's not a normal
+        // sendMessage)
         for (int i = 1; i < this.users.size(); i++) {
             msg.setNickname(this.users.get(i).getNickname());
             try {
                 this.writers.get(i).writeObject(msg);
             } catch (IOException e) {
-                // remove the writer at index i?
                 e.printStackTrace();
             }
         }
@@ -240,7 +311,8 @@ public class Server {
     }
 
     private void forwardMessage(Message msg) {
-        // forward the message to each connected client, except the one that sent the message first
+        // forward the message to each connected client, except the one that sent the
+        // message first
         for (int i = 1; i < this.users.size(); i++) {
             if (!msg.getNickname().equals(this.users.get(i).getNickname())) {
                 try {

@@ -1,3 +1,4 @@
+
 package com.game.roundr;
 
 import com.game.roundr.networking.Client;
@@ -18,6 +19,7 @@ public class App extends Application {
 
     private static Scene scene;
     public static String username = "";
+    public static String playerColor = "";
 
     public static String playerRole = "";
     public static Server server;
@@ -42,6 +44,7 @@ public class App extends Application {
             PreparedStatement stmt = conn.prepareStatement("DELETE FROM player WHERE username = ?");
             stmt.setString(1, username);
             stmt.executeUpdate();
+            System.exit(0);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -55,7 +58,7 @@ public class App extends Application {
 
     public static void setRole(String role){
         playerRole = role;
-        System.out.println("player role: " + playerRole);
+        System.out.println("Player role: " + playerRole);
     }
 
     public static Server getServer() {

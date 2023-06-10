@@ -1,4 +1,3 @@
-
 package com.game.roundr.lobby;
 
 import com.game.roundr.App;
@@ -39,7 +38,7 @@ public class CreateLobbyController implements Initializable {
     @FXML
     private void handleCreateLobbyButtonClick() throws IOException {
         // Create the server when the button is clicked
-        App.server = new Server(App.username);
+        App.server = new Server(null, App.username, 2, 6);
         App.client = null;// Start the server
         App.setRole("Server");
         System.out.println(App.server);

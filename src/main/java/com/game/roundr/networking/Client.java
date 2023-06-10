@@ -1,6 +1,7 @@
 package com.game.roundr.networking;
 
 import com.game.roundr.App;
+import com.game.roundr.lobby.GameLobbyController;
 import com.game.roundr.models.User;
 import com.game.roundr.models.chat.Message;
 import com.game.roundr.models.chat.MessageType;
@@ -12,8 +13,8 @@ import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Client {
-
+public class Client implements ClientInt{
+    private GameLobbyController controller;
     private ClientListener clientListener;
     private String nickname;
     private OutputStream os;
@@ -21,7 +22,8 @@ public class Client {
     private InputStream is;
     private ObjectInputStream input;
 
-    public  Client(String address, int port, String nickname){
+    public  Client(GameLobbyController controller, String address, int port, String nickname){
+        this.controller = controller;
         this.nickname = nickname;
         this.clientListener = new ClientListener(address, port);
         this.clientListener.start();
@@ -49,7 +51,7 @@ public class Client {
                 input = new ObjectInputStream(is);
 
                 // send CONNECT message
-                Message msg = new Message(MessageType.CONNECT, nickname, "");
+                Message msg = new Message(MessageType.CONNECT, controller.getCurrentTimestamp(), nickname, "");
                 output.writeObject(msg);
 
                 while (this.socket.isConnected())
@@ -57,7 +59,7 @@ public class Client {
                     Message incomingMsg = (Message)  input.readObject();
                     if(incomingMsg != null)
                     {
-                        System.out.println("Client (" + this.getId() + "): received " + incomingMsg.toString()); // test
+                        System.out.println("Client (" + this.getId() + "): received " + incomingMsg.toString()); 
                         switch (incomingMsg.getMsgType())
                         {
                             case CONNECT_FAILED :
@@ -68,6 +70,7 @@ public class Client {
                             case CONNECT_OK:
                             {
                                 App.setScene("lobby/GameLobby");
+                                controller.resetList();
                                 System.out.println("Extract User List: " + extractUserList(incomingMsg.getContent()));
                                 // add the message to the chat textArea
                                 System.out.println(nickname + " has joined the room");
@@ -75,14 +78,29 @@ public class Client {
                                 break;
 
                             }
+                            case CHAT:
+							{
+								// add the message to the chat textArea
+								controller.addToTextArea(incomingMsg);
+								
+								break;
+							}
                             case USER_JOINED:
                             {
                                 // add the message to the chat textArea
                                 System.out.println( incomingMsg.getNickname() + " has joined the room");;
 
+                                // add the user and update the list
+ 								controller.addUser(new User(incomingMsg.getNickname()));
 
                                 break;
                             }
+                            case READY:
+							{
+								controller.updateReady(incomingMsg.getNickname(), Boolean.parseBoolean(incomingMsg.getContent()));
+								
+								break;
+							}
                             case DISCONNECT:
                             {
                                 // the room has been closed (connection lost from the server)
@@ -102,7 +120,8 @@ public class Client {
                                 {
                                     // add the message to the chat textArea
                                     System.out.println( incomingMsg.getNickname() + " has left the room");
-
+// //controller: remove user from list
+// 									controller.removeUser(incomingMsg.getNickname());
 
                                 }
 
@@ -110,7 +129,7 @@ public class Client {
                             }
                             default:
                             {
-                                System.out.println("Client: received unknow message type: " + incomingMsg.toString());
+                                System.out.println("Client: received unknown message type: " + incomingMsg.toString());
                                 break;
                             }
                         }
@@ -134,17 +153,8 @@ public class Client {
             }
         }
     }
-
-
-    public void CloseClient()
-    {
-        Message msg = new Message(MessageType.DISCONNECT, this.nickname, "");
-
-        // send disconnect message
-        this.sendMessage(msg);
-    }
-
-    private void sendMessage(Message message)
+	
+	private void sendMessage(Message message)
     {
         try {
             this.output.writeObject(message);
@@ -152,6 +162,37 @@ public class Client {
             e.printStackTrace();
         }
     }
+
+    @Override
+	public void sendChatMessage(String content)
+	{
+		Message msg = new Message(MessageType.CHAT, this.controller.getCurrentTimestamp(), this.nickname, content);
+		
+		// send the message
+		this.sendMessage(msg);
+		
+		// add the message to the textArea
+		this.controller.addToTextArea(msg);
+	}
+	
+	@Override
+	public void sendReady(boolean ready)
+	{
+		Message msg = new Message(MessageType.READY, this.controller.getCurrentTimestamp(), this.nickname, "" + ready);
+		
+		// send ready message
+		this.sendMessage(msg);
+	}
+
+    @Override
+    public void CloseClient()
+    {
+        Message msg = new Message(MessageType.DISCONNECT, controller.getCurrentTimestamp(), this.nickname, "");
+
+        // send disconnect message
+        this.sendMessage(msg);
+    }
+
     private List<User> extractUserList(String s)
     {
         List<User> list = new ArrayList<User>();

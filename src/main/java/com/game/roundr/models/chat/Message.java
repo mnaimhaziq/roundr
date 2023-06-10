@@ -14,15 +14,17 @@ public class Message implements Serializable{
 	{
 		
 	}
-	public Message(String type, String nickname, String content)
+	public Message(String type, String timestamp, String nickname, String content)
 	{
 		this.msgType = MessageType.valueOf(type);
+		this.timestamp = timestamp;
 		this.nickname = nickname;
 		this.content = content;
 	}
-	public Message(MessageType type, String nickname, String content)
+	public Message(MessageType type, String timestamp, String nickname, String content)
 	{
 		this.msgType = type;
+		this.timestamp = timestamp;
 		this.nickname = nickname;
 		this.content = content;
 	}

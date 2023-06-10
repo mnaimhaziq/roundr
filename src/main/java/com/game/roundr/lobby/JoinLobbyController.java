@@ -40,6 +40,7 @@ public class JoinLobbyController implements Initializable {
 
         App.setScene("MainMenu");
     }
+    
 
 
 
@@ -75,14 +76,14 @@ public class JoinLobbyController implements Initializable {
 
 
     public void handleJoinLobbyButton() throws IOException{
-        App.setRole("Client");
-        createClient("localhost", 9001);
+     App.setRole("Client");
+     createClient("localhost", 9003);
         App.setScene("lobby/GameLobby");
 
     }
 
     private void createClient(String serverAddress, int serverPort) {
-        App.client = new Client( serverAddress, serverPort, App.username);
+        App.client = new Client( null, serverAddress, serverPort, App.username);
         App.server = null;
         System.out.println("Connected to server: " + serverAddress + ":" + serverPort);
         System.out.println("App.client: " + App.client);

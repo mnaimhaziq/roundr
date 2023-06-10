@@ -6,6 +6,8 @@
 <?import javafx.scene.shape.*?>
 <?import javafx.scene.text.*?>
 
+<fx:include source="MainMenu.fxml" fx:id="MainMenuController"/>
+
 <HBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.game.roundr.lobby.GameLobbyController">
    <children>
       <VBox alignment="CENTER" prefHeight="700.0" prefWidth="680.0">
@@ -18,7 +20,7 @@
                   <Insets bottom="40.0" left="80.0" right="40.0" />
                </VBox.margin>
             </Label>
-            <GridPane alignment="CENTER" gridLinesVisible="true" prefHeight="330.0" prefWidth="470.0">
+            <GridPane fx:id="gridPaneUsers" alignment="CENTER" gridLinesVisible="true" prefHeight="330.0" prefWidth="470.0">
               <columnConstraints>
                 <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                 <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
@@ -37,7 +39,7 @@
                <children>
                   <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="20.0" style="-fx-background-color: #FCFF79;" GridPane.columnIndex="1">
                      <children>
-                        <Circle fill="WHITE" radius="15.0" stroke="BLACK" strokeType="INSIDE" />
+                        <Circle fx:id="readyCircle" fill="WHITE" radius="15.0" stroke="BLACK" strokeType="INSIDE" />
                         <Label text="Player 2">
                            <font>
                               <Font name="Inter Bold" size="18.0" />
@@ -121,7 +123,7 @@
                         <Font name="Inter Bold" size="18.0" />
                      </font>
                   </Button>
-                  <Button mnemonicParsing="false" onMouseClicked="#handleReadyButton" prefHeight="40.0" prefWidth="160.0" style="-fx-background-color: D9D9D9;" text="Ready">
+                  <Button fx:id="readyButton" mnemonicParsing="false" onAction="#toggleReady" prefHeight="40.0" prefWidth="160.0" style="-fx-background-color: D9D9D9;" text="Not ready">
                      <font>
                         <Font name="Inter Bold" size="18.0" />
                      </font>
@@ -133,21 +135,44 @@
             </HBox>
          </children>
       </VBox>
-      <VBox alignment="CENTER_LEFT" prefHeight="370.0" prefWidth="500.0">
+      <VBox fx:id="chatRoomS" alignment="CENTER_LEFT" prefHeight="370.0" prefWidth="500.0" visible="false">
          <children>
-            <ScrollPane hbarPolicy="NEVER" maxHeight="525.0" maxWidth="330.0" prefHeight="525.0" prefWidth="330.0" style="-fx-background-color: A8E5F9;">
+            <ScrollPane fx:id="spChat" hbarPolicy="NEVER" maxHeight="525.0" maxWidth="330.0" prefHeight="525.0" prefWidth="330.0" style="-fx-background-color: #A8E5F9;">
                <content>
-                  <AnchorPane prefHeight="525.0" prefWidth="330.0" style="-fx-background-color: A8E5F9;"/>
+                  <VBox fx:id="chatS" editable="false" prefHeight="525.0" prefWidth="330.0" wrapText="true" style="-fx-background-color: #A8E5F9;"/>
                </content>
             </ScrollPane>
             <HBox prefHeight="40.0" prefWidth="200.0">
                <children>
-                  <TextField fx:id="messageField" maxWidth="330.0" prefHeight="40.0" prefWidth="262.0" promptText="Enter Your Message" style="-fx-background-color: D9D9D9; -fx-border-radius: 0; -fx-border-color: 000000;">
+                  <TextField fx:id="textFieldChatS" onKeyPressed="#enterChatHandleS" maxWidth="330.0" prefHeight="40.0" prefWidth="262.0" promptText="Enter Your Message" style="-fx-background-color: D9D9D9; -fx-border-radius: 0; ">
                      <font>
                         <Font name="Inter Regular" size="14.0" />
                      </font>
                   </TextField>
-                  <Button fx:id="sendButton" alignment="CENTER" mnemonicParsing="false" prefHeight="40.0" prefWidth="68.0" style="-fx-background-color: #61B3FF; -fx-border-radius: 0; -fx-border-color: 000000;" text="Send" textFill="WHITE">
+                  <Button fx:id="buttonChatSendS" alignment="CENTER" mnemonicParsing="false" onAction="#handleSendMessageButtonS" prefHeight="40.0" prefWidth="68.0" style="-fx-background-color: #61B3FF; -fx-border-radius: 0;" text="Send" textFill="WHITE">
+                     <font>
+                        <Font name="Inter Bold" size="14.0" />
+                     </font>
+                  </Button>
+               </children>
+            </HBox>
+         </children>
+      </VBox>
+      <VBox fx:id="chatRoomC" alignment="CENTER_LEFT" prefHeight="370.0" prefWidth="500.0" visible="false">
+         <children>
+            <ScrollPane hbarPolicy="NEVER" maxHeight="525.0" maxWidth="330.0" prefHeight="525.0" prefWidth="330.0" style="-fx-background-color: #A8E5F9;">
+               <content>
+                  <VBox fx:id="chatC" editable="false" prefHeight="525.0" prefWidth="330.0" wrapText="true" style="-fx-background-color: #A8E5F9;"/>
+               </content>
+            </ScrollPane>
+            <HBox prefHeight="40.0" prefWidth="200.0">
+               <children>
+                  <TextField fx:id="textFieldChatC" onKeyPressed="#enterChatHandleC" maxWidth="330.0" prefHeight="40.0" prefWidth="262.0" promptText="Enter Your Message" style="-fx-background-color: D9D9D9; -fx-border-radius: 0; ">
+                     <font>
+                        <Font name="Inter Regular" size="14.0" />
+                     </font>
+                  </TextField>
+                  <Button fx:id="buttonChatSendC" alignment="CENTER" mnemonicParsing="false" onAction="#handleSendMessageButtonC" prefHeight="40.0" prefWidth="68.0" style="-fx-background-color: #61B3FF; -fx-border-radius: 0;" text="Send" textFill="WHITE">
                      <font>
                         <Font name="Inter Bold" size="14.0" />
                      </font>
