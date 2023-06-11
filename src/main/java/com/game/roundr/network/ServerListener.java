@@ -1,5 +1,6 @@
 package com.game.roundr.network;
 
+import com.game.roundr.App;
 import com.game.roundr.models.Message;
 import com.game.roundr.models.MessageType;
 
@@ -39,16 +40,16 @@ public class ServerListener implements Runnable {
 
     public void closeServerSocket() {
         try {
-            if (serverSocket != null) {
+            if (serverSocket != null)
                 serverSocket.close();
-            }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
     public void sendEndGameRequestToClients() {
-        Message message = new Message(MessageType.END_GAME, server.hostUsername, "");
+        Message message = new Message(MessageType.END_GAME, 
+                App.username, "");
         broadcastMessageToClients(message);
     }
 

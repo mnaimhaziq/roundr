@@ -65,7 +65,7 @@
                   <Font name="Inter Bold" size="18.0" />
                </font>
             </Button>
-            <Button mnemonicParsing="false" onMouseClicked="#handleCreateLobbyButtonClick" prefHeight="40.0" prefWidth="160.0" style="-fx-background-color: D9D9D9;" text="Create Lobby">
+            <Button mnemonicParsing="false" onMouseClicked="#handleCreateButtonClick" prefHeight="40.0" prefWidth="160.0" style="-fx-background-color: D9D9D9;" text="Create Lobby">
                <font>
                   <Font name="Inter Bold" size="18.0" />
                </font>

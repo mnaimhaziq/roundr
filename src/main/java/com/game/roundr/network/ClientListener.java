@@ -14,7 +14,6 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.stage.Window;
 import javafx.util.Duration;
 
 import java.io.IOException;
@@ -23,6 +22,7 @@ import java.io.ObjectOutputStream;
 import java.net.ConnectException;
 import java.net.Socket;
 import java.net.SocketException;
+import javafx.scene.control.Alert;
 
 public class ClientListener implements Runnable {
 
@@ -34,7 +34,6 @@ public class ClientListener implements Runnable {
     private MainGameAreaController mgac;
     private boolean isTimerRunning = true;
     private Timeline timer;
-
 
     public ClientListener(String address, int port, Client client, MainGameAreaController mgac) {
         this.address = address;
@@ -51,48 +50,67 @@ public class ClientListener implements Runnable {
     @Override
     public void run() {
         try {
+            // setup client socket
             socket = new Socket(address, port);
             client.output = new ObjectOutputStream(socket.getOutputStream());
             client.input = new ObjectInputStream(socket.getInputStream());
             System.out.println("Client: Running. Username: " + client.username);
 
-            // send CONNECT message
+            // send CONNECT msg to game server
             Message msg = new Message(MessageType.CONNECT, client.username, "");
-            client.output.writeObject(msg);
+            client.sendMessage(msg);
 
+            // listen for messages
             while (this.socket.isConnected()) {
                 Message inboundMsg = (Message) client.input.readObject();
 
                 if (inboundMsg != null) {
                     System.out.println("Client: Received " + inboundMsg.toString());
 
-                    switch (inboundMsg.getMsgType()) { // handle according to m.type
+                    // handle msgs based on their type
+                    switch (inboundMsg.getMsgType()) {
                         case CONNECT_FAILED -> {
-                            System.out.println("Client: Connection failed");
+                            App.showAlert(Alert.AlertType.INFORMATION, 
+                                    "Connection Failed", inboundMsg.getContent());
                             break;
                         }
                         case CONNECT_OK -> {
+                            // go to game lobby
                             App.setScene("lobby/GameLobby");
-
+                            
+                            // reset the list of players
+                            App.glc.players.clear();
+                            
+                            // fetch the list of players
+                            App.glc.updatePlayers(inboundMsg);
+                            
                             // TODO: add the message to the chat
                             System.out.println("Chat: " + client.username + " has joined");
                             break;
                         }
                         case USER_JOINED -> {
+                            // update the list of players
+                            App.glc.players.clear();
+                            App.glc.updatePlayers(inboundMsg);
+                                
                             // TODO: add the message to the chat
                             System.out.println("Chat: " + inboundMsg.getSenderName() + " has joined");
                             break;
                         }
                         case DISCONNECT -> {
-                            if (inboundMsg.getContent().equals("Server closed")) { // the server has closed
-                                // show alert
-                                System.out.println("Disconnected from server.");
+                            if (inboundMsg.getContent().equals("Server closed")) {
+                                App.showAlert(Alert.AlertType.INFORMATION, 
+                                    "Connection Closed", inboundMsg.getContent());
                                 App.client = null;
                                 
-                                // switch view
+                                // switch scene
                                 App.setScene("MainMenu");
                             } else { // a player disconnected
-                                // TODO: add message to the chat
+                                // update the list of players
+                                App.glc.players.clear();
+                                App.glc.updatePlayers(inboundMsg);
+            
+                                // TODO: add msg to the chats
                                 System.out.println("Chat: " + inboundMsg.getSenderName() + " has left");
                             }
                             break;

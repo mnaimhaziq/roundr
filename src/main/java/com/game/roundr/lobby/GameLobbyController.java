@@ -1,46 +1,136 @@
 package com.game.roundr.lobby;
 
 import com.game.roundr.App;
-import com.game.roundr.DatabaseConnection;
+import com.game.roundr.models.Message;
+import com.game.roundr.models.Player;
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.ResourceBundle;
+import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Node;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.HBox;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
+import javafx.scene.shape.StrokeType;
+import javafx.scene.text.Font;
 
-public class GameLobbyController {
-
+public class GameLobbyController implements Initializable {
 
     @FXML
-    private void handleLeaveLobbyButtonClick() throws IOException {
-        // Handle server disconnection
+    private TextField gameCode;
+    
+    @FXML
+    private Button readyButton;
+
+    @FXML
+    private ListView<Player> playerList;
+    
+    public ObservableList<Player> players = FXCollections.observableArrayList();
+    
+    @FXML
+    private void handleLeaveButtonClick() throws IOException {
+        // handle disconnections by role
         if (App.server != null) {
             App.server.closeServer();
             App.server = null;
-        }
-        // Handle client disconnection
-        else if (App.client != null) {
+        } else if (App.client != null) {
             App.client.closeClient();
             App.client = null;
         }
+        
+        // return to main menu
         App.setScene("MainMenu");
-        decrementTemp();
     }
 
     @FXML
-    private void handleReadyButton() throws IOException{
+    private void handleReadyButtonClick() throws IOException {
+//        if (readyButton.getText().equals("Ready")) {
+//            readyButton.setText("Not Ready");
+//            App.client.sendReady("ready");
+//        } else {
+//            readyButton.setText("Ready");
+//            App.client.sendReady("not_ready");
+//        }
+        App.setScene("game/MainGameArea");
+    }
+
+    @Override
+    public void initialize(URL url, ResourceBundle rb) {
+        App.glc = this;
+        playerList.setItems(players);
+        readyButton.setText("Ready");
+        playerList.setCellFactory((ListView<Player> l) -> new PlayerCell());
+    }
+
+    private class PlayerCell extends ListCell<Player> {
+
+        {
+            setStyle("-fx-padding: 0px"); // removes default paddings
+        }
+
+        @Override
+        protected void updateItem(Player item, boolean empty) {
+            super.updateItem(item, empty);
+            if (item != null) {
+                setGraphic(createGraphic(item)); // cell contents
+            }
+        }
+
+    }
+
+    private Node createGraphic(Player player) {
+        HBox hBox = new HBox(20.0);
+        hBox.setPadding(new Insets(0, 40, 0, 40));
+        hBox.setAlignment(Pos.CENTER_LEFT);
+        hBox.setPrefHeight(50.0);
+        hBox.setStyle("-fx-background-color: " + player.getColor() + ";");
+
+        Circle circle = new Circle(10.0);
+        circle.setStroke(Color.BLACK);
+        circle.setStrokeType(StrokeType.INSIDE);
+        if (player.isReady()) {
+            circle.setFill(Color.BLACK);
+        } else {
+            circle.setFill(Color.WHITE);
+        }
+
+        Label label = new Label(player.getUsername());
+        label.setFont(new Font("Inter Bold", 18.0));
+        label.setStyle("-fx-opacity: 1.0;");
+
+        hBox.getChildren().addAll(circle, label); // holds the nodes
+
+        return hBox;
+    }
+    
+    public void startGame() throws IOException {
         App.setScene("game/MainGameArea");
     }
     
-    private void decrementTemp() {
-        try {
-            Connection conn = new DatabaseConnection().getConnection();
-            PreparedStatement stmt = conn.prepareStatement("UPDATE game SET player_count = player_count - 1 WHERE game_id = (SELECT MAX(game_id) FROM game)");
-            stmt.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+    public void clearPlayers() {
+        Platform.runLater(() -> {
+            players.clear();
+        });
+    }
+    
+    public void updatePlayers(Message msg) {
+        Platform.runLater(() -> {
+            players.clear();
+            ArrayList<Player> ls = App.client.extractPlayerList(msg.getContent());
+            players.addAll(ls);
+        });
     }
 
 }
-
