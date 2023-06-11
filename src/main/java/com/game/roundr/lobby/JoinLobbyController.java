@@ -76,12 +76,6 @@ public class JoinLobbyController implements Initializable {
             e.printStackTrace();
         }
     }
-  
-    public void handleJoinLobbyButton() {
-        MainGameAreaController mgac = new MainGameAreaController();
-        App.client = new Client("localhost", App.username, mgac);
-        App.client.startClient();
-    }
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -91,6 +85,7 @@ public class JoinLobbyController implements Initializable {
 
     private class LobbyCell extends ListCell<Game> {
 
+        @Override
         protected void updateItem(Game item, boolean empty) {
             super.updateItem(item, empty);
             if (item != null) {
