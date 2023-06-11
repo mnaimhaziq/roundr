@@ -4,10 +4,7 @@ public class Game {
 
     private int gameID;
     private String gameStatus;
-    private int numOfRounds;
-    private int turnTimeLimit;
-    private int wordLength;
-    private int playerLimit;
+    private int maxPlayers;
     private int numOfPlayers;
     private String ipAddress;
     private String hostName;
@@ -15,20 +12,14 @@ public class Game {
     public Game(
             int gameID,
             String gameStatus,
-            int numOfRounds,
-            int turnTimeLimit,
-            int wordLength,
-            int playerLimit,
+            int maxPlayers,
             int numOfPlayers,
             String ipAddress,
             String hostName
     ) {
         this.gameID = gameID;
         this.gameStatus = gameStatus;
-        this.numOfRounds = numOfRounds;
-        this.turnTimeLimit = turnTimeLimit;
-        this.wordLength = wordLength;
-        this.playerLimit = playerLimit;
+        this.maxPlayers = maxPlayers;
         this.numOfPlayers = numOfPlayers;
         this.ipAddress = ipAddress;
         this.hostName = hostName;
@@ -42,20 +33,8 @@ public class Game {
         return gameStatus;
     }
 
-    public int getNumOfRounds() {
-        return numOfRounds;
-    }
-
-    public int getTurnTimeLimit() {
-        return turnTimeLimit;
-    }
-
-    public int getWordLength() {
-        return wordLength;
-    }
-
     public int getPlayerLimit() {
-        return playerLimit;
+        return maxPlayers;
     }
 
     public int getNumOfPlayers() {
