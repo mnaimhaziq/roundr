@@ -2,34 +2,15 @@ package com.game.roundr.network;
 
 import com.game.roundr.App;
 import com.game.roundr.DatabaseConnection;
-import com.game.roundr.game.EndGamePopupController;
-import com.game.roundr.game.MainGameAreaController;
-import com.game.roundr.lobby.GameLobbyController;
-import com.game.roundr.models.Player;
 import com.game.roundr.models.Message;
 import com.game.roundr.models.MessageType;
-import com.google.gson.Gson;
-import javafx.animation.Animation;
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
-import javafx.util.Duration;
-
 import java.io.*;
-import java.net.HttpURLConnection;
 import java.net.Socket;
 import java.net.SocketException;
-import java.net.URL;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
-
-import javafx.application.Platform;
 
 public class ClientHandler implements Runnable {
 
@@ -38,11 +19,6 @@ public class ClientHandler implements Runnable {
     protected ObjectInputStream input;
     protected ObjectOutputStream output;
     private String clientUsername;
-
-    private MainGameAreaController mgac;
-    private boolean isTimerRunning = true;
-    private Timeline timer;
-
     public static ArrayList<ObjectOutputStream> writers;
 
     public ClientHandler(Socket socket, Server server) {
@@ -128,8 +104,8 @@ public class ClientHandler implements Runnable {
                                 // send the reply msg to the client
                                 output.writeObject(outboundMsg);
 
-                                // TODO: add the message to the chat
-                                System.out.println("Chat: " + inboundMsg.getSenderName() + " has joined");
+                                // add the message to the chat
+                                App.glc.addToTextArea("Server: " + inboundMsg.getSenderName() + " has joined");
 
                                 //add writer to list
                                 writers.add(this.output);
@@ -138,8 +114,8 @@ public class ClientHandler implements Runnable {
                             break;
                         }
                         case DISCONNECT -> {
-                            // TODO: add the message to the chat area
-                            System.out.println("Chat: " + inboundMsg.getSenderName() + " has left");
+                            // add the message to the chat
+                            App.glc.addToTextArea("Server: " + inboundMsg.getSenderName() + " has left");
 
                             // remove the player from the server list
                             App.glc.removePlayer(inboundMsg);
@@ -190,41 +166,34 @@ public class ClientHandler implements Runnable {
                             } catch (SQLException e) {
                                 e.printStackTrace();
                             }
-                            
+
                             // update player inside server list
                             App.glc.updatePlayer(inboundMsg);
-                            
+
                             // forward message to other players
                             broadcastMessage(inboundMsg);
-                            
+
                             // if all ready, then start
                             if (App.glc.isAllReady()) {
                                 App.setScene("game/MainGameArea");
                             }
-                            
+
                             break;
                         }
                         case CHAT -> {
+                            if (App.mgac != null) {
+                                App.mgac.addToTextArea(inboundMsg);
 
-                            GameLobbyController gameLobbyController = App.glc;
-                            MainGameAreaController mainGameAreaController = App.mainGameAreaController;
-
-                            if (gameLobbyController != null ) {
-                                gameLobbyController.addToTextArea(inboundMsg);
-
-                            }
-                            else if( mainGameAreaController != null) {
-                                mainGameAreaController.addToTextArea(inboundMsg);
+                            } else if (App.glc != null) {
+                                App.glc.addToTextArea(inboundMsg);
                             }
                             // forward the chat message
                             broadcastMessage(inboundMsg);
-
                             break;
                         }
                         case END_GAME -> {
-                            MainGameAreaController mainGameAreaController = App.mainGameAreaController;
-                            if (mainGameAreaController != null) {
-                                mainGameAreaController.passedEndGamePopup(inboundMsg);
+                            if (App.mgac != null) {
+                                App.mgac.passedEndGamePopup(inboundMsg);
                                 System.out.println("Client Handler: not null");
                             } else {
                                 System.out.println("Client Handler: null");
@@ -233,40 +202,32 @@ public class ClientHandler implements Runnable {
                             break;
                         }
                         case RANDOM_WORD -> {
-                            MainGameAreaController mainGameAreaController = App.mainGameAreaController;
-                            if (mainGameAreaController != null) {
-                                mainGameAreaController.generateWordPass(inboundMsg);
+                            if (App.mgac != null) {
+                                App.mgac.generateWordPass(inboundMsg);
                                 System.out.println("Client Handler: not null " + inboundMsg.getContent());
                             } else {
                                 System.out.println("Client Handler: null " + inboundMsg.getContent());
                             }
-                            // forward the chat message
                             broadcastMessage(inboundMsg);
                             break;
                         }
                         case PLAYER_SCORE -> {
-                            // add the message to the chat textArea
-                            MainGameAreaController mainGameAreaController = App.mainGameAreaController;
-                            if (mainGameAreaController != null) {
-                                mainGameAreaController.passedScorePass(inboundMsg);
+                            if (App.mgac != null) {
+                                App.mgac.passedScorePass(inboundMsg);
                                 System.out.println("Client Handler PlayerScore: not null ");
                             } else {
                                 System.out.println("Client Handler PlayerScore: null ");
                             }
-                            // forward the chat message
                             broadcastMessage(inboundMsg);
                             break;
                         }
                         case TURN -> {
-                            // add the message to the chat textArea
-                            MainGameAreaController mainGameAreaController = App.mainGameAreaController;
-                            if (mainGameAreaController != null) {
-                                mainGameAreaController.passedShiftedTurn(inboundMsg);
+                            if (App.mgac != null) {
+                                App.mgac.passedShiftedTurn(inboundMsg);
                                 System.out.println("Client Handler Turn: not null ");
                             } else {
                                 System.out.println("Client Handler Turn: null ");
                             }
-                            // forward the chat message
                             broadcastMessage(inboundMsg);
                             break;
                         }
@@ -291,52 +252,6 @@ public class ClientHandler implements Runnable {
         }
     }
 
-//    private Message getRandomWord(int wordLength){
-//
-//
-//        try {
-//
-//            // Create URL object with the API endpoint
-//            URL url = new URL("https://random-word-api.vercel.app/api?words=1&length=" + wordLength + "");
-//
-//            // Create HttpURLConnection object and open connection
-//            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-//
-//            // Set request method to GET
-//            connection.setRequestMethod("GET");
-//
-//            // Get the response code
-//            int responseCode = connection.getResponseCode();
-//            if (responseCode == HttpURLConnection.HTTP_OK) {
-//                // Create BufferedReader to read the response
-//                BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-//
-//                // Read the response line by line
-//                String line;
-//                StringBuilder response = new StringBuilder();
-//                while ((line = reader.readLine()) != null) {
-//                    response.append(line);
-//                }
-//                reader.close();
-//
-//                // Parse the JSON response using Gson
-//                Gson gson = new Gson();
-//                String[] words = gson.fromJson(response.toString(), String[].class);
-//
-//                // Extract the word from the array
-//                String word = words[0];
-//
-//                Message message = new Message(MessageType.RANDOM_WORD,App.username, word);
-//                return message;
-//            } else {
-//                System.out.println("GET request failed. Response Code: " + responseCode);
-//            }
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//        return null;
-//    }
-
     // send msg to all players except the sender
     public void broadcastMessage(Message msg) {
         for (ClientHandler handler : server.handlers) {
@@ -360,61 +275,6 @@ public class ClientHandler implements Runnable {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    private void showEndGamePopup() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/game/roundr/game/EndGamePopup.fxml"));
-            Parent popupRoot = loader.load();
-            EndGamePopupController popupController = loader.getController();
-
-            // Pass the timer from MainGameAreaController to EndGamePopupController
-            popupController.initData(mgac.getTimer(), this::resumeTimer);
-
-            // Update the shared variable based on the timer state
-            boolean timerRunning = mgac.timer.getStatus() == Animation.Status.RUNNING;
-            isTimerRunning = timerRunning;
-
-            System.out.println(timerRunning);
-            // Pause or resume the timer based on the updated state
-            if (!isTimerRunning) {
-                mgac.getTimer().pause();
-            }
-
-            Stage popupStage = new Stage();
-            popupStage.initModality(Modality.APPLICATION_MODAL);
-            popupStage.setScene(new Scene(popupRoot));
-
-            // Create a new stage as the owner of the popup stage
-            Stage ownerStage = new Stage();
-
-            // Set the owner of the popup stage
-            popupStage.initOwner(ownerStage);
-
-            popupStage.showAndWait();
-
-            // After the popup is closed, update the timer state based on the shared variable
-            if (isTimerRunning) {
-                mgac.getTimer().play();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void resumeTimer() {
-        // Initialize the timer
-        timer = new Timeline(new KeyFrame(Duration.seconds(1), event -> {
-            // Timer logic here
-        }));
-
-        // Call the play() method
-        timer.play();
-        isTimerRunning = true;
-    }
-
-    public String getUsername() {
-        return clientUsername;
     }
 
 }

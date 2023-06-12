@@ -3,9 +3,6 @@ package com.game.roundr.game;
 import com.game.roundr.App;
 import com.game.roundr.DatabaseConnection;
 import com.game.roundr.models.Message;
-import com.game.roundr.models.Player;
-import com.game.roundr.network.Client;
-import com.game.roundr.network.ClientListener;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
@@ -17,7 +14,6 @@ import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.stage.Window;
 import javafx.util.Duration;
 
 import java.io.*;
@@ -108,7 +104,7 @@ public class MainGameAreaController{
 
     public void initialize() {
 
-        App.mainGameAreaController = this;
+        App.mgac = this;
 
         try {
             Connection conn = new DatabaseConnection().getConnection();
@@ -285,9 +281,9 @@ public class MainGameAreaController{
             generateWordPass(messageGeneratedWord); // Add the message to the chat area
         }
         if(App.server != null){
-            App.server.listener.sendWordMessage(generatedWord);
+            App.server.sendWordMessage(generatedWord);
         }else{
-            App.client.listener.sendWordMessage(generatedWord);
+            App.client.sendWordMessage(generatedWord);
         }
 //        sendMessageInput.clear();
     }
@@ -348,9 +344,9 @@ public class MainGameAreaController{
 
         if(turn == App.username){
             if(App.server != null){
-                App.server.listener.sendPlayerScore(playerScore);
+                App.server.sendPlayerScore(playerScore);
             }else{
-                App.client.listener.sendPlayerScore(playerScore);
+                App.client.sendPlayerScore(playerScore);
             }
         }
 //        sendMessageInput.clear();
@@ -398,7 +394,7 @@ public class MainGameAreaController{
         passedShiftedTurn(messageTurn); // Add the message to the chat area
 
             if(App.server != null){
-                App.server.listener.sendShiftedTurn(turn);
+                App.server.sendShiftedTurn(turn);
             }else{
 //                App.client.listener.sendShiftedTurn(turn);
             }
@@ -438,9 +434,9 @@ public class MainGameAreaController{
         passedEndGamePopup(messagePopup); // Add the message to the chat area
 
         if(App.server != null){
-            App.server.listener.sendEndGameRequest();
+            App.server.sendEndGameRequest();
         }else{
-            App.client.listener.sendEndGameRequest();
+            App.client.sendEndGameRequest();
         }
 
     }
@@ -685,10 +681,10 @@ public class MainGameAreaController{
             addToTextArea(message); // Add the message to the chat area
         }
         if(App.server != null){
-            App.server.listener.sendChatMessage(messageChat);
+            App.server.sendChatMessage(messageChat);
 
         }else{
-            App.client.listener.sendChatMessage(messageChat);
+            App.client.sendChatMessage(messageChat);
         }
         sendMessageInput.clear();
     }
