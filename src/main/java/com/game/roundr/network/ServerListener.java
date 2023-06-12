@@ -5,15 +5,17 @@ import com.game.roundr.models.Message;
 import com.game.roundr.models.MessageType;
 
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
+import java.util.ArrayList;
 
 public class ServerListener implements Runnable {
 
     private final Server server;
     private final ServerSocket serverSocket;
-
+    private ArrayList<ObjectOutputStream> writers;
     public ServerListener(int port, Server server) throws IOException {
         this.server = server;
         this.serverSocket = new ServerSocket(port);

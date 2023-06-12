@@ -4,6 +4,7 @@ import com.game.roundr.App;
 import com.game.roundr.DatabaseConnection;
 import com.game.roundr.game.EndGamePopupController;
 import com.game.roundr.game.MainGameAreaController;
+import com.game.roundr.lobby.GameLobbyController;
 import com.game.roundr.models.Player;
 import com.game.roundr.models.Message;
 import com.game.roundr.models.MessageType;
@@ -26,6 +27,8 @@ import java.net.URL;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.ArrayList;
+
 import javafx.application.Platform;
 
 public class ClientHandler implements Runnable {
@@ -40,12 +43,16 @@ public class ClientHandler implements Runnable {
     private boolean isTimerRunning = true;
     private Timeline timer;
 
+    public static ArrayList<ObjectOutputStream> writers;
+
     public ClientHandler(Socket socket, Server server) {
         try {
             this.socket = socket;
             this.server = server;
             input = new ObjectInputStream(socket.getInputStream());
             output = new ObjectOutputStream(socket.getOutputStream());
+            this.writers = new ArrayList<ObjectOutputStream>();
+            this.writers.add(null);
         } catch (IOException e) {
             closeConnection();
         }
@@ -124,6 +131,10 @@ public class ClientHandler implements Runnable {
                                 
                                 // TODO: add the message to the server's chat
                                 System.out.println("Chat: " + inboundMsg.getSenderName() + " has joined");
+
+                                //add writer to list
+                                writers.add(this.output);
+                                System.out.println(writers);
                             }
                             break;
                         }
@@ -210,6 +221,17 @@ public class ClientHandler implements Runnable {
                                     // TODO
                                 }
                             });
+                            break;
+                        }
+                        case CHAT -> {
+
+                            GameLobbyController gameLobbyController = App.glc;
+                            if (gameLobbyController != null) {
+                                gameLobbyController.addToTextArea(inboundMsg);
+                            }
+                            // forward the chat message
+                            broadcastMessage(inboundMsg);
+
                             break;
                         }
                         case END_GAME -> {

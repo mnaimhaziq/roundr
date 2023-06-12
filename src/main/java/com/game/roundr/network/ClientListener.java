@@ -3,6 +3,7 @@ package com.game.roundr.network;
 import com.game.roundr.App;
 import com.game.roundr.game.EndGamePopupController;
 import com.game.roundr.game.MainGameAreaController;
+import com.game.roundr.lobby.GameLobbyController;
 import com.game.roundr.models.Message;
 import com.game.roundr.models.MessageType;
 import javafx.animation.Animation;
@@ -112,6 +113,15 @@ public class ClientListener implements Runnable {
             
                                 // TODO: add msg to the chats
                                 System.out.println("Chat: " + inboundMsg.getSenderName() + " has left");
+                            }
+                            break;
+                        }
+                        case CHAT ->
+                        {
+                            // add the message to the chat textArea
+                            GameLobbyController gameLobbyController = App.glc;
+                            if (gameLobbyController != null) {
+                                gameLobbyController.addToTextArea(inboundMsg);
                             }
                             break;
                         }
@@ -243,5 +253,23 @@ public class ClientListener implements Runnable {
         Message msg = new Message(MessageType.RANDOM_WORD, App.username, content);
         // send the message
         this.sendWordMessage(msg);
+    }
+
+    private void sendMessage(Message message)
+    {
+        try {
+            client.output.writeObject(message);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void sendChatMessage(String content)
+    {
+        Message msg = new Message(MessageType.CHAT, App.username, content);
+
+        // send the message
+        this.sendMessage(msg);
+
     }
 }
