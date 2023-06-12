@@ -59,14 +59,23 @@ public class GameLobbyController implements Initializable {
 
     @FXML
     private void handleReadyButtonClick() throws IOException {
-//        if (readyButton.getText().equals("Ready")) {
-//            readyButton.setText("Not Ready");
-//            App.client.sendReady("ready");
-//        } else {
-//            readyButton.setText("Ready");
-//            App.client.sendReady("not_ready");
-//        }
-        App.setScene("game/MainGameArea");
+        if (App.server != null) {
+            if (readyButton.getText().equals("Ready")) {
+                readyButton.setText("Not Ready");
+                App.server.sendReady("ready");
+            } else {
+                readyButton.setText("Ready");
+                App.server.sendReady("not_ready");
+            }
+        } else {
+            if (readyButton.getText().equals("Ready")) {
+                readyButton.setText("Not Ready");
+                App.client.sendReady("ready");
+            } else {
+                readyButton.setText("Ready");
+                App.client.sendReady("not_ready");
+            }
+        }
     }
 
     @Override
@@ -122,10 +131,6 @@ public class GameLobbyController implements Initializable {
         return hBox;
     }
 
-    public void startGame() throws IOException {
-        App.setScene("game/MainGameArea");
-    }
-
     public void clearPlayers() {
         Platform.runLater(() -> {
             players.clear();
@@ -170,6 +175,23 @@ public class GameLobbyController implements Initializable {
             lobbyName.setText(name.toUpperCase() + "'S LOBBY");
             gameCode.setText(gameID);
         });
+    }
+
+    public void updatePlayer(Message msg) {
+        Platform.runLater(() -> {
+            for (Player player : players) {
+                if (player.getUsername().equals(msg.getSenderName())) {
+                    String anObject = "ready";
+                    player.setIsReady(msg.getContent().equals(anObject));
+                    break;
+                }
+            }
+            playerList.refresh();
+        });
+    }
+
+    public boolean isAllReady() {
+        return players.stream().allMatch(Player::isReady);
     }
 
 }

@@ -85,12 +85,12 @@ public class ClientListener implements Runnable {
                             // set the gamecode and host
                             String[] msgContent = inboundMsg.getContent().split(";");
                             App.glc.SetLobbyInfo(
-                                    msgContent[msgContent.length-1], msgContent[msgContent.length-2]);
-                            
+                                    msgContent[msgContent.length - 1], msgContent[msgContent.length - 2]);
+
                             // extract gamecode and host
-                            String[] pDetails = Arrays.copyOfRange(msgContent, 0, msgContent.length-2);
+                            String[] pDetails = Arrays.copyOfRange(msgContent, 0, msgContent.length - 2);
                             inboundMsg.setContent(String.join(";", pDetails)); // clean player
-                            
+
                             // fetch the list of players
                             App.glc.updatePlayers(inboundMsg);
 
@@ -129,8 +129,20 @@ public class ClientListener implements Runnable {
                             }
                             break;
                         }
+                        case READY -> {
+                            // update player inside server list
+                            App.glc.updatePlayer(inboundMsg);
 
+                            // if all ready, then start
+                            if (App.glc.isAllReady()) {
+                                App.setScene("game/MainGameArea");
+                            }
+                            break;
+                        }
                         case END_GAME -> {
+                            // show modal
+                            // pause timer
+
 //                            // Handle end game message
 //                            System.out.println("Requested to end the game");
 //                            // Pause the timer and show the popup
@@ -139,7 +151,6 @@ public class ClientListener implements Runnable {
 //                                showEndGamePopup();
 //                            });
 //                            break;
-
                             // Handle end game message
                             System.out.println("Requested to end the game");
 
@@ -241,8 +252,7 @@ public class ClientListener implements Runnable {
         isTimerRunning = true;
     }
 
-    private void sendMessage(Message message)
-    {
+    private void sendMessage(Message message) {
         try {
             client.output.writeObject(message);
         } catch (IOException e) {
@@ -250,8 +260,7 @@ public class ClientListener implements Runnable {
         }
     }
 
-    public void sendChatMessage(String content)
-    {
+    public void sendChatMessage(String content) {
         Message msg = new Message(MessageType.CHAT, App.username, content);
         // send the message
         this.sendMessage(msg);

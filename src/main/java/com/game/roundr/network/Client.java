@@ -34,15 +34,6 @@ public class Client {
         this.sendMessage(msg);
     }
 
-    protected void sendMessage(Message message) {
-        try {
-            output.writeObject(message);
-            output.flush();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
     public ArrayList<Player> extractPlayerList(String s) {
         ArrayList<Player> list = new ArrayList<>();
 
@@ -58,29 +49,27 @@ public class Client {
         return list;
     }
     
+    // utility to send message to the server
+    protected void sendMessage(Message msg) {
+        try {
+            output.writeObject(msg);
+            output.flush();
+        } catch (IOException e) {
+            System.out.println("Server: Failed to send message to the server");
+        }
+    }
+    
     public void sendReady(String ready) {
         Message msg = new Message(MessageType.READY, App.username, ready);
+        
+        // update the player list
+        App.glc.updatePlayer(msg);
         sendMessage(msg);
     }
 
     public void sendEndGameRequest() {
         Message message = new Message(MessageType.END_GAME, username, "");
         sendMessage(message);
-    }
-
-    private void handleIncomingMessage(Message message) {
-        // Handle different types of messages
-//        switch (message.getMsgType()) {
-//            case END_GAME:
-//                // Handle end game message
-//                // Pause the timer and show the popup
-//                Platform.runLater(() -> {
-//                    mgac.timer.pause();
-//                    mgac.showEndGamePopup();
-//                });
-//                break;
-//            // Handle other message types as needed
-//        }
     }
 
 }

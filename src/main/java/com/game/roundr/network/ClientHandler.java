@@ -178,30 +178,18 @@ public class ClientHandler implements Runnable {
                             } catch (SQLException e) {
                                 e.printStackTrace();
                             }
-
-                            Platform.runLater(() -> {
-                                // update listing
-//                                for (Player player : App.glc.players) {
-//                                    if (player.getUsername().equals(inboundMsg.getSenderName())) {
-//                                        player.setIsReady(inboundMsg.getContent().equals("ready"));
-//                                        break;
-//                                    }
-//                                }
-//
-//                                // check if ready
-//                                boolean CanStartGame = true;
-//                                for (Player player : App.glc.players) {
-//                                    if (!player.isReady()) {
-//                                        CanStartGame = false;
-//                                        break;
-//                                    }
-//                                }
-
-                                // try start game
-//                                if (CanStartGame) {
-//                                    // TODO
-//                                }
-                            });
+                            
+                            // update player inside server list
+                            App.glc.updatePlayer(inboundMsg);
+                            
+                            // forward message to other players
+                            broadcastMessage(inboundMsg);
+                            
+                            // if all ready, then start
+                            if (App.glc.isAllReady()) {
+                                App.setScene("game/MainGameArea");
+                            }
+                            
                             break;
                         }
                         case END_GAME -> {
@@ -287,8 +275,8 @@ public class ClientHandler implements Runnable {
 //        return null;
 //    }
 
+    // send msg to all players except the sender
     public void broadcastMessage(Message msg) {
-        // send to all players except the sender
         for (ClientHandler handler : server.handlers) {
             try {
                 if (!handler.clientUsername.equals(clientUsername)) {
