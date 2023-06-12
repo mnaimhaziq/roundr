@@ -92,7 +92,11 @@ public class JoinLobbyController implements Initializable {
         protected void updateItem(Game item, boolean empty) {
             super.updateItem(item, empty);
             if (item != null) {
+                setText(null);
                 setGraphic(createGraphic(item)); // cell content
+            } else {
+                setText(null);
+                setGraphic(null);
             }
         }
     }

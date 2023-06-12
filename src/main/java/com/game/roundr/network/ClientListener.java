@@ -70,46 +70,50 @@ public class ClientListener implements Runnable {
                     // handle msgs based on their type
                     switch (inboundMsg.getMsgType()) {
                         case CONNECT_FAILED -> {
-                            App.showAlert(Alert.AlertType.INFORMATION, 
+                            App.showAlert(Alert.AlertType.INFORMATION,
                                     "Connection Failed", inboundMsg.getContent());
                             break;
                         }
                         case CONNECT_OK -> {
                             // go to game lobby
                             App.setScene("lobby/GameLobby");
-                            
+
                             // reset the list of players
-                            App.glc.players.clear();
-                            
+                            App.glc.clearPlayers();
+
                             // fetch the list of players
                             App.glc.updatePlayers(inboundMsg);
-                            
+
                             // TODO: add the message to the chat
                             System.out.println("Chat: " + client.username + " has joined");
                             break;
                         }
                         case USER_JOINED -> {
-                            // update the list of players
-                            App.glc.players.clear();
+                            // reset the list of players
+                            App.glc.clearPlayers();
+
+                            // fetch the list of players
                             App.glc.updatePlayers(inboundMsg);
-                                
+
                             // TODO: add the message to the chat
                             System.out.println("Chat: " + inboundMsg.getSenderName() + " has joined");
                             break;
                         }
                         case DISCONNECT -> {
                             if (inboundMsg.getContent().equals("Server closed")) {
-                                App.showAlert(Alert.AlertType.INFORMATION, 
-                                    "Connection Closed", inboundMsg.getContent());
+                                App.showAlert(Alert.AlertType.INFORMATION,
+                                        "Connection Closed", inboundMsg.getContent());
                                 App.client = null;
-                                
+
                                 // switch scene
                                 App.setScene("MainMenu");
                             } else { // a player disconnected
-                                // update the list of players
-                                App.glc.players.clear();
+                                // reset the list of players
+                                App.glc.clearPlayers();
+
+                                // fetch the list of players
                                 App.glc.updatePlayers(inboundMsg);
-            
+
                                 // TODO: add msg to the chats
                                 System.out.println("Chat: " + inboundMsg.getSenderName() + " has left");
                             }
@@ -139,7 +143,6 @@ public class ClientListener implements Runnable {
 //                            } else {
 //                                mgac.getTimer().pause();
 //                            }
-
                             // Show the end game popup
                             Platform.runLater(this::showEndGamePopup);
                             break;
@@ -153,8 +156,7 @@ public class ClientListener implements Runnable {
         } catch (SocketException e) {
             if (e instanceof ConnectException) {
                 System.out.println("Client: Connection failed");
-            } 
-            else if (e.getMessage().equals("Connection reset")) {
+            } else if (e.getMessage().equals("Connection reset")) {
                 System.out.println("Client: Connection closed");
             }
         } catch (IOException e) {

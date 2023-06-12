@@ -37,7 +37,7 @@
                         <Insets right="30.0" />
                      </HBox.margin>
                   </Label>
-                  <TextField fx:id="gameCode" alignment="CENTER" editable="false" prefHeight="36.0" prefWidth="250.0" style="-fx-background-color: #7dddfc;" text="U239E93">
+                  <TextField fx:id="gameCode" alignment="CENTER" disable="true" editable="false" prefHeight="36.0" prefWidth="250.0" style="-fx-opacity: 1.0;" text="U239E93">
                      <font>
                         <Font name="Berlin Sans FB Demi Bold" size="18.0" />
                      </font>

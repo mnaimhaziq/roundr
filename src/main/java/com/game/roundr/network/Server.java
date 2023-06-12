@@ -43,7 +43,7 @@ public class Server {
             String color = App.getHexColorCode();
 
             // adds host to the list
-            App.glc.players.add(new Player(App.username, color));
+            App.glc.addPlayer(App.username, color);
 
             // update database table
             try {
@@ -103,7 +103,7 @@ public class Server {
     }
 
     public void closeServer() {
-        App.glc.players.clear();
+        App.glc.clearPlayers();
         Message msg = new Message(MessageType.DISCONNECT,
                 App.username, "Server closed");
 

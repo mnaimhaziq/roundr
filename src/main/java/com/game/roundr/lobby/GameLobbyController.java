@@ -30,15 +30,15 @@ public class GameLobbyController implements Initializable {
 
     @FXML
     private TextField gameCode;
-    
+
     @FXML
     private Button readyButton;
 
     @FXML
     private ListView<Player> playerList;
-    
-    public ObservableList<Player> players = FXCollections.observableArrayList();
-    
+
+    private ObservableList<Player> players = FXCollections.observableArrayList();
+
     @FXML
     private void handleLeaveButtonClick() throws IOException {
         // handle disconnections by role
@@ -49,7 +49,7 @@ public class GameLobbyController implements Initializable {
             App.client.closeClient();
             App.client = null;
         }
-        
+
         // return to main menu
         App.setScene("MainMenu");
     }
@@ -84,7 +84,11 @@ public class GameLobbyController implements Initializable {
         protected void updateItem(Player item, boolean empty) {
             super.updateItem(item, empty);
             if (item != null) {
+                setText(null);
                 setGraphic(createGraphic(item)); // cell contents
+            } else {
+                setText(null);
+                setGraphic(null);
             }
         }
 
@@ -114,7 +118,7 @@ public class GameLobbyController implements Initializable {
 
         return hBox;
     }
-    
+
     public void startGame() throws IOException {
         App.setScene("game/MainGameArea");
     }
@@ -125,11 +129,36 @@ public class GameLobbyController implements Initializable {
         });
     }
     
+    public int getPlayerSize() {
+        return players.size();
+    }
+
+    public void removePlayer(Message msg) {
+        Platform.runLater(() -> {
+            for (int i = 0; i < players.size(); i++) {
+                if (players.get(i)
+                        .getUsername().equals(msg.getSenderName())) {
+                    players.remove(i);
+                    break;
+                }
+            }
+        });
+    }
+
+    public void addPlayer(String username, String color) {
+        Platform.runLater(() -> {
+            players.add(new Player(username, color));
+        });
+    }
+
     public void updatePlayers(Message msg) {
         Platform.runLater(() -> {
             players.clear();
-            ArrayList<Player> ls = App.client.extractPlayerList(msg.getContent());
-            players.addAll(ls);
+            ArrayList<Player> l = App.client
+                    .extractPlayerList(msg.getContent());
+            for (Player player : l) {
+                players.add(player);
+            }
         });
     }
 
