@@ -13,10 +13,8 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.Window;
@@ -59,6 +57,10 @@ public class MainGameAreaController{
     private ListView playerNameList;
     @FXML
     private ListView scoreList;
+    @FXML
+    private TextField sendMessageInput;
+    @FXML
+    private TextArea textAreaChat;
 
     private int roundCount = 1;
     private int roundLimit;
@@ -72,6 +74,8 @@ public class MainGameAreaController{
     private Map<String, Integer> playerScore;
     private long startTime;
     public Timeline timer;
+
+
 
     //multiplayer stuff
 
@@ -574,4 +578,148 @@ public class MainGameAreaController{
             e.printStackTrace();
         }
     }
+
+    // CHAT FUNCTIONALITIES
+    public void HandleMessageInput() {
+
+        String messageChat =sendMessageInput.getText();
+
+        if (!messageChat.isEmpty()) {
+            Message message = new Message();
+            message.setSenderName("me"); // Set the sender name as desired
+            message.setContent(messageChat);
+
+            addToTextArea(message); // Add the message to the chat area
+        }
+        if(App.server != null){
+            App.server.listener.sendChatMessage(messageChat);
+
+        }else{
+            App.client.listener.sendChatMessage(messageChat);
+        }
+        sendMessageInput.clear();
+    }
+
+    public void onEnter(){
+        sendMessageInput.setOnKeyPressed(event -> {
+            if (event.getCode() == KeyCode.ENTER) {
+                HandleMessageInput();
+            }
+        });
+    }
+
+    public void addToTextArea(Message message)
+    {
+
+        this.addToTextArea(message.getSenderName() + ": " + message.getContent());
+    }
+    public void addToTextArea(String text){
+// client
+        if(App.client != null)
+        {
+            if(this.textAreaChat.getText().isEmpty())
+                this.textAreaChat.setText(text);
+            else this.textAreaChat.setText(this.textAreaChat.getText() + "\n" + text);
+        }
+        // server
+        else if(App.server != null)
+        {
+            this.textAreaChat.setText(this.textAreaChat.getText() + "\n" + text);
+        }
+    }
+
+//    @Override
+//    public void run() {
+//        while (true) {
+//            tick();
+//
+//            if (!circle && !accepted) {
+//                listenForServerRequest();
+//            }
+//        }
+//    }
+//
+//    private void tick() {
+//        if (errors >= 10) unableToCommunicateWithOpponent = true;
+//
+//        if (!yourTurn && !unableToCommunicateWithOpponent) {
+//            try {
+//                int space = dis.readInt();
+//                if (circle) spaces[space] = "X";
+//                else spaces[space] = "O";
+//                checkForEnemyWin();
+//                checkForTie();
+//                yourTurn = true;
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//                errors++;
+//            }
+//        }
+//    }
+//
+//    private void listenForServerRequest() {
+//        Socket socket = null;
+//        try {
+//            socket = serverSocket.accept();
+//            dos = new DataOutputStream(socket.getOutputStream());
+//            dis = new DataInputStream(socket.getInputStream());
+//            accepted = true;
+//            System.out.println("CLIENT HAS REQUESTED TO JOIN, AND WE HAVE ACCEPTED");
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//    }
+//
+//    private boolean connect() {
+//        try {
+//            socket = new Socket(ip, port);
+//            dos = new DataOutputStream(socket.getOutputStream());
+//            dis = new DataInputStream(socket.getInputStream());
+//            accepted = true;
+//        } catch (IOException e) {
+//            System.out.println("Unable to connect to the address: " + ip + ":" + port + " | Starting a server");
+//            return false;
+//        }
+//        System.out.println("Successfully connected to the server.");
+//        return true;
+//    }
+//
+//    private void initializeServer() {
+//        try {
+//            serverSocket = new ServerSocket(port, 8, InetAddress.getByName(ip));
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//        yourTurn = true;
+//        circle = false;
+//    }
+//
+//    private void render() {
+//        if (unableToCommunicateWithOpponent) {
+//            System.out.println("Render: Unable to communicate");
+//            return;
+//        }
+//
+//        if (accepted) {
+//            if (circle) {
+//                System.out.println("Render: a server");
+//            } else {
+//                System.out.println("Render: a client");
+//            }
+//
+//            if (won || enemyWon) {
+//                if (won) {
+//                    System.out.println("Render: won");
+//                } else if (enemyWon) {
+//                    System.out.println("Render: enemy won");
+//                }
+//            }
+//            if (tie) {
+//                System.out.println("Render: tie");
+//            }
+//        } else {
+//            System.out.println("Render: not accepted");
+//        }
+//
+//    }
 }

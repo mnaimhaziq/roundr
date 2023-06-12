@@ -5,6 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a70aa80d-2ccd-4253-8a2d-f9bc321a0583" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/game/roundr/game/MainGameAreaController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/game/roundr/game/MainGameAreaController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/game/roundr/models/Message.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/game/roundr/models/Message.java" afterDir="false" />
@@ -12,6 +13,8 @@
       <change beforePath="$PROJECT_DIR$/src/main/java/com/game/roundr/network/ClientHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/game/roundr/network/ClientHandler.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/game/roundr/network/ClientListener.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/game/roundr/network/ClientListener.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/game/roundr/network/ServerListener.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/game/roundr/network/ServerListener.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/game/roundr/game/MainGameArea.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/game/roundr/game/MainGameArea.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/game/roundr/lobby/GameLobby.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/game/roundr/lobby/GameLobby.fxml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -36,6 +39,7 @@
   &quot;keyToString&quot;: {
     &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;
+
   }
 }</component>
   <component name="RunManager">
@@ -68,5 +72,16 @@
       <updated>1686547915002</updated>
     </task>
     <servers />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
 </project>
