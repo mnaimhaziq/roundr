@@ -15,11 +15,8 @@ import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
@@ -41,6 +38,58 @@ public class GameLobbyController implements Initializable {
     private ListView<Player> playerList;
 
     private ObservableList<Player> players = FXCollections.observableArrayList();
+
+    @FXML
+    private TextField sendMessageInput;
+    @FXML
+    private TextArea textAreaChat;
+
+    public void HandleMessageInput() {
+
+        String messageChat = sendMessageInput.getText();
+
+        if (!messageChat.isEmpty()) {
+            Message message = new Message();
+            message.setSenderName("me"); // Set the sender name as desired
+            message.setContent(messageChat);
+
+            addToTextArea(message); // Add the message to the chat area
+        }
+        if (App.server != null) {
+            App.server.listener.sendChatMessage(messageChat);
+
+        } else {
+            App.client.listener.sendChatMessage(messageChat);
+        }
+        sendMessageInput.clear();
+    }
+
+    public void onEnter() {
+        sendMessageInput.setOnKeyPressed(event -> {
+            if (event.getCode() == KeyCode.ENTER) {
+                HandleMessageInput();
+            }
+        });
+    }
+
+    public void addToTextArea(Message message) {
+
+        this.addToTextArea(message.getSenderName() + ": " + message.getContent());
+    }
+
+    public void addToTextArea(String text) {
+// client
+        if (App.client != null) {
+            if (this.textAreaChat.getText().isEmpty()) {
+                this.textAreaChat.setText(text);
+            } else {
+                this.textAreaChat.setText(this.textAreaChat.getText() + "\n" + text);
+            }
+        } // server
+        else if (App.server != null) {
+            this.textAreaChat.setText(this.textAreaChat.getText() + "\n" + text);
+        }
+    }
 
     @FXML
     private void handleLeaveButtonClick() throws IOException {

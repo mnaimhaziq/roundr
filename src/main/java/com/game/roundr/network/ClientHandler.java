@@ -4,6 +4,8 @@ import com.game.roundr.App;
 import com.game.roundr.DatabaseConnection;
 import com.game.roundr.game.EndGamePopupController;
 import com.game.roundr.game.MainGameAreaController;
+import com.game.roundr.lobby.GameLobbyController;
+import com.game.roundr.models.Player;
 import com.game.roundr.models.Message;
 import com.game.roundr.models.MessageType;
 import com.google.gson.Gson;
@@ -25,6 +27,8 @@ import java.net.URL;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.ArrayList;
+
 import javafx.application.Platform;
 
 public class ClientHandler implements Runnable {
@@ -39,12 +43,16 @@ public class ClientHandler implements Runnable {
     private boolean isTimerRunning = true;
     private Timeline timer;
 
+    public static ArrayList<ObjectOutputStream> writers;
+
     public ClientHandler(Socket socket, Server server) {
         try {
             this.socket = socket;
             this.server = server;
             input = new ObjectInputStream(socket.getInputStream());
             output = new ObjectOutputStream(socket.getOutputStream());
+            this.writers = new ArrayList<ObjectOutputStream>();
+            this.writers.add(null);
         } catch (IOException e) {
             closeConnection();
         }
@@ -122,6 +130,10 @@ public class ClientHandler implements Runnable {
 
                                 // TODO: add the message to the chat
                                 System.out.println("Chat: " + inboundMsg.getSenderName() + " has joined");
+
+                                //add writer to list
+                                writers.add(this.output);
+                                System.out.println(writers);
                             }
                             break;
                         }
@@ -192,6 +204,19 @@ public class ClientHandler implements Runnable {
                             
                             break;
                         }
+                        case CHAT -> {
+
+                            GameLobbyController gameLobbyController = App.glc;
+                            MainGameAreaController mainGameAreaController = App.mainGameAreaController;
+                            if (gameLobbyController != null) {
+                                gameLobbyController.addToTextArea(inboundMsg);
+                                mainGameAreaController.addToTextArea(inboundMsg);
+                            }
+                            // forward the chat message
+                            broadcastMessage(inboundMsg);
+
+                            break;
+                        }
                         case END_GAME -> {
                             // Handle end game message
                             // Pause the timer and show the popup
@@ -203,6 +228,35 @@ public class ClientHandler implements Runnable {
                             MainGameAreaController mainGameAreaController = App.mainGameAreaController;
                             if (mainGameAreaController != null) {
                                 mainGameAreaController.generateWordPass(inboundMsg);
+                                System.out.println("Client Handler: not null " + inboundMsg.getContent());
+                            } else {
+                                System.out.println("Client Handler: null " + inboundMsg.getContent());
+                            }
+                            // forward the chat message
+                            broadcastMessage(inboundMsg);
+                            break;
+                        }
+                        case PLAYER_SCORE -> {
+                            // add the message to the chat textArea
+                            MainGameAreaController mainGameAreaController = App.mainGameAreaController;
+                            if (mainGameAreaController != null) {
+                                mainGameAreaController.passedScorePass(inboundMsg);
+                                System.out.println("Client Handler PlayerScore: not null ");
+                            } else {
+                                System.out.println("Client Handler PlayerScore: null ");
+                            }
+                            // forward the chat message
+                            broadcastMessage(inboundMsg);
+                            break;
+                        }
+                        case TURN -> {
+                            // add the message to the chat textArea
+                            MainGameAreaController mainGameAreaController = App.mainGameAreaController;
+                            if (mainGameAreaController != null) {
+                                mainGameAreaController.passedShiftedTurn(inboundMsg);
+                                System.out.println("Client Handler Turn: not null ");
+                            } else {
+                                System.out.println("Client Handler Turn: null ");
                             }
                             // forward the chat message
                             broadcastMessage(inboundMsg);

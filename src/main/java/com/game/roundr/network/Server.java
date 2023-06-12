@@ -169,7 +169,7 @@ public class Server {
     }
 
     // get the list of players from database
-    private ArrayList<Player> getPlayers() {
+    public ArrayList<Player> getPlayers() {
         ArrayList<Player> list = new ArrayList();
         try {
             Connection conn = new DatabaseConnection().getConnection();

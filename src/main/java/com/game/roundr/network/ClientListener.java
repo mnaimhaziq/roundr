@@ -3,8 +3,10 @@ package com.game.roundr.network;
 import com.game.roundr.App;
 import com.game.roundr.game.EndGamePopupController;
 import com.game.roundr.game.MainGameAreaController;
+import com.game.roundr.lobby.GameLobbyController;
 import com.game.roundr.models.Message;
 import com.game.roundr.models.MessageType;
+import com.game.roundr.models.Player;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -23,6 +25,7 @@ import java.net.ConnectException;
 import java.net.Socket;
 import java.net.SocketException;
 import java.util.Arrays;
+import java.util.Map;
 import javafx.scene.control.Alert;
 
 public class ClientListener implements Runnable {
@@ -139,6 +142,16 @@ public class ClientListener implements Runnable {
                             }
                             break;
                         }
+                        case CHAT -> {
+                            // add the message to the chat textArea
+                            GameLobbyController gameLobbyController = App.glc;
+                            MainGameAreaController mainGameAreaController = App.mainGameAreaController;
+                            if (gameLobbyController != null) {
+                                gameLobbyController.addToTextArea(inboundMsg);
+                                mainGameAreaController.addToTextArea(inboundMsg);
+                            }
+                            break;
+                        }
                         case END_GAME -> {
                             // show modal
                             // pause timer
@@ -173,6 +186,31 @@ public class ClientListener implements Runnable {
                             MainGameAreaController mainGameAreaController = App.mainGameAreaController;
                             if (mainGameAreaController != null) {
                                 mainGameAreaController.generateWordPass(inboundMsg);
+                                System.out.println("Client Listener: not null " + inboundMsg.getContent());
+                            } else {
+                                System.out.println("Client Listener: null " + inboundMsg.getContent());
+                            }
+                            break;
+                        }
+                        case PLAYER_SCORE -> {
+                            // add the message to the chat textArea
+                            MainGameAreaController mainGameAreaController = App.mainGameAreaController;
+                            if (mainGameAreaController != null) {
+                                mainGameAreaController.passedScorePass(inboundMsg);
+                                System.out.println("Client Listener PlayerScore: not null ");
+                            } else {
+                                System.out.println("Client Listener PlayerScore: null ");
+                            }
+                            break;
+                        }
+                        case TURN -> {
+                            // add the message to the chat textArea
+                            MainGameAreaController mainGameAreaController = App.mainGameAreaController;
+                            if (mainGameAreaController != null) {
+                                mainGameAreaController.passedShiftedTurn(inboundMsg);
+                                System.out.println("Client Listener Turn: not null ");
+                            } else {
+                                System.out.println("Client Listener Turn: null ");
                             }
                             break;
                         }
@@ -252,6 +290,28 @@ public class ClientListener implements Runnable {
         isTimerRunning = true;
     }
 
+    private void sendWordMessage(Message message) {
+        try {
+            client.output.writeObject(message);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void sendWordMessage(String content) {
+        Message msg = new Message(MessageType.RANDOM_WORD, App.username, content);
+        // send the message
+        this.sendWordMessage(msg);
+    }
+
+    private void sendPlayerScore(Message message) {
+        try {
+            client.output.writeObject(message);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     private void sendMessage(Message message) {
         try {
             client.output.writeObject(message);
@@ -260,9 +320,31 @@ public class ClientListener implements Runnable {
         }
     }
 
+    public void sendPlayerScore(Map<String, Integer> playerScore) {
+        Message msg = new Message(MessageType.PLAYER_SCORE, App.username, playerScore);
+        // send the message
+        this.sendPlayerScore(msg);
+    }
+
     public void sendChatMessage(String content) {
         Message msg = new Message(MessageType.CHAT, App.username, content);
+
         // send the message
         this.sendMessage(msg);
+
+    }
+
+    public void sendShiftedTurn(String turn) {
+        Message msg = new Message(MessageType.TURN, App.username, turn);
+        // send the message
+        this.sendShiftedTurn(msg);
+    }
+
+    private void sendShiftedTurn(Message message) {
+        try {
+            client.output.writeObject(message);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

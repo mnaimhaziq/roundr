@@ -8,14 +8,13 @@ import com.game.roundr.network.Client;
 import com.game.roundr.network.ClientListener;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.Window;
@@ -23,10 +22,7 @@ import javafx.util.Duration;
 
 import java.io.*;
 import java.net.*;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -61,6 +57,10 @@ public class MainGameAreaController{
     private ListView playerNameList;
     @FXML
     private ListView scoreList;
+    @FXML
+    private TextField sendMessageInput;
+    @FXML
+    private TextArea textAreaChat;
 
     private int roundCount = 1;
     private int roundLimit;
@@ -74,25 +74,9 @@ public class MainGameAreaController{
     private Map<String, Integer> playerScore;
     private long startTime;
     public Timeline timer;
+    private String turn = App.username;
 
     //multiplayer stuff
-    private String ip = "localhost";
-    private int port = 9001;
-    private Thread thread;
-
-    private Socket socket;
-    private DataOutputStream dos;
-    private DataInputStream dis;
-    private ServerSocket serverSocket;
-
-    private boolean yourTurn = false;
-    private boolean circle = true; //circle means server
-    private boolean accepted = false;
-    private boolean unableToCommunicateWithOpponent = false;
-    private boolean won = false;
-    private boolean enemyWon = false;
-    private boolean tie = false;
-    private int errors = 0;
 
     // Constructor
     public MainGameAreaController() {
@@ -124,6 +108,8 @@ public class MainGameAreaController{
 
     public void initialize() {
 
+        App.mainGameAreaController = this;
+
         try {
             Connection conn = new DatabaseConnection().getConnection();
 
@@ -133,8 +119,6 @@ public class MainGameAreaController{
                     "FROM game\n" +
                     "JOIN player_game ON game.game_id = player_game.game_id\n" +
                     "JOIN player ON player.player_id = player_game.player_id");
-
-
 
             ResultSet rs = stmt.executeQuery();
 
@@ -148,8 +132,6 @@ public class MainGameAreaController{
                 playerCount = rs.getInt("game.player_count");
                 App.username = rs.getString("player.username");
                 gameId = rs.getInt("game.game_id");
-
-
 
             }
 
@@ -171,7 +153,7 @@ public class MainGameAreaController{
         }
 
         //render in-match scoreboard
-        renderLiveScoreboard();
+//        renderLiveScoreboard();
 
         // Update UI labels with initial values
         updateLabels();
@@ -241,8 +223,9 @@ public class MainGameAreaController{
     };
 
     private void updateLabels() {
+        handleShiftedTurn();
         roundLabel.setText("ROUND " + roundCount);
-        playerLabel.setText("Player " + playerCount + "'s turn");
+        playerLabel.setText("Player " + turn + "'s turn");
         timeLimitLabel.setText("Time Limit: " + timeLimit + " seconds");
     }
 
@@ -300,17 +283,24 @@ public class MainGameAreaController{
             generateWordPass(messageGeneratedWord); // Add the message to the chat area
         }
         if(App.server != null){
-            App.server.listener.sendChatMessage(generatedWord);
-
+            App.server.listener.sendWordMessage(generatedWord);
         }else{
-            App.client.listener.sendChatMessage(generatedWord);
+            App.client.listener.sendWordMessage(generatedWord);
         }
 //        sendMessageInput.clear();
     }
 
     public void generateWordPass(Message message)
     {
-        this.generateWordPass(message.getContent());
+//        this.generateWordPass(message.getContent());
+        Platform.runLater(
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        generateWordPass(message.getContent());
+                    }
+                }
+        );
     }
 
     public void generateWordPass(String generatedWord){
@@ -328,16 +318,115 @@ public class MainGameAreaController{
 
     private void startPlayerTurn() {
         // Logic to start the current player's turn
-        System.out.println("Player " + playerCount + "'s turn");
+        System.out.println("Player " + turn + "'s turn");
+
+        if(App.server != null){
+            // shift turn
+            turn = App.server.getPlayers().get(playerCount).getUsername();
+        }
 
         // update players turn
         updateLabels();
 
-        // random word generator
-        handleGeneratedWord();
+        // random word generator by the server
+        if(App.server != null) {
+            handleGeneratedWord();
+        }
 
         // Start the timer for the player's turn
         startTimer();
+    }
+
+    public void handlePassScore() {
+
+            Message messageGeneratedWord = new Message();
+            messageGeneratedWord.setSenderName("me"); // Set the sender name as desired
+            messageGeneratedWord.setPlayerScore(playerScore);
+            passedScorePass(messageGeneratedWord); // Add the message to the chat area
+
+        if(turn == App.username){
+            if(App.server != null){
+                App.server.listener.sendPlayerScore(playerScore);
+            }else{
+                App.client.listener.sendPlayerScore(playerScore);
+            }
+        }
+//        sendMessageInput.clear();
+    }
+
+    public void passedScorePass(Message message)
+    {
+//        this.generateWordPass(message.getContent());
+        Platform.runLater(
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        passedScorePass(message.getPLayerScore());
+                    }
+                }
+        );
+    }
+
+    public void passedScorePass(Map<String, Integer> passedPlayerScore){
+        // client
+        if(App.client != null)
+        {
+            this.playerScore = passedPlayerScore;
+            renderLiveScoreboard();
+            timer.stop();
+            // Start the next player's turn
+            startPlayerTurn();
+        }
+        // server
+        else if(App.server != null)
+        {
+            this.playerScore = passedPlayerScore;
+            renderLiveScoreboard();
+            timer.stop();
+            // Start the next player's turn
+            startPlayerTurn();
+        }
+    }
+
+    public void handleShiftedTurn() {
+
+        Message messageTurn = new Message();
+        messageTurn.setSenderName("me"); // Set the sender name as desired
+        messageTurn.setContent(turn);
+        passedShiftedTurn(messageTurn); // Add the message to the chat area
+
+            if(App.server != null){
+                App.server.listener.sendShiftedTurn(turn);
+            }else{
+//                App.client.listener.sendShiftedTurn(turn);
+            }
+//        sendMessageInput.clear();
+    }
+
+    public void passedShiftedTurn(Message message)
+    {
+//        this.generateWordPass(message.getContent());
+        Platform.runLater(
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        passedShiftedTurn(message.getContent());
+                    }
+                }
+        );
+    }
+
+    public void passedShiftedTurn(String turn){
+        // client
+        if(App.client != null)
+        {
+            this.turn = turn;
+        }
+        // server
+        else if(App.server != null)
+        {
+            this.turn = turn;
+        }
     }
 
     void startTimer() {
@@ -375,33 +464,7 @@ public class MainGameAreaController{
             playerScore.put(Integer.toString(playerCount), playerScore.get(Integer.toString(playerCount))+(int)calculateScore());
             //reload scoreboard
             renderLiveScoreboard();
-
-            //Client-server comm
-//            if (accepted) {
-//                if (yourTurn && !unableToCommunicateWithOpponent && !won && !enemyWon) {
-//
-////                        if (!circle) spaces[position] = "X";
-////                        else spaces[position] = "O";
-//                        yourTurn = false;
-//                        // Repaint
-////                        repaint();
-////                        Toolkit.getDefaultToolkit().sync();
-//
-//                        ObjectMapper objectMapper = new ObjectMapper();
-//
-//                        try {
-//                            dos.writeInt(playerScore);
-//                            dos.flush();
-//                        } catch (IOException e1) {
-//                            errors++;
-//                            e1.printStackTrace();
-//                        }
-//
-//                        System.out.println("DATA WAS SENT");
-//                        checkForWin();
-//                        checkForTie();
-
-//                }
+            handlePassScore();
             }
     }
 
@@ -410,9 +473,6 @@ public class MainGameAreaController{
 
         // Stop the timer
         stopTimer();
-
-        // Pass turn
-        yourTurn = false;
 
         // Increment the currentPlayer for the next turn
         playerCount++;
@@ -570,6 +630,55 @@ public class MainGameAreaController{
             popupStage.showAndWait();
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    // CHAT FUNCTIONALITIES
+    public void HandleMessageInput() {
+
+        String messageChat = sendMessageInput.getText();
+
+        if (!messageChat.isEmpty()) {
+            Message message = new Message();
+            message.setSenderName("me"); // Set the sender name as desired
+            message.setContent(messageChat);
+
+            addToTextArea(message); // Add the message to the chat area
+        }
+        if(App.server != null){
+            App.server.listener.sendChatMessage(messageChat);
+
+        }else{
+            App.client.listener.sendChatMessage(messageChat);
+        }
+        sendMessageInput.clear();
+    }
+
+    public void onEnter(){
+        sendMessageInput.setOnKeyPressed(event -> {
+            if (event.getCode() == KeyCode.ENTER) {
+                HandleMessageInput();
+            }
+        });
+    }
+
+    public void addToTextArea(Message message)
+    {
+
+        this.addToTextArea(message.getSenderName() + ": " + message.getContent());
+    }
+    public void addToTextArea(String text){
+        // client
+        if(App.client != null)
+        {
+            if(this.textAreaChat.getText().isEmpty())
+                this.textAreaChat.setText(text);
+            else this.textAreaChat.setText(this.textAreaChat.getText() + "\n" + text);
+        }
+        // server
+        else if(App.server != null)
+        {
+            this.textAreaChat.setText(this.textAreaChat.getText() + "\n" + text);
         }
     }
 
