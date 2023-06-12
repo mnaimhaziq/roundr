@@ -4,7 +4,6 @@ import com.game.roundr.App;
 import com.game.roundr.DatabaseConnection;
 import com.game.roundr.game.EndGamePopupController;
 import com.game.roundr.game.MainGameAreaController;
-import com.game.roundr.models.Player;
 import com.game.roundr.models.Message;
 import com.game.roundr.models.MessageType;
 import javafx.animation.Animation;
@@ -113,7 +112,8 @@ public class ClientHandler implements Runnable {
                                 // inform the new player that connection is confirmed
                                 outboundMsg.setMsgType(MessageType.CONNECT_OK);
                                 outboundMsg.setSenderName(App.username);
-                                outboundMsg.setContent(server.getPlayerList());
+                                outboundMsg.setContent(server.getPlayerList()
+                                        .concat(";" + server.gameId + ";" + App.username));
 
                                 // send the reply msg to the client
                                 output.writeObject(outboundMsg);

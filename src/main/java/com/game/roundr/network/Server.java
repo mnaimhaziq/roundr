@@ -73,6 +73,9 @@ public class Server {
                 if (generatedKeys.next()) {
                     this.gameId = generatedKeys.getInt(1);
                 }
+                
+                // set the lobby name and lobby code
+                App.glc.SetLobbyInfo(App.username, "" + gameId);
 
                 // create player_game entry for host
                 stmt = conn.prepareStatement("INSERT INTO player_game(game_id,"

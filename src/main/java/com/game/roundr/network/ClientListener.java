@@ -22,6 +22,7 @@ import java.io.ObjectOutputStream;
 import java.net.ConnectException;
 import java.net.Socket;
 import java.net.SocketException;
+import java.util.Arrays;
 import javafx.scene.control.Alert;
 
 public class ClientListener implements Runnable {
@@ -81,6 +82,15 @@ public class ClientListener implements Runnable {
                             // reset the list of players
                             App.glc.clearPlayers();
 
+                            // set the gamecode and host
+                            String[] msgContent = inboundMsg.getContent().split(";");
+                            App.glc.SetLobbyInfo(
+                                    msgContent[msgContent.length-1], msgContent[msgContent.length-2]);
+                            
+                            // extract gamecode and host
+                            String[] pDetails = Arrays.copyOfRange(msgContent, 0, msgContent.length-2);
+                            inboundMsg.setContent(String.join(";", pDetails)); // clean player
+                            
                             // fetch the list of players
                             App.glc.updatePlayers(inboundMsg);
 

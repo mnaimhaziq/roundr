@@ -29,6 +29,9 @@ import javafx.scene.text.Font;
 public class GameLobbyController implements Initializable {
 
     @FXML
+    private Label lobbyName;
+
+    @FXML
     private TextField gameCode;
 
     @FXML
@@ -122,13 +125,13 @@ public class GameLobbyController implements Initializable {
     public void startGame() throws IOException {
         App.setScene("game/MainGameArea");
     }
-    
+
     public void clearPlayers() {
         Platform.runLater(() -> {
             players.clear();
         });
     }
-    
+
     public int getPlayerSize() {
         return players.size();
     }
@@ -159,6 +162,13 @@ public class GameLobbyController implements Initializable {
             for (Player player : l) {
                 players.add(player);
             }
+        });
+    }
+
+    public void SetLobbyInfo(String name, String gameID) {
+        Platform.runLater(() -> {
+            lobbyName.setText(name.toUpperCase() + "'S LOBBY");
+            gameCode.setText(gameID);
         });
     }
 
