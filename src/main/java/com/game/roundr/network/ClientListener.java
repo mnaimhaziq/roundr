@@ -144,6 +144,14 @@ public class ClientListener implements Runnable {
                             Platform.runLater(this::showEndGamePopup);
                             break;
                         }
+                        case RANDOM_WORD -> {
+                            // add the message to the chat textArea
+                            MainGameAreaController mainGameAreaController = App.mainGameAreaController;
+                            if (mainGameAreaController != null) {
+                                mainGameAreaController.generateWordPass(inboundMsg);
+                            }
+                            break;
+                        }
                         default -> {
                             System.out.println("Client: Received unknown message type: " + inboundMsg.toString());
                         }
@@ -216,9 +224,24 @@ public class ClientListener implements Runnable {
         timer = new Timeline(new KeyFrame(Duration.seconds(1), event -> {
             // Timer logic here
         }));
-
         // Call the play() method
         timer.play();
         isTimerRunning = true;
+    }
+
+    private void sendMessage(Message message)
+    {
+        try {
+            client.output.writeObject(message);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void sendChatMessage(String content)
+    {
+        Message msg = new Message(MessageType.CHAT, App.username, content);
+        // send the message
+        this.sendMessage(msg);
     }
 }

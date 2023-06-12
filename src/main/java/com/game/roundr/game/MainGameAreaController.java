@@ -2,6 +2,8 @@ package com.game.roundr.game;
 
 import com.game.roundr.App;
 import com.game.roundr.DatabaseConnection;
+import com.game.roundr.models.Message;
+import com.game.roundr.models.Player;
 import com.game.roundr.network.Client;
 import com.game.roundr.network.ClientListener;
 import javafx.animation.KeyFrame;
@@ -19,7 +21,8 @@ import javafx.stage.Stage;
 import javafx.stage.Window;
 import javafx.util.Duration;
 
-import java.io.IOException;
+import java.io.*;
+import java.net.*;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -29,13 +32,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import java.io.BufferedReader;
 import com.google.gson.Gson;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 
-public class MainGameAreaController {
+public class MainGameAreaController{
 
     @FXML
     private Label roundLabel;
@@ -76,6 +75,25 @@ public class MainGameAreaController {
     private long startTime;
     public Timeline timer;
 
+    //multiplayer stuff
+    private String ip = "localhost";
+    private int port = 9001;
+    private Thread thread;
+
+    private Socket socket;
+    private DataOutputStream dos;
+    private DataInputStream dis;
+    private ServerSocket serverSocket;
+
+    private boolean yourTurn = false;
+    private boolean circle = true; //circle means server
+    private boolean accepted = false;
+    private boolean unableToCommunicateWithOpponent = false;
+    private boolean won = false;
+    private boolean enemyWon = false;
+    private boolean tie = false;
+    private int errors = 0;
+
     // Constructor
     public MainGameAreaController() {
         // Initialize the timer
@@ -83,6 +101,12 @@ public class MainGameAreaController {
             // Code to update the timer label or perform actions every second
         }));
         this.timer.setCycleCount(Timeline.INDEFINITE); // Set the cycle count or use a specific value
+
+//        if (!connect()) initializeServer();
+//
+//        thread = new Thread(this, "MainGameAreaController");
+//        thread.start();
+
     }
 
     // Setter method for MainGameAreaController instance
@@ -137,8 +161,6 @@ public class MainGameAreaController {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-
-        System.out.println(App.username);
 
         // Initialize Player - Score Map
         playerScore = new HashMap<>();
@@ -266,6 +288,44 @@ public class MainGameAreaController {
         return null;
     }
 
+    public void handleGeneratedWord() {
+
+        String generatedWord = getRandomWord();
+
+        if (!generatedWord.isEmpty()) {
+            Message messageGeneratedWord = new Message();
+            messageGeneratedWord.setSenderName("me"); // Set the sender name as desired
+            messageGeneratedWord.setContent(generatedWord);
+
+            generateWordPass(messageGeneratedWord); // Add the message to the chat area
+        }
+        if(App.server != null){
+            App.server.listener.sendChatMessage(generatedWord);
+
+        }else{
+            App.client.listener.sendChatMessage(generatedWord);
+        }
+//        sendMessageInput.clear();
+    }
+
+    public void generateWordPass(Message message)
+    {
+        this.generateWordPass(message.getContent());
+    }
+
+    public void generateWordPass(String generatedWord){
+        // client
+        if(App.client != null)
+        {
+            randomWord.setText(generatedWord);
+        }
+        // server
+        else if(App.server != null)
+        {
+            randomWord.setText(generatedWord);
+        }
+    }
+
     private void startPlayerTurn() {
         // Logic to start the current player's turn
         System.out.println("Player " + playerCount + "'s turn");
@@ -274,7 +334,7 @@ public class MainGameAreaController {
         updateLabels();
 
         // random word generator
-        randomWord.setText(getRandomWord());
+        handleGeneratedWord();
 
         // Start the timer for the player's turn
         startTimer();
@@ -315,7 +375,34 @@ public class MainGameAreaController {
             playerScore.put(Integer.toString(playerCount), playerScore.get(Integer.toString(playerCount))+(int)calculateScore());
             //reload scoreboard
             renderLiveScoreboard();
-        }
+
+            //Client-server comm
+//            if (accepted) {
+//                if (yourTurn && !unableToCommunicateWithOpponent && !won && !enemyWon) {
+//
+////                        if (!circle) spaces[position] = "X";
+////                        else spaces[position] = "O";
+//                        yourTurn = false;
+//                        // Repaint
+////                        repaint();
+////                        Toolkit.getDefaultToolkit().sync();
+//
+//                        ObjectMapper objectMapper = new ObjectMapper();
+//
+//                        try {
+//                            dos.writeInt(playerScore);
+//                            dos.flush();
+//                        } catch (IOException e1) {
+//                            errors++;
+//                            e1.printStackTrace();
+//                        }
+//
+//                        System.out.println("DATA WAS SENT");
+//                        checkForWin();
+//                        checkForTie();
+
+//                }
+            }
     }
 
     private void handlePlayerTurnEnd() throws IOException {
@@ -323,6 +410,9 @@ public class MainGameAreaController {
 
         // Stop the timer
         stopTimer();
+
+        // Pass turn
+        yourTurn = false;
 
         // Increment the currentPlayer for the next turn
         playerCount++;
@@ -482,4 +572,99 @@ public class MainGameAreaController {
             e.printStackTrace();
         }
     }
+
+//    @Override
+//    public void run() {
+//        while (true) {
+//            tick();
+//
+//            if (!circle && !accepted) {
+//                listenForServerRequest();
+//            }
+//        }
+//    }
+//
+//    private void tick() {
+//        if (errors >= 10) unableToCommunicateWithOpponent = true;
+//
+//        if (!yourTurn && !unableToCommunicateWithOpponent) {
+//            try {
+//                int space = dis.readInt();
+//                if (circle) spaces[space] = "X";
+//                else spaces[space] = "O";
+//                checkForEnemyWin();
+//                checkForTie();
+//                yourTurn = true;
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//                errors++;
+//            }
+//        }
+//    }
+//
+//    private void listenForServerRequest() {
+//        Socket socket = null;
+//        try {
+//            socket = serverSocket.accept();
+//            dos = new DataOutputStream(socket.getOutputStream());
+//            dis = new DataInputStream(socket.getInputStream());
+//            accepted = true;
+//            System.out.println("CLIENT HAS REQUESTED TO JOIN, AND WE HAVE ACCEPTED");
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//    }
+//
+//    private boolean connect() {
+//        try {
+//            socket = new Socket(ip, port);
+//            dos = new DataOutputStream(socket.getOutputStream());
+//            dis = new DataInputStream(socket.getInputStream());
+//            accepted = true;
+//        } catch (IOException e) {
+//            System.out.println("Unable to connect to the address: " + ip + ":" + port + " | Starting a server");
+//            return false;
+//        }
+//        System.out.println("Successfully connected to the server.");
+//        return true;
+//    }
+//
+//    private void initializeServer() {
+//        try {
+//            serverSocket = new ServerSocket(port, 8, InetAddress.getByName(ip));
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//        yourTurn = true;
+//        circle = false;
+//    }
+//
+//    private void render() {
+//        if (unableToCommunicateWithOpponent) {
+//            System.out.println("Render: Unable to communicate");
+//            return;
+//        }
+//
+//        if (accepted) {
+//            if (circle) {
+//                System.out.println("Render: a server");
+//            } else {
+//                System.out.println("Render: a client");
+//            }
+//
+//            if (won || enemyWon) {
+//                if (won) {
+//                    System.out.println("Render: won");
+//                } else if (enemyWon) {
+//                    System.out.println("Render: enemy won");
+//                }
+//            }
+//            if (tie) {
+//                System.out.println("Render: tie");
+//            }
+//        } else {
+//            System.out.println("Render: not accepted");
+//        }
+//
+//    }
 }

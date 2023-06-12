@@ -189,5 +189,3 @@ public class JoinLobbyController implements Initializable {
     }
 }
 
-}
-
