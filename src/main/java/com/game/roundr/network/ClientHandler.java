@@ -218,9 +218,13 @@ public class ClientHandler implements Runnable {
                             break;
                         }
                         case END_GAME -> {
-                            // Handle end game message
-                            // Pause the timer and show the popup
-                            // Broadcast the message to all other clients
+                            MainGameAreaController mainGameAreaController = App.mainGameAreaController;
+                            if (mainGameAreaController != null) {
+                                mainGameAreaController.passedEndGamePopup(inboundMsg);
+                                System.out.println("Client Handler: not null");
+                            } else {
+                                System.out.println("Client Handler: null");
+                            }
                             broadcastMessage(inboundMsg);
                             break;
                         }

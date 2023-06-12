@@ -164,8 +164,7 @@ public class ClientListener implements Runnable {
 //                                showEndGamePopup();
 //                            });
 //                            break;
-                            // Handle end game message
-                            System.out.println("Requested to end the game");
+
 
 //                            // Update the shared variable based on the timer state
 //                            boolean timerRunning = mgac.timer.getStatus() == Animation.Status.RUNNING;
@@ -177,8 +176,21 @@ public class ClientListener implements Runnable {
 //                            } else {
 //                                mgac.getTimer().pause();
 //                            }
-                            // Show the end game popup
-                            Platform.runLater(this::showEndGamePopup);
+
+
+//                            // Handle end game message
+//                            System.out.println("Requested to end the game");
+//
+//                            // Show the end game popup
+//                            Platform.runLater(this::showEndGamePopup);
+
+                            MainGameAreaController mainGameAreaController = App.mainGameAreaController;
+                            if (mainGameAreaController != null) {
+                                mainGameAreaController.passedEndGamePopup(inboundMsg);
+                                System.out.println("Client Listener: not null " + inboundMsg.getContent());
+                            } else {
+                                System.out.println("Client Listener: null " + inboundMsg.getContent());
+                            }
                             break;
                         }
                         case RANDOM_WORD -> {
@@ -341,6 +353,20 @@ public class ClientListener implements Runnable {
     }
 
     private void sendShiftedTurn(Message message) {
+        try {
+            client.output.writeObject(message);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void sendEndGameRequest() {
+        Message msg = new Message(MessageType.END_GAME, App.username, "");
+        // send the message
+        this.sendEndGameRequest(msg);
+    }
+
+    private void sendEndGameRequest(Message message) {
         try {
             client.output.writeObject(message);
         } catch (IOException e) {

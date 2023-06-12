@@ -78,7 +78,7 @@ public class GameLobbyController implements Initializable {
     }
 
     public void addToTextArea(String text) {
-// client
+        // client
         if (App.client != null) {
             if (this.textAreaChat.getText().isEmpty()) {
                 this.textAreaChat.setText(text);
