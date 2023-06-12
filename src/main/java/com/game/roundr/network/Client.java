@@ -1,16 +1,14 @@
 package com.game.roundr.network;
 
+import com.game.roundr.App;
 import com.game.roundr.game.MainGameAreaController;
 import com.game.roundr.models.Player;
 import com.game.roundr.models.Message;
 import com.game.roundr.models.MessageType;
-import javafx.application.Platform;
-
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
-import java.util.List;
 
 public class Client {
 
@@ -19,7 +17,6 @@ public class Client {
     protected ObjectInputStream input;
     protected final String username;
     private final int PORT = 9001;
-
 
     public Client(String address, String username, MainGameAreaController mgac) {
         this.username = username;
@@ -31,12 +28,13 @@ public class Client {
     }
 
     public void closeClient() {
+        App.glc.clearPlayers();
         Message msg = new Message(
                 MessageType.DISCONNECT, username, "");
         this.sendMessage(msg);
     }
 
-    private void sendMessage(Message message) {
+    protected void sendMessage(Message message) {
         try {
             output.writeObject(message);
             output.flush();
@@ -45,19 +43,24 @@ public class Client {
         }
     }
 
-    protected List<Player> extractUserList(String s) {
-        List<Player> list = new ArrayList<>();
+    public ArrayList<Player> extractPlayerList(String s) {
+        ArrayList<Player> list = new ArrayList<>();
 
         String[] players = s.split(";");
 
         for (String playerStr : players) {
-            String[] playerInfo = playerStr.split(","); // get info
-            Player player = new Player(playerInfo[0]);
-            player.setIsReady(Boolean.parseBoolean(playerInfo[1]));
+            String[] playerInfo = playerStr.split(",");
+            Player player = new Player(playerInfo[0], playerInfo[1]);
+            player.setIsReady(Boolean.parseBoolean(playerInfo[2]));
             list.add(player);
         }
 
         return list;
+    }
+    
+    public void sendReady(String ready) {
+        Message msg = new Message(MessageType.READY, App.username, ready);
+        sendMessage(msg);
     }
 
     public void sendEndGameRequest() {
@@ -79,7 +82,5 @@ public class Client {
 //            // Handle other message types as needed
 //        }
     }
-
-
 
 }
