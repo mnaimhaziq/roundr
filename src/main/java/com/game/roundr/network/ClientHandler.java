@@ -266,6 +266,19 @@ public class ClientHandler implements Runnable {
                             broadcastMessage(inboundMsg);
                             break;
                         }
+                        case TURN -> {
+                            // add the message to the chat textArea
+                            MainGameAreaController mainGameAreaController = App.mainGameAreaController;
+                            if (mainGameAreaController != null) {
+                                mainGameAreaController.passedShiftedTurn(inboundMsg);
+                                System.out.println("Client Handler Turn: not null ");
+                            } else {
+                                System.out.println("Client Handler Turn: null ");
+                            }
+                            // forward the chat message
+                            broadcastMessage(inboundMsg);
+                            break;
+                        }
                         default -> {
                             System.out.println("Server: Received unknown message type: " + inboundMsg.getMsgType());
                         }

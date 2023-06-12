@@ -131,4 +131,25 @@ public class ServerListener implements Runnable {
             }
         }
     }
+
+    public void sendShiftedTurn(String turn)
+    {
+        Message msg = new Message(MessageType.TURN, App.username, turn);
+
+        // send the chat message to everyone
+        this.sendShiftedTurn(msg);
+    }
+
+    private void sendShiftedTurn(Message message)
+    {
+        // send the message to each user except the server
+        for (ClientHandler handler : server.handlers) {
+            try {
+                handler.output.writeObject(message);
+                handler.output.flush();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 }

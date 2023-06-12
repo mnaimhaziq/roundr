@@ -179,6 +179,17 @@ public class ClientListener implements Runnable {
                             }
                             break;
                         }
+                        case TURN -> {
+                            // add the message to the chat textArea
+                            MainGameAreaController mainGameAreaController = App.mainGameAreaController;
+                            if (mainGameAreaController != null) {
+                                mainGameAreaController.passedShiftedTurn(inboundMsg);
+                                System.out.println("Client Listener Turn: not null ");
+                            } else {
+                                System.out.println("Client Listener Turn: null ");
+                            }
+                            break;
+                        }
                         default -> {
                             System.out.println("Client: Received unknown message type: " + inboundMsg.toString());
                         }
@@ -272,7 +283,13 @@ public class ClientListener implements Runnable {
         this.sendWordMessage(msg);
     }
 
-    private void sendPlayerScore(Message message)
+    private void sendPlayerScore(Message message) {
+        try {
+            client.output.writeObject(message);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
 
     private void sendMessage(Message message)
@@ -284,7 +301,6 @@ public class ClientListener implements Runnable {
             e.printStackTrace();
         }
     }
-
 
     public void sendPlayerScore(Map<String, Integer> playerScore)
     {
@@ -300,5 +316,20 @@ public class ClientListener implements Runnable {
         // send the message
         this.sendMessage(msg);
 
+    }
+
+    public void sendShiftedTurn(String turn)
+    {
+        Message msg = new Message(MessageType.TURN, App.username, turn);
+        // send the message
+        this.sendShiftedTurn(msg);
+    }
+
+    private void sendShiftedTurn(Message message) {
+        try {
+            client.output.writeObject(message);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
