@@ -85,4 +85,25 @@ public class ServerListener implements Runnable {
             }
         }
     }
+
+    public void sendWordMessage(String content)
+    {
+        Message msg = new Message(MessageType.RANDOM_WORD, App.username, content);
+
+        // send the chat message to everyone
+        this.sendWordMessage(msg);
+    }
+
+    private void sendWordMessage(Message message)
+    {
+        // send the message to each user except the server
+        for (ClientHandler handler : server.handlers) {
+            try {
+                handler.output.writeObject(message);
+                handler.output.flush();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 }

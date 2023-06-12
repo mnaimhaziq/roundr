@@ -300,10 +300,10 @@ public class MainGameAreaController{
             generateWordPass(messageGeneratedWord); // Add the message to the chat area
         }
         if(App.server != null){
-            App.server.listener.sendChatMessage(generatedWord);
+            App.server.listener.sendWordMessage(generatedWord);
 
         }else{
-            App.client.listener.sendChatMessage(generatedWord);
+            App.client.listener.sendWordMessage(generatedWord);
         }
 //        sendMessageInput.clear();
     }

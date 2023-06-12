@@ -229,7 +229,7 @@ public class ClientListener implements Runnable {
         isTimerRunning = true;
     }
 
-    private void sendMessage(Message message)
+    private void sendWordMessage(Message message)
     {
         try {
             client.output.writeObject(message);
@@ -238,10 +238,10 @@ public class ClientListener implements Runnable {
         }
     }
 
-    public void sendChatMessage(String content)
+    public void sendWordMessage(String content)
     {
-        Message msg = new Message(MessageType.CHAT, App.username, content);
+        Message msg = new Message(MessageType.RANDOM_WORD, App.username, content);
         // send the message
-        this.sendMessage(msg);
+        this.sendWordMessage(msg);
     }
 }
