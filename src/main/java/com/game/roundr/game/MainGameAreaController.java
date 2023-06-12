@@ -12,10 +12,8 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.Window;
@@ -61,6 +59,10 @@ public class MainGameAreaController{
     private ListView playerNameList;
     @FXML
     private ListView scoreList;
+    @FXML
+    private TextField sendMessageInput;
+    @FXML
+    private TextArea textAreaChat;
 
     private int roundCount = 1;
     private int roundLimit;
@@ -74,6 +76,8 @@ public class MainGameAreaController{
     private Map<String, Integer> playerScore;
     private long startTime;
     public Timeline timer;
+
+
 
     //multiplayer stuff
     private String ip = "localhost";
@@ -570,6 +574,55 @@ public class MainGameAreaController{
             popupStage.showAndWait();
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    // CHAT FUNCTIONALITIES
+    public void HandleMessageInput() {
+
+        String messageChat =sendMessageInput.getText();
+
+        if (!messageChat.isEmpty()) {
+            Message message = new Message();
+            message.setSenderName("me"); // Set the sender name as desired
+            message.setContent(messageChat);
+
+            addToTextArea(message); // Add the message to the chat area
+        }
+        if(App.server != null){
+            App.server.listener.sendChatMessage(messageChat);
+
+        }else{
+            App.client.listener.sendChatMessage(messageChat);
+        }
+        sendMessageInput.clear();
+    }
+
+    public void onEnter(){
+        sendMessageInput.setOnKeyPressed(event -> {
+            if (event.getCode() == KeyCode.ENTER) {
+                HandleMessageInput();
+            }
+        });
+    }
+
+    public void addToTextArea(Message message)
+    {
+
+        this.addToTextArea(message.getSenderName() + ": " + message.getContent());
+    }
+    public void addToTextArea(String text){
+// client
+        if(App.client != null)
+        {
+            if(this.textAreaChat.getText().isEmpty())
+                this.textAreaChat.setText(text);
+            else this.textAreaChat.setText(this.textAreaChat.getText() + "\n" + text);
+        }
+        // server
+        else if(App.server != null)
+        {
+            this.textAreaChat.setText(this.textAreaChat.getText() + "\n" + text);
         }
     }
 
