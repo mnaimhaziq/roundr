@@ -55,7 +55,7 @@
                      <font>
                         <Font name="Inter Regular" size="18.0" />
                      </font></TextField>
-                  <Button fx:id="submitButton" alignment="CENTER_RIGHT" mnemonicParsing="false" style="-fx-background-color: lightblue;" text="Submit" textFill="WHITE">
+                  <Button fx:id="submitButton" alignment="CENTER_RIGHT" mnemonicParsing="false" style="-fx-background-color: #61B3FF;" text="Submit" textFill="WHITE">
                      <font>
                         <Font name="Inter Regular" size="18.0" />
                      </font></Button>
@@ -119,7 +119,7 @@
                            <font>
                               <Font name="Inter Regular" size="18.0" />
                            </font></TextField>
-                        <Button  mnemonicParsing="false" onAction="#HandleMessageInput"  style="-fx-background-color: lightblue;" text="Submit" textFill="WHITE">
+                        <Button  mnemonicParsing="false" onAction="#HandleMessageInput"  style="-fx-background-color: #61B3FF;" text="Submit" textFill="WHITE">
                            <font>
                               <Font name="Inter Regular" size="18.0" />
                            </font></Button>

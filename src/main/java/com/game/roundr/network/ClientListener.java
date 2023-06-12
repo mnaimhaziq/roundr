@@ -123,8 +123,10 @@ public class ClientListener implements Runnable {
                         {
                             // add the message to the chat textArea
                             GameLobbyController gameLobbyController = App.glc;
+                            MainGameAreaController mainGameAreaController = App.mainGameAreaController;
                             if (gameLobbyController != null) {
                                 gameLobbyController.addToTextArea(inboundMsg);
+                                mainGameAreaController.addToTextArea(inboundMsg);
                             }
                             break;
                         }

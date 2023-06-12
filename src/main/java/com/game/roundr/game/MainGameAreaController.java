@@ -636,7 +636,7 @@ public class MainGameAreaController{
     // CHAT FUNCTIONALITIES
     public void HandleMessageInput() {
 
-        String messageChat =sendMessageInput.getText();
+        String messageChat = sendMessageInput.getText();
 
         if (!messageChat.isEmpty()) {
             Message message = new Message();
@@ -668,7 +668,7 @@ public class MainGameAreaController{
         this.addToTextArea(message.getSenderName() + ": " + message.getContent());
     }
     public void addToTextArea(String text){
-// client
+        // client
         if(App.client != null)
         {
             if(this.textAreaChat.getText().isEmpty())

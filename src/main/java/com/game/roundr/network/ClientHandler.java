@@ -226,8 +226,10 @@ public class ClientHandler implements Runnable {
                         case CHAT -> {
 
                             GameLobbyController gameLobbyController = App.glc;
+                            MainGameAreaController mainGameAreaController = App.mainGameAreaController;
                             if (gameLobbyController != null) {
                                 gameLobbyController.addToTextArea(inboundMsg);
+                                mainGameAreaController.addToTextArea(inboundMsg);
                             }
                             // forward the chat message
                             broadcastMessage(inboundMsg);
