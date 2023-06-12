@@ -166,9 +166,11 @@ public class MainGameAreaController{
         // Handle end game button
         endGameButton.setOnAction(event -> {
             if (App.client != null) {
+                handleEndGamePopup();
                 App.client.sendEndGameRequest();
             } else if (App.server != null) {
-//                App.server.sendEndGameRequest();
+                handleEndGamePopup();
+                App.server.sendEndGameRequest();
             }
             handleEndGameButton();
         });
@@ -322,7 +324,7 @@ public class MainGameAreaController{
 
         if(App.server != null){
             // shift turn
-            turn = App.server.getPlayers().get(playerCount).getUsername();
+            turn = App.server.getPlayers().get(playerCount-1).getUsername();
         }
 
         // update players turn
@@ -427,6 +429,43 @@ public class MainGameAreaController{
         {
             this.turn = turn;
         }
+    }
+
+    public void handleEndGamePopup() {
+
+        Message messagePopup = new Message();
+        messagePopup.setSenderName("me"); // Set the sender name as desired
+        passedEndGamePopup(messagePopup); // Add the message to the chat area
+
+        if(App.server != null){
+            App.server.listener.sendEndGameRequest();
+        }else{
+            App.client.listener.sendEndGameRequest();
+        }
+
+    }
+
+    public void passedEndGamePopup(Message message) {
+
+        Platform.runLater(
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        passedEndGamePopup(message.getContent());
+                    }
+                }
+        );
+
+    }
+
+    public void passedEndGamePopup(String content) {
+
+        if (App.server != null) {
+            handleEndGameButton();
+        } else{
+            handleEndGameButton();
+        }
+
     }
 
     void startTimer() {

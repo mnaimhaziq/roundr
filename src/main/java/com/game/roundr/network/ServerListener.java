@@ -51,12 +51,6 @@ public class ServerListener implements Runnable {
         }
     }
 
-    public void sendEndGameRequestToClients() {
-        Message message = new Message(MessageType.END_GAME, 
-                App.username, "");
-        broadcastMessageToClients(message);
-    }
-
     public void broadcastMessageToClients(Message message) {
         // Send the message to all connected clients
         for (ClientHandler handler : server.handlers) {
@@ -141,6 +135,25 @@ public class ServerListener implements Runnable {
     }
 
     private void sendShiftedTurn(Message message)
+    {
+        // send the message to each user except the server
+        for (ClientHandler handler : server.handlers) {
+            try {
+                handler.output.writeObject(message);
+                handler.output.flush();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void sendEndGameRequest() {
+        Message message = new Message(MessageType.END_GAME,
+                App.username, "");
+        this.sendEndGameRequest(message);
+    }
+
+    private void sendEndGameRequest(Message message)
     {
         // send the message to each user except the server
         for (ClientHandler handler : server.handlers) {

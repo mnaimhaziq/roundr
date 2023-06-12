@@ -8,10 +8,9 @@
       <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/game/roundr/game/MainGameAreaController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/game/roundr/game/MainGameAreaController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/game/roundr/models/MessageType.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/game/roundr/models/MessageType.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/game/roundr/lobby/GameLobbyController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/game/roundr/lobby/GameLobbyController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/game/roundr/network/ClientHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/game/roundr/network/ClientHandler.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/game/roundr/network/ClientListener.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/game/roundr/network/ClientListener.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/game/roundr/network/Server.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/game/roundr/network/Server.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/game/roundr/network/ServerListener.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/game/roundr/network/ServerListener.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
