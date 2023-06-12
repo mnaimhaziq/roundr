@@ -1,5 +1,6 @@
 package com.game.roundr;
 
+import com.game.roundr.game.MainGameAreaController;
 import com.game.roundr.lobby.GameLobbyController;
 import com.game.roundr.network.Client;
 import com.game.roundr.network.Server;
@@ -20,6 +21,7 @@ public class App extends Application {
     public static Server server;
     public static Client client;
     public static GameLobbyController glc;
+    public static MainGameAreaController mainGameAreaController;
 
     @Override
     public void start(Stage stage) throws IOException {

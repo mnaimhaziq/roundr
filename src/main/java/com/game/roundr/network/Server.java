@@ -20,7 +20,7 @@ import java.util.ArrayList;
 public class Server {
 
     private static final int PORT = 9001;
-    private ServerListener listener;
+    public ServerListener listener;
     protected int gameId;
     protected final Config config;
     protected ArrayList<ClientHandler> handlers = new ArrayList<>(); // Runnables
