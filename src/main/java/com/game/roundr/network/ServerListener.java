@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
+import java.util.Map;
 
 public class ServerListener implements Runnable {
 
@@ -95,6 +96,27 @@ public class ServerListener implements Runnable {
     }
 
     private void sendWordMessage(Message message)
+    {
+        // send the message to each user except the server
+        for (ClientHandler handler : server.handlers) {
+            try {
+                handler.output.writeObject(message);
+                handler.output.flush();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void sendPlayerScore(Map<String, Integer> playerScore)
+    {
+        Message msg = new Message(MessageType.PLAYER_SCORE, App.username, playerScore);
+
+        // send the chat message to everyone
+        this.sendPlayerScore(msg);
+    }
+
+    private void sendPlayerScore(Message message)
     {
         // send the message to each user except the server
         for (ClientHandler handler : server.handlers) {

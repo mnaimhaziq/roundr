@@ -223,6 +223,22 @@ public class ClientHandler implements Runnable {
                             MainGameAreaController mainGameAreaController = App.mainGameAreaController;
                             if (mainGameAreaController != null) {
                                 mainGameAreaController.generateWordPass(inboundMsg);
+                                System.out.println("Client Handler: not null " + inboundMsg.getContent());
+                            } else {
+                                System.out.println("Client Handler: null " + inboundMsg.getContent());
+                            }
+                            // forward the chat message
+                            broadcastMessage(inboundMsg);
+                            break;
+                        }
+                        case PLAYER_SCORE -> {
+                            // add the message to the chat textArea
+                            MainGameAreaController mainGameAreaController = App.mainGameAreaController;
+                            if (mainGameAreaController != null) {
+                                mainGameAreaController.passedScorePass(inboundMsg);
+                                System.out.println("Client Handler PlayerScore: not null ");
+                            } else {
+                                System.out.println("Client Handler PlayerScore: null ");
                             }
                             // forward the chat message
                             broadcastMessage(inboundMsg);
