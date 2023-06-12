@@ -64,6 +64,10 @@ public class Client {
 
         // update the player list
         App.glc.updatePlayer(msg);
+        
+        // if all ready, then start
+        App.glc.startGame();
+        
         sendMessage(msg);
     }
 

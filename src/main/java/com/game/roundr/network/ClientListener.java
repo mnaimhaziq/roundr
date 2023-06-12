@@ -111,9 +111,7 @@ public class ClientListener implements Runnable {
                             App.glc.updatePlayer(inboundMsg);
 
                             // if all ready, then start
-                            if (App.glc.isAllReady()) {
-                                App.setScene("game/MainGameArea");
-                            }
+                            App.glc.startGame();
                             break;
                         }
                         case CHAT -> {

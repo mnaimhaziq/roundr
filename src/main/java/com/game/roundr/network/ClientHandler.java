@@ -10,7 +10,6 @@ import java.net.SocketException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.ArrayList;
 
 public class ClientHandler implements Runnable {
 
@@ -19,7 +18,6 @@ public class ClientHandler implements Runnable {
     protected ObjectInputStream input;
     protected ObjectOutputStream output;
     private String clientUsername;
-    public static ArrayList<ObjectOutputStream> writers;
 
     public ClientHandler(Socket socket, Server server) {
         try {
@@ -27,8 +25,6 @@ public class ClientHandler implements Runnable {
             this.server = server;
             input = new ObjectInputStream(socket.getInputStream());
             output = new ObjectOutputStream(socket.getOutputStream());
-            this.writers = new ArrayList<ObjectOutputStream>();
-            this.writers.add(null);
         } catch (IOException e) {
             closeConnection();
         }
@@ -106,10 +102,6 @@ public class ClientHandler implements Runnable {
 
                                 // add the message to the chat
                                 App.glc.addToTextArea("Server: " + inboundMsg.getSenderName() + " has joined");
-
-                                //add writer to list
-                                writers.add(this.output);
-                                System.out.println(writers);
                             }
                             break;
                         }
@@ -152,20 +144,7 @@ public class ClientHandler implements Runnable {
                         }
                         case READY -> {
                             // update database
-                            try {
-                                Connection conn = new DatabaseConnection().getConnection();
-                                PreparedStatement stmt = conn.prepareStatement("UPDATE `player_game` SET status = "
-                                        + "? WHERE player_id = (SELECT player_id FROM player WHERE username = ?)");
-                                stmt.setString(1, inboundMsg.getContent());
-                                stmt.setString(2, inboundMsg.getSenderName());
-                                stmt.executeUpdate();
-
-                                // close db resources
-                                conn.close();
-                                stmt.close();
-                            } catch (SQLException e) {
-                                e.printStackTrace();
-                            }
+                            server.updateReady(inboundMsg);
 
                             // update player inside server list
                             App.glc.updatePlayer(inboundMsg);
@@ -174,9 +153,7 @@ public class ClientHandler implements Runnable {
                             broadcastMessage(inboundMsg);
 
                             // if all ready, then start
-                            if (App.glc.isAllReady()) {
-                                App.setScene("game/MainGameArea");
-                            }
+                            App.glc.startGame();
 
                             break;
                         }
