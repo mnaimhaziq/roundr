@@ -74,8 +74,7 @@ public class MainGameAreaController{
     private Map<String, Integer> playerScore;
     private long startTime;
     public Timeline timer;
-
-
+    private String turn = App.username;
 
     //multiplayer stuff
 
@@ -224,8 +223,9 @@ public class MainGameAreaController{
     };
 
     private void updateLabels() {
+        handleShiftedTurn();
         roundLabel.setText("ROUND " + roundCount);
-        playerLabel.setText("Player " + playerCount + "'s turn");
+        playerLabel.setText("Player " + turn + "'s turn");
         timeLimitLabel.setText("Time Limit: " + timeLimit + " seconds");
     }
 
@@ -318,7 +318,12 @@ public class MainGameAreaController{
 
     private void startPlayerTurn() {
         // Logic to start the current player's turn
-        System.out.println("Player " + playerCount + "'s turn");
+        System.out.println("Player " + turn + "'s turn");
+
+        if(App.server != null){
+            // shift turn
+            turn = App.server.getPlayers().get(playerCount).getUsername();
+        }
 
         // update players turn
         updateLabels();
@@ -339,10 +344,12 @@ public class MainGameAreaController{
             messageGeneratedWord.setPlayerScore(playerScore);
             passedScorePass(messageGeneratedWord); // Add the message to the chat area
 
-        if(App.server != null){
-            App.server.listener.sendPlayerScore(playerScore);
-        }else{
-            App.client.listener.sendPlayerScore(playerScore);
+        if(turn == App.username){
+            if(App.server != null){
+                App.server.listener.sendPlayerScore(playerScore);
+            }else{
+                App.client.listener.sendPlayerScore(playerScore);
+            }
         }
 //        sendMessageInput.clear();
     }
@@ -366,12 +373,59 @@ public class MainGameAreaController{
         {
             this.playerScore = passedPlayerScore;
             renderLiveScoreboard();
+            timer.stop();
+            // Start the next player's turn
+            startPlayerTurn();
         }
         // server
         else if(App.server != null)
         {
             this.playerScore = passedPlayerScore;
             renderLiveScoreboard();
+            timer.stop();
+            // Start the next player's turn
+            startPlayerTurn();
+        }
+    }
+
+    public void handleShiftedTurn() {
+
+        Message messageTurn = new Message();
+        messageTurn.setSenderName("me"); // Set the sender name as desired
+        messageTurn.setContent(turn);
+        passedShiftedTurn(messageTurn); // Add the message to the chat area
+
+            if(App.server != null){
+                App.server.listener.sendShiftedTurn(turn);
+            }else{
+//                App.client.listener.sendShiftedTurn(turn);
+            }
+//        sendMessageInput.clear();
+    }
+
+    public void passedShiftedTurn(Message message)
+    {
+//        this.generateWordPass(message.getContent());
+        Platform.runLater(
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        passedShiftedTurn(message.getContent());
+                    }
+                }
+        );
+    }
+
+    public void passedShiftedTurn(String turn){
+        // client
+        if(App.client != null)
+        {
+            this.turn = turn;
+        }
+        // server
+        else if(App.server != null)
+        {
+            this.turn = turn;
         }
     }
 
