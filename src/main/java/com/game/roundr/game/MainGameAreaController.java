@@ -161,7 +161,11 @@ public class MainGameAreaController {
 
         // Handle end game button
         endGameButton.setOnAction(event -> {
-            App.client.sendEndGameRequest();
+            if (App.client != null) {
+                App.client.sendEndGameRequest();
+            } else if (App.server != null) {
+//                App.server.sendEndGameRequest();
+            }
             handleEndGameButton();
         });
 
