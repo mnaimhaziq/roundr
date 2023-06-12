@@ -64,4 +64,25 @@ public class ServerListener implements Runnable {
             }
         }
     }
+
+    public void sendChatMessage(String content)
+    {
+        Message msg = new Message(MessageType.CHAT, App.username, content);
+
+        // send the chat message to everyone
+        this.sendChatMessage(msg);
+    }
+
+    private void sendChatMessage(Message message)
+    {
+        // send the message to each user except the server
+        for (ClientHandler handler : server.handlers) {
+            try {
+                handler.output.writeObject(message);
+                handler.output.flush();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 }

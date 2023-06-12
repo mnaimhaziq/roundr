@@ -12,7 +12,7 @@ import java.util.ArrayList;
 
 public class Client {
 
-    private final ClientListener listener;
+    public final ClientListener listener;
     protected ObjectOutputStream output;
     protected ObjectInputStream input;
     protected final String username;

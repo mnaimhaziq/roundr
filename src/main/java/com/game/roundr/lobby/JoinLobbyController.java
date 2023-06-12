@@ -164,4 +164,32 @@ public class JoinLobbyController implements Initializable {
         } catch (SQLException e) { e.printStackTrace(); }
     }
 
+    private void joinLobby(String gameCode, String gameAddress) {
+        MainGameAreaController mgac = new MainGameAreaController();
+        App.client = new Client(gameAddress, App.username, mgac);
+        App.client.startClient();
+
+        // update database tables
+        try {
+            // create player_game entry in the db
+            Connection conn = new DatabaseConnection().getConnection();
+            PreparedStatement stmt = conn.prepareStatement("INSERT INTO player_game"
+                    + "(game_id, player_id, is_host, player_color, final_score) "
+                    + "SELECT game.game_id, player.player_id, 0, ?, 0 FROM game "
+                    + "JOIN player WHERE game.game_id = ? AND player.username = ?");
+            stmt.setString(1, App.getHexColorCode());
+            stmt.setString(2, gameCode);
+            stmt.setString(3, App.username); // game and player details
+            stmt.executeUpdate();
+
+            // update number of players in lobby
+            stmt = conn.prepareStatement("UPDATE game "
+                    + "SET player_count = player_count + 1 WHERE game_id = ?"); // +
+            stmt.setString(1, gameCode);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 }
+

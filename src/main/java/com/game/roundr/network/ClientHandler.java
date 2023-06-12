@@ -6,6 +6,7 @@ import com.game.roundr.game.EndGamePopupController;
 import com.game.roundr.game.MainGameAreaController;
 import com.game.roundr.models.Message;
 import com.game.roundr.models.MessageType;
+import com.google.gson.Gson;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -15,11 +16,12 @@ import javafx.scene.Scene;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+
+import java.io.*;
+import java.net.HttpURLConnection;
 import java.net.Socket;
 import java.net.SocketException;
+import java.net.URL;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -209,6 +211,15 @@ public class ClientHandler implements Runnable {
                             broadcastMessage(inboundMsg);
                             break;
                         }
+                        case RANDOM_WORD -> {
+                            MainGameAreaController mainGameAreaController = App.mainGameAreaController;
+                            if (mainGameAreaController != null) {
+                                mainGameAreaController.generateWordPass(inboundMsg);
+                            }
+                            // forward the chat message
+                            broadcastMessage(inboundMsg);
+                            break;
+                        }
                         default -> {
                             System.out.println("Server: Received unknown message type: " + inboundMsg.getMsgType());
                         }
@@ -230,13 +241,59 @@ public class ClientHandler implements Runnable {
         }
     }
 
+//    private Message getRandomWord(int wordLength){
+//
+//
+//        try {
+//
+//            // Create URL object with the API endpoint
+//            URL url = new URL("https://random-word-api.vercel.app/api?words=1&length=" + wordLength + "");
+//
+//            // Create HttpURLConnection object and open connection
+//            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+//
+//            // Set request method to GET
+//            connection.setRequestMethod("GET");
+//
+//            // Get the response code
+//            int responseCode = connection.getResponseCode();
+//            if (responseCode == HttpURLConnection.HTTP_OK) {
+//                // Create BufferedReader to read the response
+//                BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+//
+//                // Read the response line by line
+//                String line;
+//                StringBuilder response = new StringBuilder();
+//                while ((line = reader.readLine()) != null) {
+//                    response.append(line);
+//                }
+//                reader.close();
+//
+//                // Parse the JSON response using Gson
+//                Gson gson = new Gson();
+//                String[] words = gson.fromJson(response.toString(), String[].class);
+//
+//                // Extract the word from the array
+//                String word = words[0];
+//
+//                Message message = new Message(MessageType.RANDOM_WORD,App.username, word);
+//                return message;
+//            } else {
+//                System.out.println("GET request failed. Response Code: " + responseCode);
+//            }
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//        return null;
+//    }
+
     public void broadcastMessage(Message msg) {
         // send to all players except the sender
         for (ClientHandler handler : server.handlers) {
             try {
                 if (!handler.clientUsername.equals(clientUsername)) {
                     handler.output.writeObject(msg);
-                    handler.output.flush(); // send any buffered ouput bytes
+                    handler.output.flush(); // send any buffered output bytes
                 }
             } catch (IOException e) {
                 e.printStackTrace();
