@@ -1,10 +1,12 @@
 package com.game.roundr.lobby;
 
 import com.game.roundr.App;
+import com.game.roundr.DatabaseConnection;
 import com.game.roundr.models.Message;
 import com.game.roundr.models.Player;
 import java.io.IOException;
 import java.net.URL;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 import javafx.application.Platform;
@@ -54,6 +56,7 @@ public class GameLobbyController implements Initializable {
             message.setContent(messageChat);
 
             addToTextArea(message); // Add the message to the chat area
+            insertChatToDatabase(message);
         }
         if (App.server != null) {
             App.server.listener.sendChatMessage(messageChat);
@@ -124,6 +127,35 @@ public class GameLobbyController implements Initializable {
                 readyButton.setText("Ready");
                 App.client.sendReady("not_ready");
             }
+        }
+    }
+
+    public void insertChatToDatabase(Message message){
+        try {
+            int gameId = DatabaseConnection.getGameIdFromDB();        // Retrieve game_id from the database
+            int playerId = DatabaseConnection.getPlayerIdFromDB();    // Retrieve player_id from the database
+
+            Connection conn = new DatabaseConnection().getConnection();
+            PreparedStatement stmt = conn.prepareStatement("INSERT INTO chat "
+                            + "(game_id, player_id, message_content, timestamp) "
+                            + "VALUES (?, ?, ?, ?)",
+                    Statement.RETURN_GENERATED_KEYS);
+            stmt.setInt(1, gameId);      // Assuming you have a method to get the game ID from the Message object
+            stmt.setInt(2, playerId);    // Assuming you have a method to get the player ID from the Message object
+            stmt.setString(3, message.getContent());
+            stmt.setTimestamp(4, new Timestamp(System.currentTimeMillis()));
+            stmt.executeUpdate();
+
+            // Retrieve the generated keys
+            ResultSet rs = stmt.getGeneratedKeys();
+            if (rs.next()) {
+                int chatId = rs.getInt(1);  // Assuming the chat_id is the generated key column
+                // Do something with the chatId if needed
+            }
+
+            conn.close();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 
