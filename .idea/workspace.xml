@@ -8,7 +8,8 @@
       <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/game/roundr/game/MainGameAreaController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/game/roundr/game/MainGameAreaController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/game/roundr/lobby/GameLobbyController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/game/roundr/lobby/GameLobbyController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/game/roundr/models/Message.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/game/roundr/models/Message.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/game/roundr/models/MessageType.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/game/roundr/models/MessageType.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/game/roundr/network/ClientHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/game/roundr/network/ClientHandler.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/game/roundr/network/ClientListener.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/game/roundr/network/ClientListener.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/game/roundr/network/ServerListener.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/game/roundr/network/ServerListener.java" afterDir="false" />
@@ -37,11 +38,8 @@
   <component name="PropertiesComponent">{
   &quot;keyToString&quot;: {
     &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/mnaim/Desktop/latestRoundrProject/roundr&quot;,
-    &quot;project.structure.last.edited&quot;: &quot;Project&quot;,
-    &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
-    &quot;project.structure.side.proportion&quot;: &quot;0.0&quot;
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;
+
   }
 }</component>
   <component name="RunManager">

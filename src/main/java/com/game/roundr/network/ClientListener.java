@@ -6,6 +6,7 @@ import com.game.roundr.game.MainGameAreaController;
 import com.game.roundr.lobby.GameLobbyController;
 import com.game.roundr.models.Message;
 import com.game.roundr.models.MessageType;
+import com.game.roundr.models.Player;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -23,6 +24,8 @@ import java.io.ObjectOutputStream;
 import java.net.ConnectException;
 import java.net.Socket;
 import java.net.SocketException;
+import java.util.Map;
+
 import javafx.scene.control.Alert;
 
 public class ClientListener implements Runnable {
@@ -159,6 +162,20 @@ public class ClientListener implements Runnable {
                             MainGameAreaController mainGameAreaController = App.mainGameAreaController;
                             if (mainGameAreaController != null) {
                                 mainGameAreaController.generateWordPass(inboundMsg);
+                                System.out.println("Client Listener: not null " + inboundMsg.getContent());
+                            } else {
+                                System.out.println("Client Listener: null " + inboundMsg.getContent());
+                            }
+                            break;
+                        }
+                        case PLAYER_SCORE -> {
+                            // add the message to the chat textArea
+                            MainGameAreaController mainGameAreaController = App.mainGameAreaController;
+                            if (mainGameAreaController != null) {
+                                mainGameAreaController.passedScorePass(inboundMsg);
+                                System.out.println("Client Listener PlayerScore: not null ");
+                            } else {
+                                System.out.println("Client Listener PlayerScore: null ");
                             }
                             break;
                         }
@@ -255,13 +272,25 @@ public class ClientListener implements Runnable {
         this.sendWordMessage(msg);
     }
 
+    private void sendPlayerScore(Message message)
+
+
     private void sendMessage(Message message)
+
     {
         try {
             client.output.writeObject(message);
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+
+    public void sendPlayerScore(Map<String, Integer> playerScore)
+    {
+        Message msg = new Message(MessageType.PLAYER_SCORE, App.username, playerScore);
+        // send the message
+        this.sendPlayerScore(msg);
     }
 
     public void sendChatMessage(String content)
