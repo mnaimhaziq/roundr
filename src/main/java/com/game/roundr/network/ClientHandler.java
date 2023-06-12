@@ -244,7 +244,7 @@ public class ClientHandler implements Runnable {
             try {
                 if (!handler.clientUsername.equals(clientUsername)) {
                     handler.output.writeObject(msg);
-                    handler.output.flush(); // send any buffered ouput bytes
+                    handler.output.flush(); // send any buffered output bytes
                 }
             } catch (IOException e) {
                 e.printStackTrace();
