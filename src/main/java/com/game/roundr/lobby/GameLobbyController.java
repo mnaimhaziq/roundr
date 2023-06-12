@@ -26,26 +26,27 @@ import javafx.scene.text.Font;
 public class GameLobbyController implements Initializable {
 
     @FXML
+    private Label lobbyName;
+
+    @FXML
     private TextField gameCode;
-    
+
     @FXML
     private Button readyButton;
 
     @FXML
     private ListView<Player> playerList;
-    
-    public ObservableList<Player> players = FXCollections.observableArrayList();
+
+    private ObservableList<Player> players = FXCollections.observableArrayList();
 
     @FXML
     private TextField sendMessageInput;
     @FXML
     private TextArea textAreaChat;
 
-
-
     public void HandleMessageInput() {
 
-        String messageChat =sendMessageInput.getText();
+        String messageChat = sendMessageInput.getText();
 
         if (!messageChat.isEmpty()) {
             Message message = new Message();
@@ -54,16 +55,16 @@ public class GameLobbyController implements Initializable {
 
             addToTextArea(message); // Add the message to the chat area
         }
-        if(App.server != null){
+        if (App.server != null) {
             App.server.listener.sendChatMessage(messageChat);
 
-        }else{
+        } else {
             App.client.listener.sendChatMessage(messageChat);
         }
         sendMessageInput.clear();
     }
 
-    public void onEnter(){
+    public void onEnter() {
         sendMessageInput.setOnKeyPressed(event -> {
             if (event.getCode() == KeyCode.ENTER) {
                 HandleMessageInput();
@@ -71,26 +72,25 @@ public class GameLobbyController implements Initializable {
         });
     }
 
-    public void addToTextArea(Message message)
-    {
+    public void addToTextArea(Message message) {
 
         this.addToTextArea(message.getSenderName() + ": " + message.getContent());
     }
-    public void addToTextArea(String text){
+
+    public void addToTextArea(String text) {
 // client
-        if(App.client != null)
-        {
-            if(this.textAreaChat.getText().isEmpty())
+        if (App.client != null) {
+            if (this.textAreaChat.getText().isEmpty()) {
                 this.textAreaChat.setText(text);
-            else this.textAreaChat.setText(this.textAreaChat.getText() + "\n" + text);
-        }
-        // server
-        else if(App.server != null)
-        {
+            } else {
+                this.textAreaChat.setText(this.textAreaChat.getText() + "\n" + text);
+            }
+        } // server
+        else if (App.server != null) {
             this.textAreaChat.setText(this.textAreaChat.getText() + "\n" + text);
         }
     }
-    
+
     @FXML
     private void handleLeaveButtonClick() throws IOException {
         // handle disconnections by role
@@ -101,21 +101,30 @@ public class GameLobbyController implements Initializable {
             App.client.closeClient();
             App.client = null;
         }
-        
+
         // return to main menu
         App.setScene("MainMenu");
     }
 
     @FXML
     private void handleReadyButtonClick() throws IOException {
-//        if (readyButton.getText().equals("Ready")) {
-//            readyButton.setText("Not Ready");
-//            App.client.sendReady("ready");
-//        } else {
-//            readyButton.setText("Ready");
-//            App.client.sendReady("not_ready");
-//        }
-        App.setScene("game/MainGameArea");
+        if (App.server != null) {
+            if (readyButton.getText().equals("Ready")) {
+                readyButton.setText("Not Ready");
+                App.server.sendReady("ready");
+            } else {
+                readyButton.setText("Ready");
+                App.server.sendReady("not_ready");
+            }
+        } else {
+            if (readyButton.getText().equals("Ready")) {
+                readyButton.setText("Not Ready");
+                App.client.sendReady("ready");
+            } else {
+                readyButton.setText("Ready");
+                App.client.sendReady("not_ready");
+            }
+        }
     }
 
     @Override
@@ -136,7 +145,11 @@ public class GameLobbyController implements Initializable {
         protected void updateItem(Player item, boolean empty) {
             super.updateItem(item, empty);
             if (item != null) {
+                setText(null);
                 setGraphic(createGraphic(item)); // cell contents
+            } else {
+                setText(null);
+                setGraphic(null);
             }
         }
 
@@ -166,23 +179,68 @@ public class GameLobbyController implements Initializable {
 
         return hBox;
     }
-    
-    public void startGame() throws IOException {
-        App.setScene("game/MainGameArea");
-    }
-    
+
     public void clearPlayers() {
         Platform.runLater(() -> {
             players.clear();
         });
     }
-    
+
+    public int getPlayerSize() {
+        return players.size();
+    }
+
+    public void removePlayer(Message msg) {
+        Platform.runLater(() -> {
+            for (int i = 0; i < players.size(); i++) {
+                if (players.get(i)
+                        .getUsername().equals(msg.getSenderName())) {
+                    players.remove(i);
+                    break;
+                }
+            }
+        });
+    }
+
+    public void addPlayer(String username, String color) {
+        Platform.runLater(() -> {
+            players.add(new Player(username, color));
+        });
+    }
+
     public void updatePlayers(Message msg) {
         Platform.runLater(() -> {
             players.clear();
-            ArrayList<Player> ls = App.client.extractPlayerList(msg.getContent());
-            players.addAll(ls);
+            ArrayList<Player> l = App.client
+                    .extractPlayerList(msg.getContent());
+            for (Player player : l) {
+                players.add(player);
+            }
         });
+    }
+
+    public void SetLobbyInfo(String name, String gameID) {
+        Platform.runLater(() -> {
+            lobbyName.setText(name.toUpperCase() + "'S LOBBY");
+            gameCode.setText(gameID);
+        });
+    }
+
+    public void updatePlayer(Message msg) {
+        Platform.runLater(() -> {
+            for (Player player : players) {
+                if (player.getUsername().equals(msg.getSenderName())) {
+                    String anObject = "ready";
+                    player.setIsReady(msg.getContent().equals(anObject));
+                    break;
+                }
+            }
+            playerList.refresh();
+        });
+    }
+
+    public boolean isAllReady() {
+        return players.stream().allMatch(Player::isReady);
     }
 
 }

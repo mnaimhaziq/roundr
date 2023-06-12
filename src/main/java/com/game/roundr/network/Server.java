@@ -34,7 +34,7 @@ public class Server {
         try {
             // change view
             App.setScene("lobby/GameLobby");
-            
+
             // create the main network thread
             listener = new ServerListener(PORT, this);
             new Thread(listener).start(); // network thread
@@ -43,7 +43,7 @@ public class Server {
             String color = App.getHexColorCode();
 
             // adds host to the list
-            App.glc.players.add(new Player(App.username, color));
+            App.glc.addPlayer(App.username, color);
 
             // update database table
             try {
@@ -74,6 +74,9 @@ public class Server {
                     this.gameId = generatedKeys.getInt(1);
                 }
 
+                // set the lobby name and lobby code
+                App.glc.SetLobbyInfo(App.username, "" + gameId);
+
                 // create player_game entry for host
                 stmt = conn.prepareStatement("INSERT INTO player_game(game_id,"
                         + "player_id, is_host, player_color, final_score) "
@@ -103,7 +106,7 @@ public class Server {
     }
 
     public void closeServer() {
-        App.glc.players.clear();
+        App.glc.clearPlayers();
         Message msg = new Message(MessageType.DISCONNECT,
                 App.username, "Server closed");
 
@@ -116,7 +119,7 @@ public class Server {
                 e.printStackTrace();
             }
         }
-        
+
         // remove game details
         try {
             Connection conn = new DatabaseConnection().getConnection();
@@ -124,7 +127,7 @@ public class Server {
                     "DELETE FROM player_game WHERE `game_id` = ?;");
             stmt.setInt(1, gameId);
             stmt.executeUpdate();
-            
+
             stmt = conn.prepareStatement(
                     "DELETE FROM game WHERE `game_id` = ?;");
             stmt.setInt(1, gameId);
@@ -145,7 +148,7 @@ public class Server {
     // build player list to send to other players
     public String getPlayerList() {
         StringBuilder list = new StringBuilder();
-        
+
         ArrayList<Player> players = getPlayers();
 
         for (int i = 0; i < players.size(); i++) {
@@ -164,7 +167,7 @@ public class Server {
 
         return list.toString();
     }
-    
+
     // get the list of players from database
     public ArrayList<Player> getPlayers() {
         ArrayList<Player> list = new ArrayList();
@@ -174,13 +177,13 @@ public class Server {
                     + "player.username FROM player_game JOIN player "
                     + "ON player.player_id = player_game.player_id");
             ResultSet rs = stmt.executeQuery();
-            
+
             while (rs.next()) {
                 list.add(new Player(rs.getString("username"),
                         rs.getString("player_color"),
                         rs.getString("status").equals("ready")));
             }
-            
+
             // close db resources
             conn.close();
             stmt.close();
@@ -191,20 +194,52 @@ public class Server {
         return list;
     }
 
-    public void sendEndGameRequest() {
-        Message message = new Message(MessageType.END_GAME,
-                App.username, "");
-        sendMessage(message);
-    }
-
-    private void sendMessage(Message message) {
-        try {
-            output.writeObject(message);
-            output.flush();
-        } catch (IOException e) {
-            e.printStackTrace();
+    // general method to send msg to all clients
+    public void sendMessage(Message msg) {
+        for (ClientHandler handler : handlers) {
+            try {
+                handler.output.writeObject(msg);
+                handler.output.flush();
+            } catch (IOException e) {
+                System.out.println("Server: Error while sending message to clients");
+            }
         }
     }
 
+    public void sendReady(String ready) throws IOException{
+        Message msg = new Message(MessageType.READY, App.username, ready);
+
+        // update database
+        try {
+            Connection conn = new DatabaseConnection().getConnection();
+            PreparedStatement stmt = conn.prepareStatement("UPDATE player_game SET status = "
+                    + "? WHERE player_id = (SELECT player_id FROM player WHERE username=?)");
+            stmt.setString(1, msg.getContent());
+            stmt.setString(2, msg.getSenderName());
+            stmt.executeUpdate();
+
+            // close db resources
+            conn.close();
+            stmt.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        // update player inside server list
+        App.glc.updatePlayer(msg);
+
+        // forward message to other players
+        sendMessage(msg);
+
+        // if all ready, then start
+        if (App.glc.isAllReady()) {
+            App.setScene("game/MainGameArea");
+        }
+    }
+
+    public void sendEndGameRequest() {
+        Message msg = new Message(MessageType.END_GAME, App.username, "");
+        sendMessage(msg);
+    }
 
 }

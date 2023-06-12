@@ -71,17 +71,17 @@ public class ClientHandler implements Runnable {
                         case CONNECT -> {
                             Message outboundMsg = new Message(); // reply to be sent 
 
-                            if (App.glc.players.size() == server.config.maxPlayers) {
+                            if (App.glc.getPlayerSize() == server.config.maxPlayers) {
                                 outboundMsg.setMsgType(MessageType.CONNECT_FAILED); // decline player
                                 outboundMsg.setContent("The lobby is full");
                                 System.out.println("Server: Connection failed");
-                                
+
                                 // send the reply msg to the client
                                 output.writeObject(outboundMsg);
                             } else {
                                 // create random color for the player
                                 String color = App.getHexColorCode();
-                                
+
                                 // update database tables
                                 try {
                                     // create player_game entry in the db
@@ -100,21 +100,19 @@ public class ClientHandler implements Runnable {
                                             + "SET player_count = player_count + 1 WHERE `game_id` = ?;");
                                     stmt.setInt(1, server.gameId);
                                     stmt.executeUpdate();
-                                    
+
                                     // close db resources
                                     conn.close();
                                     stmt.close();
                                 } catch (SQLException e) {
                                     e.printStackTrace();
                                 }
-                                
+
                                 // assign a handler to the player and add to the server lists
                                 clientUsername = inboundMsg.getSenderName();
-                                Platform.runLater(() -> {
-                                    App.glc.players.add(new Player(clientUsername, color));
-                                });
+                                App.glc.addPlayer(clientUsername, color);
                                 server.handlers.add(this);
-                                
+
                                 // inform the current players that a new player joined
                                 outboundMsg.setMsgType(MessageType.USER_JOINED);
                                 outboundMsg.setSenderName(inboundMsg.getSenderName());
@@ -124,12 +122,13 @@ public class ClientHandler implements Runnable {
                                 // inform the new player that connection is confirmed
                                 outboundMsg.setMsgType(MessageType.CONNECT_OK);
                                 outboundMsg.setSenderName(App.username);
-                                outboundMsg.setContent(server.getPlayerList());
+                                outboundMsg.setContent(server.getPlayerList()
+                                        .concat(";" + server.gameId + ";" + App.username));
 
                                 // send the reply msg to the client
                                 output.writeObject(outboundMsg);
-                                
-                                // TODO: add the message to the server's chat
+
+                                // TODO: add the message to the chat
                                 System.out.println("Chat: " + inboundMsg.getSenderName() + " has joined");
 
                                 //add writer to list
@@ -139,24 +138,18 @@ public class ClientHandler implements Runnable {
                             break;
                         }
                         case DISCONNECT -> {
-                            // TODO: add the message to the chat areas
+                            // TODO: add the message to the chat area
                             System.out.println("Chat: " + inboundMsg.getSenderName() + " has left");
 
                             // remove the player from the server list
-                            Platform.runLater(() -> {
-                                for (int i = 0; i < App.glc.players.size(); i++) {
-                                    if (App.glc.players.get(i)
-                                            .getUsername().equals(inboundMsg.getSenderName())) {
-                                                App.glc.players.remove(i);
-                                                break;
-                                    }
-                                }
-                            });
-                            
+                            App.glc.removePlayer(inboundMsg);
+
                             // remove the player_game row from the db
                             try {
                                 Connection conn = new DatabaseConnection().getConnection();
-                                PreparedStatement stmt = conn.prepareStatement("DELETE FROM `player_game` WHERE player_id = (SELECT player_id FROM player WHERE username = ?) AND game_id = ?;");
+                                PreparedStatement stmt = conn.prepareStatement("DELETE "
+                                        + "FROM `player_game` WHERE player_id = (SELECT player_id FROM "
+                                        + "player WHERE username = ?) AND `game_id` = ?;");
                                 stmt.setString(1, inboundMsg.getSenderName());
                                 stmt.setInt(2, server.gameId);
                                 stmt.executeUpdate();
@@ -190,7 +183,7 @@ public class ClientHandler implements Runnable {
                                 stmt.setString(1, inboundMsg.getContent());
                                 stmt.setString(2, inboundMsg.getSenderName());
                                 stmt.executeUpdate();
-                                
+
                                 // close db resources
                                 conn.close();
                                 stmt.close();
@@ -198,29 +191,17 @@ public class ClientHandler implements Runnable {
                                 e.printStackTrace();
                             }
                             
-                            Platform.runLater(() -> {
-                                // update listing
-                                for (Player player : App.glc.players) {
-                                    if (player.getUsername().equals(inboundMsg.getSenderName())) {
-                                        player.setIsReady(inboundMsg.getContent().equals("ready"));
-                                        break;
-                                    }
-                                }
-
-                                // check if ready
-                                boolean CanStartGame = true;
-                                for (Player player : App.glc.players) {
-                                    if (!player.isReady()) {
-                                        CanStartGame = false;
-                                        break;
-                                    }
-                                }
-                                
-                                // try start game
-                                if (CanStartGame) {
-                                    // TODO
-                                }
-                            });
+                            // update player inside server list
+                            App.glc.updatePlayer(inboundMsg);
+                            
+                            // forward message to other players
+                            broadcastMessage(inboundMsg);
+                            
+                            // if all ready, then start
+                            if (App.glc.isAllReady()) {
+                                App.setScene("game/MainGameArea");
+                            }
+                            
                             break;
                         }
                         case CHAT -> {
@@ -348,8 +329,8 @@ public class ClientHandler implements Runnable {
 //        return null;
 //    }
 
+    // send msg to all players except the sender
     public void broadcastMessage(Message msg) {
-        // send to all players except the sender
         for (ClientHandler handler : server.handlers) {
             try {
                 if (!handler.clientUsername.equals(clientUsername)) {

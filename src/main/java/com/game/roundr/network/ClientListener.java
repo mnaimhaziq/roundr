@@ -24,8 +24,8 @@ import java.io.ObjectOutputStream;
 import java.net.ConnectException;
 import java.net.Socket;
 import java.net.SocketException;
+import java.util.Arrays;
 import java.util.Map;
-
 import javafx.scene.control.Alert;
 
 public class ClientListener implements Runnable {
@@ -74,53 +74,75 @@ public class ClientListener implements Runnable {
                     // handle msgs based on their type
                     switch (inboundMsg.getMsgType()) {
                         case CONNECT_FAILED -> {
-                            App.showAlert(Alert.AlertType.INFORMATION, 
+                            App.showAlert(Alert.AlertType.INFORMATION,
                                     "Connection Failed", inboundMsg.getContent());
                             break;
                         }
                         case CONNECT_OK -> {
                             // go to game lobby
                             App.setScene("lobby/GameLobby");
-                            
+
                             // reset the list of players
-                            App.glc.players.clear();
-                            
+                            App.glc.clearPlayers();
+
+                            // set the gamecode and host
+                            String[] msgContent = inboundMsg.getContent().split(";");
+                            App.glc.SetLobbyInfo(
+                                    msgContent[msgContent.length - 1], msgContent[msgContent.length - 2]);
+
+                            // extract gamecode and host
+                            String[] pDetails = Arrays.copyOfRange(msgContent, 0, msgContent.length - 2);
+                            inboundMsg.setContent(String.join(";", pDetails)); // clean player
+
                             // fetch the list of players
                             App.glc.updatePlayers(inboundMsg);
-                            
+
                             // TODO: add the message to the chat
                             System.out.println("Chat: " + client.username + " has joined");
                             break;
                         }
                         case USER_JOINED -> {
-                            // update the list of players
-                            App.glc.players.clear();
+                            // reset the list of players
+                            App.glc.clearPlayers();
+
+                            // fetch the list of players
                             App.glc.updatePlayers(inboundMsg);
-                                
+
                             // TODO: add the message to the chat
                             System.out.println("Chat: " + inboundMsg.getSenderName() + " has joined");
                             break;
                         }
                         case DISCONNECT -> {
                             if (inboundMsg.getContent().equals("Server closed")) {
-                                App.showAlert(Alert.AlertType.INFORMATION, 
-                                    "Connection Closed", inboundMsg.getContent());
+                                App.showAlert(Alert.AlertType.INFORMATION,
+                                        "Connection Closed", inboundMsg.getContent());
                                 App.client = null;
-                                
+
                                 // switch scene
                                 App.setScene("MainMenu");
                             } else { // a player disconnected
-                                // update the list of players
-                                App.glc.players.clear();
+                                // reset the list of players
+                                App.glc.clearPlayers();
+
+                                // fetch the list of players
                                 App.glc.updatePlayers(inboundMsg);
-            
+
                                 // TODO: add msg to the chats
                                 System.out.println("Chat: " + inboundMsg.getSenderName() + " has left");
                             }
                             break;
                         }
-                        case CHAT ->
-                        {
+                        case READY -> {
+                            // update player inside server list
+                            App.glc.updatePlayer(inboundMsg);
+
+                            // if all ready, then start
+                            if (App.glc.isAllReady()) {
+                                App.setScene("game/MainGameArea");
+                            }
+                            break;
+                        }
+                        case CHAT -> {
                             // add the message to the chat textArea
                             GameLobbyController gameLobbyController = App.glc;
                             MainGameAreaController mainGameAreaController = App.mainGameAreaController;
@@ -130,8 +152,10 @@ public class ClientListener implements Runnable {
                             }
                             break;
                         }
-
                         case END_GAME -> {
+                            // show modal
+                            // pause timer
+
 //                            // Handle end game message
 //                            System.out.println("Requested to end the game");
 //                            // Pause the timer and show the popup
@@ -140,7 +164,6 @@ public class ClientListener implements Runnable {
 //                                showEndGamePopup();
 //                            });
 //                            break;
-
                             // Handle end game message
                             System.out.println("Requested to end the game");
 
@@ -154,7 +177,6 @@ public class ClientListener implements Runnable {
 //                            } else {
 //                                mgac.getTimer().pause();
 //                            }
-
                             // Show the end game popup
                             Platform.runLater(this::showEndGamePopup);
                             break;
@@ -201,8 +223,7 @@ public class ClientListener implements Runnable {
         } catch (SocketException e) {
             if (e instanceof ConnectException) {
                 System.out.println("Client: Connection failed");
-            } 
-            else if (e.getMessage().equals("Connection reset")) {
+            } else if (e.getMessage().equals("Connection reset")) {
                 System.out.println("Client: Connection closed");
             }
         } catch (IOException e) {
@@ -269,8 +290,7 @@ public class ClientListener implements Runnable {
         isTimerRunning = true;
     }
 
-    private void sendWordMessage(Message message)
-    {
+    private void sendWordMessage(Message message) {
         try {
             client.output.writeObject(message);
         } catch (IOException e) {
@@ -278,8 +298,7 @@ public class ClientListener implements Runnable {
         }
     }
 
-    public void sendWordMessage(String content)
-    {
+    public void sendWordMessage(String content) {
         Message msg = new Message(MessageType.RANDOM_WORD, App.username, content);
         // send the message
         this.sendWordMessage(msg);
@@ -293,10 +312,7 @@ public class ClientListener implements Runnable {
         }
     }
 
-
-    private void sendMessage(Message message)
-
-    {
+    private void sendMessage(Message message) {
         try {
             client.output.writeObject(message);
         } catch (IOException e) {
@@ -304,15 +320,13 @@ public class ClientListener implements Runnable {
         }
     }
 
-    public void sendPlayerScore(Map<String, Integer> playerScore)
-    {
+    public void sendPlayerScore(Map<String, Integer> playerScore) {
         Message msg = new Message(MessageType.PLAYER_SCORE, App.username, playerScore);
         // send the message
         this.sendPlayerScore(msg);
     }
 
-    public void sendChatMessage(String content)
-    {
+    public void sendChatMessage(String content) {
         Message msg = new Message(MessageType.CHAT, App.username, content);
 
         // send the message
@@ -320,8 +334,7 @@ public class ClientListener implements Runnable {
 
     }
 
-    public void sendShiftedTurn(String turn)
-    {
+    public void sendShiftedTurn(String turn) {
         Message msg = new Message(MessageType.TURN, App.username, turn);
         // send the message
         this.sendShiftedTurn(msg);
