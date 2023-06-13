@@ -55,7 +55,7 @@
                         <Insets right="30.0" />
                      </HBox.margin>
                   </Label>
-                  <TextField fx:id="codeTextField" prefHeight="36.0" prefWidth="265.0">
+                  <TextField fx:id="codeTextField" focusTraversable="false" prefHeight="36.0" prefWidth="265.0">
                      <font>
                         <Font name="Inter Regular" size="18.0" />
                      </font>

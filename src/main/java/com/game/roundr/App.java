@@ -1,6 +1,8 @@
 
 package com.game.roundr;
 
+import com.game.roundr.game.MainGameAreaController;
+import com.game.roundr.lobby.GameLobbyController;
 import com.game.roundr.network.Client;
 import com.game.roundr.network.Server;
 import javafx.application.Application;
@@ -9,7 +11,12 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.Random;
+import javafx.application.Platform;
+import javafx.scene.control.Alert;
 
 public class App extends Application {
 
@@ -17,7 +24,8 @@ public class App extends Application {
     public static String username = "";
     public static Server server;
     public static Client client;
-
+    public static GameLobbyController glc;
+    public static MainGameAreaController mainGameAreaController;
     public static Integer playerGameID;
 
     public static String playerRole = "";
@@ -39,14 +47,21 @@ public class App extends Application {
         if (client != null) {
             client.closeClient();
         }
+        try {
+            Connection conn = new DatabaseConnection().getConnection();
+            PreparedStatement stmt = conn.prepareStatement("DELETE FROM player WHERE username = ?");
+            stmt.setString(1, username);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
-    
+
     public static void main(String[] args) {
         launch();
     }
-    
-    /* --------------------------- Utility methods -------------------------- */
-    
+
+    /* ------------------------------ Utility methods ------------------------------ */
     // Use to change the scene
     public static void setScene(String fxml) throws IOException {
         scene.setRoot(loadFXML(fxml));
@@ -55,7 +70,7 @@ public class App extends Application {
     private static Parent loadFXML(String fxml) throws IOException {
         return FXMLLoader.load(App.class.getResource(fxml + ".fxml"));
     }
-    
+
     // Use to generate random color hex codes
     public static String getHexColorCode() {
         // Colour in the pastel range (120-230)
@@ -65,7 +80,15 @@ public class App extends Application {
         int b = random.nextInt(111) + 120;
         return String.format("#%02X%02X%02X", r, g, b);
     }
-    
-    /* --------------------------- Utility methods -------------------------- */
 
+    public static void showAlert(Alert.AlertType type, String header, String content) {
+        Platform.runLater(() -> {
+            Alert alert = new Alert(type);
+            alert.setHeaderText(header);
+            alert.setContentText(content);
+            alert.showAndWait();
+        });
+    }
+
+    /* ------------------------------ Utility methods ------------------------------ */
 }

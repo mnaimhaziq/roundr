@@ -121,7 +121,7 @@ public class ChatController implements Initializable {
             this.textFieldChatS.setText("");
             this.textFieldChatS.clear();
         }
-        listenerS.sendMessageToClient(msg);
+        // listenerS.sendMessageToClient(msg);
         textFieldChatS.clear();
     }
 
@@ -380,7 +380,7 @@ public class ChatController implements Initializable {
             });
 
             try {
-                listenerS.receiveMessageFromClient(chatS);
+                // listenerS.receiveMessageFromClient(chatS);
                 handleSendMessageButtonS(null);
             } catch (IOException e) {
                 // TODO Auto-generated catch block

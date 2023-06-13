@@ -6,6 +6,7 @@ public class Player {
 
     private String username;
     private boolean isReady;
+    private String color;
     private InetAddress address;
 
     public Player(String username) {
@@ -13,6 +14,18 @@ public class Player {
         this.isReady = false;
     }
 
+    public Player(String username, String color) {
+        this.username = username;
+        this.color = color;
+        this.isReady = false;
+    }
+    
+    public Player(String username, String color, boolean isReady) {
+        this.username = username;
+        this.color = color;
+        this.isReady = isReady;
+    }
+    
     public Player(String username, InetAddress address) {
         this.username = username;
         this.address = address;
@@ -41,6 +54,14 @@ public class Player {
 
     public void setAddress(InetAddress address) {
         this.address = address;
+    }
+
+    public String getColor() {
+        return color;
+    }
+
+    public void setColor(String color) {
+        this.color = color;
     }
 
 }

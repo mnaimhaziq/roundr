@@ -1,102 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.shape.*?>
-<?import javafx.scene.text.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
-<fx:include source="MainMenu.fxml" fx:id="MainMenuController"/>
-
-<HBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.game.roundr.lobby.GameLobbyController">
+<?import javafx.scene.control.TextArea?>
+<HBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1000.0" spacing="80.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.game.roundr.lobby.GameLobbyController">
    <children>
-      <VBox alignment="CENTER" prefHeight="700.0" prefWidth="680.0">
+      <VBox alignment="CENTER">
          <children>
-            <Label alignment="CENTER" prefWidth="470.0" text="PLAYER'S LOBBY">
+            <Label fx:id="lobbyName" alignment="CENTER" maxWidth="400.0" text="PLAYER'S LOBBY">
                <font>
                   <Font name="Berlin Sans FB Demi Bold" size="35.0" />
                </font>
                <VBox.margin>
-                  <Insets bottom="40.0" left="80.0" right="40.0" />
+                  <Insets bottom="40.0" />
                </VBox.margin>
             </Label>
-            <GridPane fx:id="gridPaneUsers" alignment="CENTER" gridLinesVisible="true" prefHeight="330.0" prefWidth="470.0">
-              <columnConstraints>
-                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-              </columnConstraints>
-              <rowConstraints>
-                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-              </rowConstraints>
+            <ListView fx:id="playerList" disable="true" focusTraversable="false" maxWidth="400.0" prefHeight="300.0" style="-fx-opacity: 1.0;">
                <VBox.margin>
-                  <Insets left="80.0" right="40.0" />
+                  <Insets />
                </VBox.margin>
-               <opaqueInsets>
-                  <Insets top="10.0" />
-               </opaqueInsets>
-               <children>
-                  <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="20.0" style="-fx-background-color: #FCFF79;" GridPane.columnIndex="1">
-                     <children>
-                        <Circle fx:id="readyCircle" fill="WHITE" radius="15.0" stroke="BLACK" strokeType="INSIDE" />
-                        <Label text="Player 2">
-                           <font>
-                              <Font name="Inter Bold" size="18.0" />
-                           </font>
-                        </Label>
-                     </children>
-                  </HBox>
-                  <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="20.0" style="-fx-background-color: #ED7474;">
-                     <children>
-                        <Circle fill="WHITE" radius="15.0" stroke="BLACK" strokeType="INSIDE" />
-                        <Label text="Player 1">
-                           <font>
-                              <Font name="Inter Bold" size="18.0" />
-                           </font>
-                        </Label>
-                     </children>
-                  </HBox>
-                  <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="20.0" style="-fx-background-color: #ffa5d2;" GridPane.rowIndex="1">
-                     <children>
-                        <Circle fill="WHITE" radius="15.0" stroke="BLACK" strokeType="INSIDE" />
-                        <Label text="Player 3">
-                           <font>
-                              <Font name="Inter Bold" size="18.0" />
-                           </font>
-                        </Label>
-                     </children>
-                  </HBox>
-                  <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="20.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
-                     <children>
-                        <Label text="-">
-                           <font>
-                              <Font name="Inter Bold" size="18.0" />
-                           </font>
-                        </Label>
-                     </children>
-                  </HBox>
-                  <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="20.0" GridPane.rowIndex="2">
-                     <children>
-                        <Label text="-">
-                           <font>
-                              <Font name="Inter Bold" size="18.0" />
-                           </font>
-                        </Label>
-                     </children>
-                  </HBox>
-                  <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="20.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
-                     <children>
-                        <Label text="-">
-                           <font>
-                              <Font name="Inter Bold" size="18.0" />
-                           </font>
-                        </Label>
-                     </children>
-                  </HBox>
-               </children>
-            </GridPane>
-            <HBox alignment="CENTER" prefHeight="110.0" prefWidth="590.0">
+            </ListView>
+            <HBox alignment="CENTER" maxWidth="400.0" prefHeight="110.0">
                <children>
                   <Label text="Game Code:">
                      <font>
@@ -106,50 +38,48 @@
                         <Insets right="30.0" />
                      </HBox.margin>
                   </Label>
-                  <TextField alignment="CENTER" editable="false" prefHeight="36.0" prefWidth="200.0" style="-fx-background-color: #7dddfc;" text="U239E93">
+                  <TextField fx:id="gameCode" alignment="CENTER" editable="false" focusTraversable="false" prefHeight="36.0" prefWidth="250.0">
                      <font>
                         <Font name="Berlin Sans FB Demi Bold" size="18.0" />
                      </font>
                   </TextField>
                </children>
-               <padding>
-                  <Insets left="80.0" right="40.0" />
-               </padding>
             </HBox>
-            <HBox alignment="BOTTOM_CENTER" prefHeight="40.0" prefWidth="470.0" spacing="30.0">
+            <HBox alignment="BOTTOM_CENTER" maxWidth="400.0" prefHeight="40.0" spacing="80.0">
                <children>
-                  <Button mnemonicParsing="false" onMouseClicked="#handleLeaveLobbyButtonClick" prefHeight="40.0" prefWidth="160.0" style="-fx-background-color: D9D9D9;" text="Leave Lobby">
+                  <Button mnemonicParsing="false" onMouseClicked="#handleLeaveButtonClick" prefHeight="40.0" prefWidth="160.0" style="-fx-background-color: D9D9D9;" text="Leave Lobby">
                      <font>
                         <Font name="Inter Bold" size="18.0" />
                      </font>
                   </Button>
-                  <Button fx:id="readyButton" mnemonicParsing="false" onAction="#toggleReady" prefHeight="40.0" prefWidth="160.0" style="-fx-background-color: D9D9D9;" text="Not ready">
+                  <Button fx:id="readyButton" mnemonicParsing="false" onMouseClicked="#handleReadyButtonClick" prefHeight="40.0" prefWidth="160.0" style="-fx-background-color: D9D9D9;" text="Ready">
                      <font>
                         <Font name="Inter Bold" size="18.0" />
                      </font>
                   </Button>
                </children>
                <VBox.margin>
-                  <Insets left="80.0" right="40.0" />
+                  <Insets />
                </VBox.margin>
             </HBox>
          </children>
       </VBox>
-      <VBox fx:id="chatRoomS" alignment="CENTER_LEFT" prefHeight="370.0" prefWidth="500.0" visible="false">
+      <VBox alignment="CENTER_LEFT">
          <children>
-            <ScrollPane fx:id="spChat" hbarPolicy="NEVER" maxHeight="525.0" maxWidth="330.0" prefHeight="525.0" prefWidth="330.0" style="-fx-background-color: #A8E5F9;">
+            <ScrollPane fx:id="chatScrollPane" hbarPolicy="NEVER" prefHeight="496.0" prefWidth="330.0" fitToWidth="true" style="-fx-background-color: #A8E5F9;">
                <content>
-                  <VBox fx:id="chatS" editable="false" prefHeight="525.0" prefWidth="330.0" wrapText="true" style="-fx-background-color: #A8E5F9;"/>
+                  <!-- <TextArea fx:id="textAreaChat" prefHeight="514.0" prefWidth="314.0" /> -->
+                  <VBox fx:id="chatVBox" prefHeight="514.0" prefWidth="314.0" style="-fx-background-color: #A8E5F9;"/>
                </content>
             </ScrollPane>
             <HBox prefHeight="40.0" prefWidth="200.0">
                <children>
-                  <TextField fx:id="textFieldChatS" onKeyPressed="#enterChatHandleS" maxWidth="330.0" prefHeight="40.0" prefWidth="262.0" promptText="Enter Your Message" style="-fx-background-color: D9D9D9; -fx-border-radius: 0; ">
+                  <TextField fx:id="sendMessageInput" maxWidth="330.0" onAction="#onEnter" promptText="Enter Your Message" prefHeight="40.0" prefWidth="262.0">
                      <font>
                         <Font name="Inter Regular" size="14.0" />
                      </font>
                   </TextField>
-                  <Button fx:id="buttonChatSendS" alignment="CENTER" mnemonicParsing="false" onAction="#handleSendMessageButtonS" prefHeight="40.0" prefWidth="68.0" style="-fx-background-color: #61B3FF; -fx-border-radius: 0;" text="Send" textFill="WHITE">
+                  <Button alignment="CENTER" mnemonicParsing="false" onAction="#HandleMessageInput" prefHeight="40.0" style="-fx-background-color: #61B3FF;" text="Submit" textFill="WHITE">
                      <font>
                         <Font name="Inter Bold" size="14.0" />
                      </font>
@@ -157,29 +87,9 @@
                </children>
             </HBox>
          </children>
-      </VBox>
-      <VBox fx:id="chatRoomC" alignment="CENTER_LEFT" prefHeight="370.0" prefWidth="500.0" visible="false">
-         <children>
-            <ScrollPane hbarPolicy="NEVER" maxHeight="525.0" maxWidth="330.0" prefHeight="525.0" prefWidth="330.0" style="-fx-background-color: #A8E5F9;">
-               <content>
-                  <VBox fx:id="chatC" editable="false" prefHeight="525.0" prefWidth="330.0" wrapText="true" style="-fx-background-color: #A8E5F9;"/>
-               </content>
-            </ScrollPane>
-            <HBox prefHeight="40.0" prefWidth="200.0">
-               <children>
-                  <TextField fx:id="textFieldChatC" onKeyPressed="#enterChatHandleC" maxWidth="330.0" prefHeight="40.0" prefWidth="262.0" promptText="Enter Your Message" style="-fx-background-color: D9D9D9; -fx-border-radius: 0; ">
-                     <font>
-                        <Font name="Inter Regular" size="14.0" />
-                     </font>
-                  </TextField>
-                  <Button fx:id="buttonChatSendC" alignment="CENTER" mnemonicParsing="false" onAction="#handleSendMessageButtonC" prefHeight="40.0" prefWidth="68.0" style="-fx-background-color: #61B3FF; -fx-border-radius: 0;" text="Send" textFill="WHITE">
-                     <font>
-                        <Font name="Inter Bold" size="14.0" />
-                     </font>
-                  </Button>
-               </children>
-            </HBox>
-         </children>
+         <HBox.margin>
+            <Insets />
+         </HBox.margin>
       </VBox>
    </children>
 </HBox>
