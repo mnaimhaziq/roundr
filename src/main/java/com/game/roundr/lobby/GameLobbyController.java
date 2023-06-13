@@ -256,16 +256,8 @@ public class GameLobbyController implements Initializable {
         });
     }
 
-    public void startGame() {
-        Platform.runLater(() -> {
-            if (players.stream().allMatch(Player::isReady)) {
-                try {
-                   App.setScene("game/MainGameArea");
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
+    public boolean isAllReady() {
+        return players.stream().allMatch(Player::isReady);
     }
 
 }
