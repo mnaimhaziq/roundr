@@ -25,6 +25,7 @@ import java.net.ConnectException;
 import java.net.Socket;
 import java.net.SocketException;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import javafx.scene.control.Alert;
 
@@ -229,6 +230,17 @@ public class ClientListener implements Runnable {
                             }
                             break;
                         }
+                        case PLAYER_STATE -> {
+                            // add the message to the chat textArea
+                            MainGameAreaController mainGameAreaController = App.mainGameAreaController;
+                            if (mainGameAreaController != null) {
+                                mainGameAreaController.passedPlayerState(inboundMsg);
+                                System.out.println("Client Listener Turn: not null ");
+                            } else {
+                                System.out.println("Client Listener Turn: null ");
+                            }
+                            break;
+                        }
                         default -> {
                             System.out.println("Client: Received unknown message type: " + inboundMsg.toString());
                         }
@@ -356,6 +368,20 @@ public class ClientListener implements Runnable {
     }
 
     private void sendShiftedTurn(Message message) {
+        try {
+            client.output.writeObject(message);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void sendPlayerState(List<Object> playerState) {
+        Message msg = new Message(MessageType.PLAYER_STATE, App.username, playerState);
+        // send the message
+        this.sendPlayerState(msg);
+    }
+
+    private void sendPlayerState(Message message) {
         try {
             client.output.writeObject(message);
         } catch (IOException e) {

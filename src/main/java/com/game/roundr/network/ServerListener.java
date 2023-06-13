@@ -9,6 +9,7 @@ import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
+import java.util.List;
 import java.util.Map;
 import java.util.ArrayList;
 
@@ -135,6 +136,27 @@ public class ServerListener implements Runnable {
     }
 
     private void sendShiftedTurn(Message message)
+    {
+        // send the message to each user except the server
+        for (ClientHandler handler : server.handlers) {
+            try {
+                handler.output.writeObject(message);
+                handler.output.flush();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void sendPlayerState(List<Object> playerState)
+    {
+        Message msg = new Message(MessageType.PLAYER_STATE, App.username, playerState);
+
+        // send the chat message to everyone
+        this.sendPlayerState(msg);
+    }
+
+    private void sendPlayerState(Message message)
     {
         // send the message to each user except the server
         for (ClientHandler handler : server.handlers) {

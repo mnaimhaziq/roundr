@@ -25,6 +25,7 @@ import java.net.*;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -152,6 +153,13 @@ public class MainGameAreaController{
             playerScore.put(Integer.toString(i), 0);
         }
 
+        if(App.server != null){
+            // shift turn
+            turn = App.server.getPlayers().get(playerCount-1).getUsername();
+            System.out.println("Current turn: " + turn);
+            handlePlayerState();
+        }
+
         //render in-match scoreboard
 //        renderLiveScoreboard();
 
@@ -225,7 +233,7 @@ public class MainGameAreaController{
     };
 
     private void updateLabels() {
-        handleShiftedTurn();
+//        handleShiftedTurn();
         roundLabel.setText("ROUND " + roundCount);
         playerLabel.setText("Player " + turn + "'s turn");
         timeLimitLabel.setText("Time Limit: " + timeLimit + " seconds");
@@ -322,18 +330,18 @@ public class MainGameAreaController{
         // Logic to start the current player's turn
         System.out.println("Player " + turn + "'s turn");
 
-        if(App.server != null){
-            // shift turn
-            turn = App.server.getPlayers().get(playerCount-1).getUsername();
-        }
+//        if(App.server != null){
+//            // shift turn
+//            turn = App.server.getPlayers().get(playerCount-1).getUsername();
+//        }
 
         // update players turn
         updateLabels();
 
         // random word generator by the server
-        if(App.server != null) {
-            handleGeneratedWord();
-        }
+//        if(App.server != null) {
+//            handleGeneratedWord();
+//        }
 
         // Start the timer for the player's turn
         startTimer();
@@ -346,13 +354,13 @@ public class MainGameAreaController{
             messageGeneratedWord.setPlayerScore(playerScore);
             passedScorePass(messageGeneratedWord); // Add the message to the chat area
 
-        if(turn == App.username){
+//        if(turn == App.username){
             if(App.server != null){
                 App.server.listener.sendPlayerScore(playerScore);
             }else{
                 App.client.listener.sendPlayerScore(playerScore);
             }
-        }
+//        }
 //        sendMessageInput.clear();
     }
 
@@ -431,6 +439,64 @@ public class MainGameAreaController{
         }
     }
 
+    public void handlePlayerState() {
+
+        Message messagePlayerState = new Message();
+        messagePlayerState.setSenderName("me"); // Set the sender name as desired
+        List<Object> playerState = new ArrayList<>();
+        playerState.add(turn);
+        playerState.add(playerScore);
+        playerState.add(getRandomWord());
+        playerState.add(playerCount);
+        messagePlayerState.setPlayerState(playerState);
+        passedPlayerState(messagePlayerState); // Add the message to the chat area
+
+        if(App.server != null){
+            App.server.listener.sendPlayerState(playerState);
+        }else{
+            App.client.listener.sendPlayerState(playerState);
+        }
+//        sendMessageInput.clear();
+    }
+
+    public void passedPlayerState(Message message)
+    {
+//        this.generateWordPass(message.getContent());
+        Platform.runLater(
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            passedPlayerState(message.getPLayerState());
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                }
+        );
+    }
+
+    public void passedPlayerState(List<Object> playerState) throws IOException {
+        // client
+        if(App.client != null)
+        {
+            this.turn = (String)playerState.get(0);
+            this.playerScore = (Map<String, Integer>)playerState.get(1);
+            this.turn = (String)playerState.get(2);
+            this.playerCount = (int)playerState.get(3);
+            handlePlayerTurnEndForPassedPlayerState();
+        }
+        // server
+        else if(App.server != null)
+        {
+            this.turn = (String)playerState.get(0);
+            this.playerScore = (Map<String, Integer>)playerState.get(1);
+            this.turn = (String)playerState.get(2);
+            this.playerCount = (int)playerState.get(3);
+            handlePlayerTurnEndForPassedPlayerState();
+        }
+    }
+
     public void handleEndGamePopup() {
 
         Message messagePopup = new Message();
@@ -503,7 +569,7 @@ public class MainGameAreaController{
             playerScore.put(Integer.toString(playerCount), playerScore.get(Integer.toString(playerCount))+(int)calculateScore());
             //reload scoreboard
             renderLiveScoreboard();
-            handlePassScore();
+//            handlePassScore();
             }
     }
 
@@ -515,6 +581,11 @@ public class MainGameAreaController{
 
         // Increment the currentPlayer for the next turn
         playerCount++;
+
+        //push
+        if(turn == App.username){
+            handlePlayerState();
+        }
 
         if (roundCount == roundLimit && playerCount > playerLimit) {
             // All players have finished their turns and all rounds have finished
@@ -563,6 +634,27 @@ public class MainGameAreaController{
             conn.close();
         } catch (SQLException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    private void handlePlayerTurnEndForPassedPlayerState() throws IOException {
+        if (roundCount == roundLimit && playerCount > playerLimit) {
+            // All players have finished their turns and all rounds have finished
+            try {
+                endGame();
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+        } else if (playerCount > playerLimit){
+            // All players have finished their turns
+            playerCount = 1;
+            updateRoundTable(); // Update the round table with the current round information
+            startNextRound();
+        } else {
+            // Start the next player's turn
+            startPlayerTurn();
         }
     }
 

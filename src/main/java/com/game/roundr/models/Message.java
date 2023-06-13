@@ -2,6 +2,7 @@ package com.game.roundr.models;
 
 import java.io.Serializable;
 import java.nio.channels.FileChannel;
+import java.util.List;
 import java.util.Map;
 
 public class Message implements Serializable {
@@ -13,6 +14,7 @@ public class Message implements Serializable {
     private String timestamp;
     private String content;
     private Map<String, Integer> playerScore;
+    private List<Object> playerState;
 
     public Message() {
     }
@@ -34,6 +36,12 @@ public class Message implements Serializable {
         this.senderName = senderName;
         this.playerScore = playerScore;
     }
+    public Message(MessageType type, String senderName, List<Object> playerState) {
+        this.msgType = type;
+        this.senderName = senderName;
+        this.playerState = playerState;
+    }
+
 
     public MessageType getMsgType() {
         return msgType;
@@ -65,6 +73,9 @@ public class Message implements Serializable {
     public Map<String, Integer> getPLayerScore() {
         return playerScore;
     }
+    public List<Object> getPLayerState() {
+        return playerState;
+    }
 
     public void setContent(String content) {
         this.content = content;
@@ -72,6 +83,10 @@ public class Message implements Serializable {
 
     public void setPlayerScore(Map<String, Integer> playerScore) {
         this.playerScore = playerScore;
+    }
+
+    public void setPlayerState(List<Object> playerState) {
+        this.playerState = playerState;
     }
 
     public String toString() {
