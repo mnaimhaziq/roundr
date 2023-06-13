@@ -48,7 +48,7 @@ public class Client {
 
         return list;
     }
-    
+
     // utility to send message to the server
     protected void sendMessage(Message msg) {
         try {
@@ -58,12 +58,16 @@ public class Client {
             System.out.println("Server: Failed to send message to the server");
         }
     }
-    
+
     public void sendReady(String ready) {
         Message msg = new Message(MessageType.READY, App.username, ready);
-        
+
         // update the player list
         App.glc.updatePlayer(msg);
+
+        // if all ready, then start
+        App.glc.startGame();
+
         sendMessage(msg);
     }
 
