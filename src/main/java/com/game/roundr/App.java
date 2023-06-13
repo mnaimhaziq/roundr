@@ -10,6 +10,9 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.Random;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
@@ -39,6 +42,14 @@ public class App extends Application {
         }
         if (client != null) {
             client.closeClient();
+        }
+        try {
+            Connection conn = new DatabaseConnection().getConnection();
+            PreparedStatement stmt = conn.prepareStatement("DELETE FROM player WHERE username = ?");
+            stmt.setString(1, username);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 
