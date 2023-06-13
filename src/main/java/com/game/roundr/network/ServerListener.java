@@ -1,9 +1,14 @@
 package com.game.roundr.network;
 
+import com.game.roundr.chat.ChatController;
 import com.game.roundr.models.Message;
 import com.game.roundr.models.MessageType;
 
+import javafx.scene.layout.VBox;
+
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
@@ -12,6 +17,9 @@ public class ServerListener implements Runnable {
 
     private final Server server;
     private final ServerSocket serverSocket;
+    protected ObjectOutputStream output;
+    protected InputStream input;
+    private ChatController chat;
 
     public ServerListener(int port, Server server) throws IOException {
         this.server = server;
@@ -62,5 +70,62 @@ public class ServerListener implements Runnable {
                 e.printStackTrace();
             }
         }
+    }
+
+    // private void sendMessage(Message message)
+    // {
+    // try {
+    // this.output.writeObject(message);
+    // } catch (IOException e) {
+    // e.printStackTrace();
+    // }
+    // }
+
+    // public void sendChatMessage(String content)
+    // {
+    // Message msg = new Message(MessageType.CHAT, this.chat.getCurrentTimestamp(),
+    // content);
+
+    // // send the message
+    // this.sendMessage(msg);
+
+    // // add the message to the textArea
+    // this.chat.addToChatBox(msg);(msg);
+    // }
+
+    public void sendMessageToClient(String msg) {
+
+        try {
+            output.writeObject(msg);
+            String lineSeparator = System.getProperty("line.separator");
+            byte[] lineSeparatorBytes = lineSeparator.getBytes();
+            output.write(lineSeparatorBytes);
+            output.flush();
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Error sending message to client.");
+        }
+
+    }
+
+    public void receiveMessageFromClient(VBox vBox){
+        new Thread(new Runnable(){
+            @Override
+            public void run(){
+                
+                while (!serverSocket.isClosed()) {
+                    try {
+                String msg = input.readObject();
+                ChatController.addChatBubbleS(msg, vBox);
+                
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    System.out.println("Error receiving message from client.");
+                    break;
+                }
+            }
+            }
+        }).start();
     }
 }

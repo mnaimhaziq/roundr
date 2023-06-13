@@ -169,7 +169,7 @@ public class JoinLobbyController implements Initializable {
     }
 
     private void joinLobby(String gameCode, String gameAddress) {
-        App.client = new Client(gameAddress, App.username);
+        App.client = new Client(gameAddress, App.username, null);
         App.client.startClient();
 
         // update database tables

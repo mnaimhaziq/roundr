@@ -1,6 +1,7 @@
 package com.game.roundr.network;
 
 import com.game.roundr.App;
+import com.game.roundr.chat.ChatController;
 import com.game.roundr.game.EndGamePopupController;
 import com.game.roundr.game.MainGameAreaController;
 import com.game.roundr.models.Message;
@@ -31,6 +32,7 @@ public class ClientListener implements Runnable {
     private final Client client;
     private final int port;
 
+    private ChatController chat;
     private MainGameAreaController mgac;
     private boolean isTimerRunning = true;
     private Timeline timer;
@@ -78,6 +80,15 @@ public class ClientListener implements Runnable {
                             System.out.println("Chat: " + client.username + " has joined");
                             break;
                         }
+                        case CHAT -> {
+								// add the message to the chatbox
+								// chat.addToChatBox(inboundMsg);
+								
+								// forward the chat message
+								
+								
+								break;
+						}
                         case USER_JOINED -> {
                             // TODO: add the message to the chat
                             System.out.println("Chat: " + inboundMsg.getSenderName() + " has joined");

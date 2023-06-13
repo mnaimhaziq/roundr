@@ -1,5 +1,6 @@
 package com.game.roundr.network;
 
+import com.game.roundr.chat.ChatController;
 import com.game.roundr.game.EndGamePopupController;
 import com.game.roundr.game.MainGameAreaController;
 import com.game.roundr.models.Player;
@@ -30,6 +31,7 @@ public class ClientHandler implements Runnable {
     protected ObjectOutputStream output;
     private String clientUsername;
 
+    private ChatController chat;
     private MainGameAreaController mgac;
     private boolean isTimerRunning = true;
     private Timeline timer;
@@ -88,6 +90,12 @@ public class ClientHandler implements Runnable {
                             output.writeObject(outboundMsg);
                             break;
                         }
+                        case CHAT -> {
+								// add the message to the chatbox
+								// chat.addToTextArea(inboundMsg);
+								
+								break;
+						}
                         case DISCONNECT -> {
                             // TODO: add the message to the chat areas
                             System.out.println("Chat: " + inboundMsg.getSenderName() + " has left");
@@ -218,4 +226,38 @@ public class ClientHandler implements Runnable {
         return clientUsername;
     }
 
+    public void sendMessageToServer(String msg) {
+
+        try {
+            output.writeObject(msg);
+            String lineSeparator = System.getProperty("line.separator");
+            byte[] lineSeparatorBytes = lineSeparator.getBytes();
+            output.write(lineSeparatorBytes);
+            output.flush();
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Error sending message to server.");
+        }
+
+    }
+
+    // private void sendMessage(Message message)
+	// {
+	// 	try {
+	// 		this.output.writeObject(message);
+	// 	} catch (IOException e) {
+	// 		e.printStackTrace();
+	// 	}
+	// }
+    
+	// public void sendChatMessage(String content)
+	// {
+	// 	Message msg = new Message(MessageType.CHAT, this.chat.getCurrentTimestamp(), content);
+		
+	// 	// send the message
+	// 	this.sendMessage(msg);
+		
+	// 	// add the message to the textArea
+	// 	this.chat.addToTextArea(msg);
+	// }
 }

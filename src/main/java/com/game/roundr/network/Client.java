@@ -1,10 +1,12 @@
 package com.game.roundr.network;
 
+import com.game.roundr.chat.ChatController;
 import com.game.roundr.game.MainGameAreaController;
 import com.game.roundr.models.Player;
 import com.game.roundr.models.Message;
 import com.game.roundr.models.MessageType;
 import javafx.application.Platform;
+import javafx.scene.layout.VBox;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -80,6 +82,27 @@ public class Client {
 //        }
     }
 
+    public void receiveMessageFromClient(VBox chatC) {
+        
+        new Thread(new Runnable(){
+            @Override
+            public void run(){
+                
+                while (!serverSocket.isClosed()) {
+                    try {
+                String msg = input.readObject();
+                ChatController.addChatBubbleS(msg, vBox);
+                
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    System.out.println("Error receiving message from client.");
+                    break;
+                }
+            }
+            }
+        }).start();
+    }
 
 
 }
