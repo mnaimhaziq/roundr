@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -45,6 +46,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
@@ -62,8 +64,6 @@ public class ChatController implements Initializable {
     private Circle playerCircleS;
     @FXML
     private Button buttonChatSendS;
-    private ArrayList<Label> listNicknameS;
-    private ArrayList<Label> listReadyS;
 
     // Client Chatbox
     @FXML
@@ -76,8 +76,6 @@ public class ChatController implements Initializable {
     private Circle playerCircleC;
     @FXML
     private Button buttonChatSendC;
-    private ArrayList<Label> listNicknameC;
-    private ArrayList<Label> listReadyC;
 
     private SimpleDateFormat tformatter;
     private Server server;
@@ -108,60 +106,84 @@ public class ChatController implements Initializable {
             textFlow.setPadding(new Insets(5, 10, 5, 10));
             t.setFill(Color.color(0.934, 0.945, 0.996));
 
+            // Paint playerColor = getPlayerColorFromDatabase();
+            // Circle circle = new Circle(10, playerColor)
+
             hBox.getChildren().add(textFlow);
             // chatS.getChildren().add(hBox);
-    Platform.runLater(new Runnable() {
-    @Override
-    public void run() {
-    chatS.getChildren().add(hBox);
-    }
-    });
+            Platform.runLater(new Runnable() {
+                @Override
+                public void run() {
+                    chatS.getChildren().add(hBox);
+                }
+            });
 
             this.textFieldChatS.setText("");
             this.textFieldChatS.clear();
         }
-        server.sendMessageToClient(msg);
+        listenerS.sendMessageToClient(msg);
         textFieldChatS.clear();
     }
 
     // // send message from Server by clicking ENTER key
     // @FXML
     // private void enterChatHandleS(KeyEvent event) {
-    //     if (event.getCode().equals(KeyCode.ENTER)) {
-    //         String msg = this.textFieldChatS.getText();
-    //         if (!msg.isEmpty() && !msg.isBlank())
-    //             this.listenerS.sendChatMessage(msg);
-    //         this.textFieldChatS.setText("");
-    //     }
+    // if (event.getCode().equals(KeyCode.ENTER)) {
+    // String msg = this.textFieldChatS.getText();
+    // if (!msg.isEmpty() && !msg.isBlank())
+    // this.listenerS.sendChatMessage(msg);
+    // this.textFieldChatS.setText("");
+    // }
     // }
 
-    //server receive message from client
-    //chat bubble for client (display from server)
-    public static void addChatBubbleS(String msg, VBox vbox) {
-
-    HBox hBox = new HBox();
-    hBox.setAlignment(Pos.CENTER_LEFT);
-    hBox.setPadding(new Insets(5, 5, 5, 10));
-
-    Text text = new Text(msg);
-    TextFlow textFlow = new TextFlow(text);
-
-    textFlow.setStyle("-fx-background-color: rgb(1233,233,235)" +
-    "-fx-background-radius: 20px");
-
-    textFlow.setPadding(new Insets(5, 10, 5, 10));
-    text.setFill(Color.color(0.934, 0.945, 0.996));
-
-    hBox.getChildren().add(textFlow);
-
-    Platform.runLater(new Runnable() {
-    @Override
-    public void run() {
-    vbox.getChildren().add(hBox);
+    private String getPlayerColorFromDatabase() {
+        String playerColor = null;
+        try {
+            Connection conn = new DatabaseConnection().getConnection();
+            PreparedStatement stmt = conn
+                    .prepareStatement("SELECT player_color FROM player_game WHERE player_game_id = ?");
+            stmt.setInt(1, App.playerGameID);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                playerColor = rs.getString("player_color");
+            }
+            rs.close();
+            stmt.close();
+            conn.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return playerColor;
     }
-    });
+
+    // server receive message from client
+    // chat bubble for client (display from server)
+    public static void addChatBubbleS(Message msg, VBox vbox) {
+
+        HBox hBox = new HBox();
+        hBox.setAlignment(Pos.CENTER_LEFT);
+        hBox.setPadding(new Insets(5, 5, 5, 10));
+
+        Text text = new Text(); // pass the message later
+        TextFlow textFlow = new TextFlow(text);
+
+        textFlow.setStyle("-fx-background-color: rgb(1233,233,235)" +
+                "-fx-background-radius: 20px");
+
+        textFlow.setPadding(new Insets(5, 10, 5, 10));
+        text.setFill(Color.color(0.934, 0.945, 0.996));
+
+        hBox.getChildren().add(textFlow);
+
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                vbox.getChildren().add(hBox);
+            }
+        });
     }
-//client to server
+
+    // client to server
     // send message from Client
     @FXML
     public void handleSendMessageButtonC(ActionEvent event) {
@@ -219,65 +241,65 @@ public class ChatController implements Initializable {
     // this.state = NavState.MP_CLIENT;
     // }
 
-
     // from server to client
     // chat bubble for server (display from client)
-    public static void addChatBubbleC(String msgFromServer, VBox vBox) {
-    HBox hBox = new HBox();
-    hBox.setAlignment(Pos.CENTER_LEFT);
-    hBox.setPadding(new Insets(5, 5, 5, 10));
+    public static void addChatBubbleC(Message msg, VBox vBox) {
+        HBox hBox = new HBox();
+        hBox.setAlignment(Pos.CENTER_LEFT);
+        hBox.setPadding(new Insets(5, 5, 5, 10));
 
-    Text text = new Text(msgFromServer);
-    TextFlow textFlow = new TextFlow(text);
+        Text text = new Text();
+        TextFlow textFlow = new TextFlow(text);
 
-    textFlow.setStyle("-fx-background-color: rgb(1233,233,235)" +
-    "-fx-background-radius: 20px");
+        textFlow.setStyle("-fx-background-color: rgb(1233,233,235)" +
+                "-fx-background-radius: 20px");
 
-    textFlow.setPadding(new Insets(5, 10, 5, 10));
-    text.setFill(Color.color(0.934, 0.945, 0.996));
+        textFlow.setPadding(new Insets(5, 10, 5, 10));
+        text.setFill(Color.color(0.934, 0.945, 0.996));
 
-    hBox.getChildren().add(textFlow);
+        hBox.getChildren().add(textFlow);
 
-    Platform.runLater(new Runnable() {
-    @Override
-    public void run() {
-    vBox.getChildren().add(hBox);
-    }
-    });
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                vBox.getChildren().add(hBox);
+            }
+        });
     }
 
     // public class DialogBox extends HBox {
 
-    //     private Label text;
+    // private Label text;
 
-    //     public DialogBox(Label content, Circle circle) {
-    //         text = content;
-    //         playerCircleS = circle;
+    // public DialogBox(Label content, Circle circle) {
+    // text = content;
+    // playerCircleS = circle;
 
-    //         text.setWrapText(true);
-    //         playerCircleS.setFill(Color.web("#A1FF89"));
-    //         playerCircleS.setRadius(15.0);
+    // text.setWrapText(true);
+    // playerCircleS.setFill(Color.web("#A1FF89"));
+    // playerCircleS.setRadius(15.0);
 
-    //         this.setAlignment(Pos.TOP_RIGHT);
-    //         this.getChildren().addAll(text, playerCircleS);
-    //     }
+    // this.setAlignment(Pos.TOP_RIGHT);
+    // this.getChildren().addAll(text, playerCircleS);
+    // }
     // }
 
     // private void flip() {
-    //     this.setAlignment(Pos.TOP_LEFT);
-    //     ObservableList<Node> tmp = FXCollections.observableArrayList(this.getChildren());
-    //     FXCollections.reverse(tmp);
-    //     this.getChildren().setAll(tmp);
+    // this.setAlignment(Pos.TOP_LEFT);
+    // ObservableList<Node> tmp =
+    // FXCollections.observableArrayList(this.getChildren());
+    // FXCollections.reverse(tmp);
+    // this.getChildren().setAll(tmp);
     // }
 
     // public static DialogBox getSenderDialog(Label l, Circle c) {
-    //     return new DialogBox(l, c);
+    // return new DialogBox(l, c);
     // }
 
     // public static DialogBox getReceiverDialog(Label content, Circle circle) {
-    //     var db = new DialogBox(content, circle);
-    //     db.flip();
-    //     return db;
+    // var db = new DialogBox(content, circle);
+    // db.flip();
+    // return db;
     // }
 
     // // method ni tak siap lagi
@@ -300,41 +322,40 @@ public class ChatController implements Initializable {
     // }
     // }
     // private String getResponse(String input) {
-    //     return ": " + input;
+    // return ": " + input;
     // }
 
     // private void handleUserInput() {
-    //     Label senderText = new Label(textFieldChatS.getText());
-    //     Label receiverText = new Label(getResponse(textFieldChatC.getText()));
+    // Label senderText = new Label(textFieldChatS.getText());
+    // Label receiverText = new Label(getResponse(textFieldChatC.getText()));
 
-    //     chatS.getChildren().addAll(
-    //             DialogBox.getSenderDialog(senderText, new Circle()),
-    //             DialogBox.getReceiverDialog(receiverText, new Circle()));
-    //     textFieldChatS.clear();
+    // chatS.getChildren().addAll(
+    // DialogBox.getSenderDialog(senderText, new Circle()),
+    // DialogBox.getReceiverDialog(receiverText, new Circle()));
+    // textFieldChatS.clear();
     // }
 
-	// public void addToChatBox(String text)
-	// {
-	// 	// client
-	// 	if(this.state == State.CLIENT)
-	// 	{
-	// 		if(this.chatC.getText().isEmpty())
-	// 			this.chatC.setText(text);
-	// 		else this.chatC.setText(this.chatC.getText() + "\n" + text);
-	// 	}
-	// 	// server
-	// 	else if(this.state == State.SERVER)
-	// 	{
-	// 		this.chatS.setText(this.chatS.getText() + "\n" + text);
-	// 	}
-	// }
-
+    // public void addToChatBox(String text)
+    // {
+    // // client
+    // if(this.state == State.CLIENT)
+    // {
+    // if(this.chatC.getText().isEmpty())
+    // this.chatC.setText(text);
+    // else this.chatC.setText(this.chatC.getText() + "\n" + text);
+    // }
+    // // server
+    // else if(this.state == State.SERVER)
+    // {
+    // this.chatS.setText(this.chatS.getText() + "\n" + text);
+    // }
+    // }
 
     // // display the message in HBox
     // public void addToChatBox(Message message) {
-    //     this.addToChatBox(message.getTimestamp() + " " + message.getSenderName() +
-    //     ": " + message.getContent());
-    //     // this.handleUserInput();
+    // this.addToChatBox(message.getTimestamp() + " " + message.getSenderName() +
+    // ": " + message.getContent());
+    // // this.handleUserInput();
     // }
 
     @Override
@@ -349,36 +370,35 @@ public class ChatController implements Initializable {
         // this.listReadyS = new ArrayList<Label>();
         // this.listReadyC = new ArrayList<Label>();
 
-        if (this.state == State.SERVER){
-        // To automatically resize and scroll to the latest chat (server)
-        chatS.heightProperty().addListener(new ChangeListener<Number>() {
-            @Override
-            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-                spChatS.setVvalue((Double) newValue);
+        if (this.state == State.SERVER) {
+            // To automatically resize and scroll to the latest chat (server)
+            chatS.heightProperty().addListener(new ChangeListener<Number>() {
+                @Override
+                public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                    spChatS.setVvalue((Double) newValue);
+                }
+            });
+
+            try {
+                listenerS.receiveMessageFromClient(chatS);
+                handleSendMessageButtonS(null);
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
             }
-        });
 
-        try {
-            listenerS.receiveMessageFromClient(chatS);
-            handleSendMessageButtonS(null);
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        } else if (this.state == State.CLIENT) {
+            // To automatically resize and scroll to the latest chat (client)
+            chatC.heightProperty().addListener(new ChangeListener<Number>() {
+                @Override
+                public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                    spChatC.setVvalue((Double) newValue);
+                }
+            });
 
-
-    }else if(this.state == State.CLIENT){
-        // To automatically resize and scroll to the latest chat (client)
-        chatC.heightProperty().addListener(new ChangeListener<Number>() {
-            @Override
-            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-                spChatC.setVvalue((Double) newValue);
-            }
-        });
-
-    handlerC.receiveMessageFromServer(chatC);
+            handlerC.receiveMessageFromServer(chatC);
             handleSendMessageButtonC(null);
-    }
+        }
 
         throw new UnsupportedOperationException("Unimplemented method 'initialize'");
     }

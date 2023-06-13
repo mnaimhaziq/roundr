@@ -4,10 +4,12 @@ import com.game.roundr.chat.ChatController;
 import com.game.roundr.models.Message;
 import com.game.roundr.models.MessageType;
 
+import javafx.event.ActionEvent;
 import javafx.scene.layout.VBox;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -18,7 +20,7 @@ public class ServerListener implements Runnable {
     private final Server server;
     private final ServerSocket serverSocket;
     protected ObjectOutputStream output;
-    protected InputStream input;
+    protected ObjectInputStream input;
     private ChatController chat;
 
     public ServerListener(int port, Server server) throws IOException {
@@ -35,6 +37,9 @@ public class ServerListener implements Runnable {
                 System.out.println("Server: A player is connected");
                 // create a new thread to handle the player connection
                 new Thread(new ClientHandler(socket, server)).start();
+                // Message message = new Message(MessageType.CHAT, server.hostUsername, "");
+                // if(chat.handleSendMessageButtonS(null)){
+                // chat.sendMessageToClient(message);
             }
         } catch (SocketException e) {
             System.out.println("Server: Server socket closed");
@@ -108,24 +113,39 @@ public class ServerListener implements Runnable {
 
     }
 
-    public void receiveMessageFromClient(VBox vBox){
-        new Thread(new Runnable(){
-            @Override
-            public void run(){
+    // public void receiveMessageFromClient(VBox vBox){
+    //     new Thread(new Runnable(){
+    //         @Override
+    //         public void run(){
                 
-                while (!serverSocket.isClosed()) {
-                    try {
-                String msg = input.readObject();
+    //             while (!serverSocket.isClosed()) {
+    //                 try {
+    //             Object msg = input.readObject();
+    //             ChatController.addChatBubbleS(msg, vBox);
+                
+
+    //             } catch (Exception e) {
+    //                 e.printStackTrace();
+    //                 System.out.println("Error receiving message from client.");
+    //                 break;
+    //             }
+    //         }
+    //         }
+    //     }).start();
+    // }
+        public void receiveMessageFromClient(VBox vBox){
+            try {
+                Message msg = (Message) input.readObject();
                 ChatController.addChatBubbleS(msg, vBox);
-                
 
                 } catch (Exception e) {
                     e.printStackTrace();
                     System.out.println("Error receiving message from client.");
-                    break;
+                    
                 }
             }
-            }
-        }).start();
-    }
+            
+        
+    
+
 }

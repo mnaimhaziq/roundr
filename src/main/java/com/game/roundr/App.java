@@ -15,11 +15,10 @@ public class App extends Application {
 
     private static Scene scene;
     public static String username = "";
-    
     public static Server server;
     public static Client client;
 
-    public static String playerColor = "";
+    public static Integer playerGameID;
 
     public static String playerRole = "";
 

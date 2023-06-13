@@ -12,6 +12,7 @@ import javafx.animation.Timeline;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Duration;
@@ -30,7 +31,7 @@ public class ClientHandler implements Runnable {
     protected ObjectInputStream input;
     protected ObjectOutputStream output;
     private String clientUsername;
-
+    
     private ChatController chat;
     private MainGameAreaController mgac;
     private boolean isTimerRunning = true;
@@ -84,6 +85,8 @@ public class ClientHandler implements Runnable {
                                 outboundMsg.setContent(server.getPlayerList());
 
                                 // TODO: add the message to the chat
+                                outboundMsg.setMsgType(MessageType.CHAT);
+
                                 System.out.println("Chat: " + inboundMsg.getSenderName() + " has joined");
                             }
                             // send back msg to the new player
@@ -92,14 +95,14 @@ public class ClientHandler implements Runnable {
                         }
                         case CHAT -> {
 								// add the message to the chatbox
-								// chat.addToTextArea(inboundMsg);
-								
+								output.writeObject(inboundMsg);
+                                output.flush();
 								break;
 						}
                         case DISCONNECT -> {
                             // TODO: add the message to the chat areas
                             System.out.println("Chat: " + inboundMsg.getSenderName() + " has left");
-
+                            
                             // remove the player from the list
                             for (int i = 0; i < server.players.size(); i++) {
                                 if (server.players.get(i).getUsername().equals(inboundMsg.getSenderName())) {
@@ -202,7 +205,8 @@ public class ClientHandler implements Runnable {
 
             popupStage.showAndWait();
 
-            // After the popup is closed, update the timer state based on the shared variable
+            // After the popup is closed, update the timer state based on the shared
+            // variable
             if (isTimerRunning) {
                 mgac.getTimer().play();
             }
@@ -222,7 +226,7 @@ public class ClientHandler implements Runnable {
         isTimerRunning = true;
     }
 
-    public String getUsername(){
+    public String getUsername() {
         return clientUsername;
     }
 
@@ -241,23 +245,40 @@ public class ClientHandler implements Runnable {
 
     }
 
-    // private void sendMessage(Message message)
-	// {
-	// 	try {
-	// 		this.output.writeObject(message);
-	// 	} catch (IOException e) {
-	// 		e.printStackTrace();
-	// 	}
-	// }
+    public void receiveMessageFromServer(VBox vBox) {
+
+                    try {
+                        Message msg = (Message) input.readObject();
+                        ChatController.addChatBubbleC(msg, vBox);
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        System.out.println("Error receiving message from server.");
+                        
+                    }
+                }
+            
+        
     
-	// public void sendChatMessage(String content)
-	// {
-	// 	Message msg = new Message(MessageType.CHAT, this.chat.getCurrentTimestamp(), content);
-		
-	// 	// send the message
-	// 	this.sendMessage(msg);
-		
-	// 	// add the message to the textArea
-	// 	this.chat.addToTextArea(msg);
-	// }
+
+    // private void sendMessage(Message message)
+    // {
+    // try {
+    // this.output.writeObject(message);
+    // } catch (IOException e) {
+    // e.printStackTrace();
+    // }
+    // }
+
+    // public void sendChatMessage(String content)
+    // {
+    // Message msg = new Message(MessageType.CHAT, this.chat.getCurrentTimestamp(),
+    // content);
+
+    // // send the message
+    // this.sendMessage(msg);
+
+    // // add the message to the textArea
+    // this.chat.addToTextArea(msg);
+    // }
 }

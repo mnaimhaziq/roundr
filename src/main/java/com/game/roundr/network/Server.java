@@ -1,6 +1,7 @@
 package com.game.roundr.network;
 
 import com.game.roundr.App;
+import com.game.roundr.chat.ChatController;
 import com.game.roundr.models.Player;
 
 import javafx.scene.layout.VBox;
@@ -30,7 +31,6 @@ public class Server {
         try {
             listener = new ServerListener(PORT, this);
             new Thread(listener).start(); // network thread
-            
             // change view
             App.setScene("lobby/GameLobby");
         } catch (BindException e) {
@@ -78,7 +78,7 @@ public class Server {
         sendMessage(message);
     }
 
-    private void sendMessage(Message message) {
+    public void sendMessage(Message message) {
         try {
             output.writeObject(message);
             output.flush();

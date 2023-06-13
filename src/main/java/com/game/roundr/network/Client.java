@@ -22,7 +22,7 @@ public class Client {
     protected final String username;
     private final int PORT = 9001;
 
-
+    
     public Client(String address, String username, MainGameAreaController mgac) {
         this.username = username;
         this.listener = new ClientListener(address, PORT, this, mgac);
@@ -82,27 +82,6 @@ public class Client {
 //        }
     }
 
-    public void receiveMessageFromClient(VBox chatC) {
-        
-        new Thread(new Runnable(){
-            @Override
-            public void run(){
-                
-                while (!serverSocket.isClosed()) {
-                    try {
-                String msg = input.readObject();
-                ChatController.addChatBubbleS(msg, vBox);
-                
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    System.out.println("Error receiving message from client.");
-                    break;
-                }
-            }
-            }
-        }).start();
-    }
 
 
 }
