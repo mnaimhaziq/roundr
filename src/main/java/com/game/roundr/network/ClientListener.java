@@ -201,9 +201,9 @@ public class ClientListener implements Runnable {
                             MainGameAreaController mainGameAreaController = App.mainGameAreaController;
                             if (mainGameAreaController != null) {
                                 mainGameAreaController.generateWordPass(inboundMsg);
-                                System.out.println("Client Listener: not null " + inboundMsg.getContent());
+                                System.out.println("Client Listener random: not null " + inboundMsg.getContent());
                             } else {
-                                System.out.println("Client Listener: null " + inboundMsg.getContent());
+                                System.out.println("Client Listener random: null " + inboundMsg.getContent());
                             }
                             break;
                         }
