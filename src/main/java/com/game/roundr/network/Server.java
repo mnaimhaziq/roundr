@@ -16,9 +16,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Map;
-import javafx.concurrent.Task;
-import javafx.scene.control.Alert;
 
 public class Server {
 
@@ -35,12 +32,12 @@ public class Server {
 
     public void startServer() {
         try {
+            // change view
+            App.setScene("lobby/GameLobby");
+
             // create the main network thread
             listener = new ServerListener(PORT, this);
             new Thread(listener).start(); // network thread
-
-            // change view
-            App.setScene("lobby/GameLobby");
 
             // generate random color
             String color = App.getHexColorCode();
@@ -102,9 +99,9 @@ public class Server {
                 e.printStackTrace();
             }
         } catch (BindException e) {
-            App.showAlert(Alert.AlertType.WARNING, "Cannot Create Lobby", "The port and address is in use");
+            System.out.println("Server: The port and address is in use");
         } catch (IOException e) {
-            App.showAlert(Alert.AlertType.WARNING, "Cannot Create Lobby", "Failed to create server socket");
+            System.out.println("Server: Failed to create server socket");
         }
     }
 
@@ -197,33 +194,6 @@ public class Server {
         return list;
     }
 
-    public void updateReady(Message msg) {
-        Task<Void> task = new Task<Void>() {
-            @Override
-            protected Void call() throws Exception {
-                try {
-                    Connection conn = new DatabaseConnection().getConnection();
-                    PreparedStatement stmt = conn.prepareStatement("UPDATE player_game SET status = "
-                            + "? WHERE player_id = (SELECT player_id FROM player WHERE username=?)");
-                    stmt.setString(1, msg.getContent());
-                    stmt.setString(2, msg.getSenderName());
-                    stmt.executeUpdate();
-
-                    // close db resources
-                    conn.close();
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-                return null;
-            }
-        };
-
-        Thread th = new Thread(task);
-        th.setDaemon(true);
-        th.start();
-    }
-
     // general method to send msg to all clients
     public void sendMessage(Message msg) {
         for (ClientHandler handler : handlers) {
@@ -236,12 +206,25 @@ public class Server {
         }
     }
 
-    public void sendReady(String ready) throws IOException {
+    public void sendReady(String ready) throws IOException{
         Message msg = new Message(MessageType.READY, App.username, ready);
 
         // update database
-        updateReady(msg);
-        
+        try {
+            Connection conn = new DatabaseConnection().getConnection();
+            PreparedStatement stmt = conn.prepareStatement("UPDATE player_game SET status = "
+                    + "? WHERE player_id = (SELECT player_id FROM player WHERE username=?)");
+            stmt.setString(1, msg.getContent());
+            stmt.setString(2, msg.getSenderName());
+            stmt.executeUpdate();
+
+            // close db resources
+            conn.close();
+            stmt.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
         // update player inside server list
         App.glc.updatePlayer(msg);
 
@@ -249,32 +232,13 @@ public class Server {
         sendMessage(msg);
 
         // if all ready, then start
-        App.glc.startGame();
+        if (App.glc.isAllReady()) {
+            App.setScene("game/MainGameArea");
+        }
     }
 
     public void sendEndGameRequest() {
         Message msg = new Message(MessageType.END_GAME, App.username, "");
-        sendMessage(msg);
-    }
-
-    public void sendShiftedTurn(String turn) {
-        Message msg = new Message(MessageType.TURN, App.username, turn);
-        sendMessage(msg);
-    }
-
-    public void sendPlayerScore(Map<String, Integer> scores) {
-        Message msg = new Message(MessageType.PLAYER_SCORE, App.username, scores);
-        sendMessage(msg);
-    }
-
-    public void sendChatMessage(String content) {
-        Message msg = new Message(MessageType.CHAT, App.username, content);
-        App.mgac.addToTextArea(msg);
-        sendMessage(msg);
-    }
-
-    public void sendWordMessage(String content) {
-        Message msg = new Message(MessageType.RANDOM_WORD, App.username, content);
         sendMessage(msg);
     }
 

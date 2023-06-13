@@ -73,7 +73,7 @@ public class ScoreboardController {
     }
 
     public void initialize() {
-        App.mgac = null;
+
         timeline = new Timeline(new KeyFrame(Duration.seconds(1), this::updateTimer));
         timeline.setCycleCount(remainingTime); // Run the timeline for the specified number of seconds
         timeline.setOnFinished(this::handleTimerFinished);

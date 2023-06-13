@@ -3,6 +3,9 @@ package com.game.roundr.game;
 import com.game.roundr.App;
 import com.game.roundr.DatabaseConnection;
 import com.game.roundr.models.Message;
+import com.game.roundr.models.Player;
+import com.game.roundr.network.Client;
+import com.game.roundr.network.ClientListener;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
@@ -14,6 +17,7 @@ import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.Window;
 import javafx.util.Duration;
 
 import java.io.*;
@@ -103,7 +107,7 @@ public class MainGameAreaController {
 
     public void initialize() {
 
-        App.mgac = this;
+        App.mainGameAreaController = this;
 
         try {
             Connection conn = new DatabaseConnection().getConnection();
@@ -379,6 +383,7 @@ public class MainGameAreaController {
         if (App.server != null) {
             App.server.sendShiftedTurn(turn);
         } else {
+
 //                App.client.listener.sendShiftedTurn(turn);
         }
 //        sendMessageInput.clear();
