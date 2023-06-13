@@ -5,9 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a70aa80d-2ccd-4253-8a2d-f9bc321a0583" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/game/roundr/App.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/game/roundr/App.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/game/roundr/DatabaseConnection.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/game/roundr/DatabaseConnection.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/game/roundr/lobby/GameLobbyController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/game/roundr/lobby/GameLobbyController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/game/roundr/game/MainGameAreaController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/game/roundr/game/MainGameAreaController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/game/roundr/network/ClientListener.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/game/roundr/network/ClientListener.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -32,7 +33,7 @@
   "keyToString": {
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "last_opened_file_path": "C:/Users/mnaim/Desktop/ROUNDERLATEST/roundr"
+    "last_opened_file_path": "D:/code/roundr/roundrFOUR/roundr"
   }
 }]]></component>
   <component name="RunManager">

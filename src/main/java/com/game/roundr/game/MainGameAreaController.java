@@ -25,6 +25,7 @@ import java.net.*;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -148,12 +149,21 @@ public class MainGameAreaController{
         playerScore = new HashMap<>();
 
         // Initialize score
-        for (int i=1; i <= playerLimit; i++) {
-            playerScore.put(Integer.toString(i), 0);
+//        for (int i=1; i <= playerLimit; i++) {
+//            playerScore.put(Integer.toString(i), 0);
+//        }
+
+        if(App.server != null){
+            List<Player> playerServer = App.server.getPlayers();
+            for (Player player : playerServer) {
+                String playerName = player.getUsername();
+                playerScore.put(playerName, 0);
+            }
+            handlePassScore();
         }
 
         //render in-match scoreboard
-//        renderLiveScoreboard();
+        renderLiveScoreboard();
 
         // Update UI labels with initial values
         updateLabels();
@@ -335,6 +345,9 @@ public class MainGameAreaController{
             handleGeneratedWord();
         }
 
+        //reload live scoreboard
+        renderLiveScoreboard();
+
         // Start the timer for the player's turn
         startTimer();
     }
@@ -346,13 +359,13 @@ public class MainGameAreaController{
             messageGeneratedWord.setPlayerScore(playerScore);
             passedScorePass(messageGeneratedWord); // Add the message to the chat area
 
-        if(turn == App.username){
+//        if(turn == App.username){
             if(App.server != null){
                 App.server.listener.sendPlayerScore(playerScore);
             }else{
                 App.client.listener.sendPlayerScore(playerScore);
             }
-        }
+//        }
 //        sendMessageInput.clear();
     }
 
@@ -375,18 +388,18 @@ public class MainGameAreaController{
         {
             this.playerScore = passedPlayerScore;
             renderLiveScoreboard();
-            timer.stop();
+//            timer.stop();
             // Start the next player's turn
-            startPlayerTurn();
+//            startPlayerTurn();
         }
         // server
         else if(App.server != null)
         {
             this.playerScore = passedPlayerScore;
             renderLiveScoreboard();
-            timer.stop();
+//            timer.stop();
             // Start the next player's turn
-            startPlayerTurn();
+//            startPlayerTurn();
         }
     }
 
@@ -500,7 +513,7 @@ public class MainGameAreaController{
             timer.stop();
             System.out.println("Score: " + calculateScore());
             //increment score
-            playerScore.put(Integer.toString(playerCount), playerScore.get(Integer.toString(playerCount))+(int)calculateScore());
+            playerScore.put(App.username, playerScore.get(App.username)+(int)calculateScore());
             //reload scoreboard
             renderLiveScoreboard();
             handlePassScore();
