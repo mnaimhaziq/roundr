@@ -176,20 +176,7 @@ public class ClientHandler implements Runnable {
                         }
                         case READY -> {
                             // update database
-                            try {
-                                Connection conn = new DatabaseConnection().getConnection();
-                                PreparedStatement stmt = conn.prepareStatement("UPDATE `player_game` SET status = "
-                                        + "? WHERE player_id = (SELECT player_id FROM player WHERE username = ?)");
-                                stmt.setString(1, inboundMsg.getContent());
-                                stmt.setString(2, inboundMsg.getSenderName());
-                                stmt.executeUpdate();
-
-                                // close db resources
-                                conn.close();
-                                stmt.close();
-                            } catch (SQLException e) {
-                                e.printStackTrace();
-                            }
+                            server.updateReady(inboundMsg);
                             
                             // update player inside server list
                             App.glc.updatePlayer(inboundMsg);
@@ -198,9 +185,7 @@ public class ClientHandler implements Runnable {
                             broadcastMessage(inboundMsg);
                             
                             // if all ready, then start
-                            if (App.glc.isAllReady()) {
-                                App.setScene("game/MainGameArea");
-                            }
+                            App.glc.startGame();
                             
                             break;
                         }
