@@ -17,7 +17,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Map;
-import javafx.concurrent.Task;
 import javafx.scene.control.Alert;
 
 public class Server {
@@ -41,10 +40,10 @@ public class Server {
 
             // change view
             App.setScene("lobby/GameLobby");
-
+            
             // generate random color
             String color = App.getHexColorCode();
-
+            
             // adds host to the list
             App.glc.addPlayer(App.username, color);
 
@@ -197,33 +196,6 @@ public class Server {
         return list;
     }
 
-    public void updateReady(Message msg) {
-        Task<Void> task = new Task<Void>() {
-            @Override
-            protected Void call() throws Exception {
-                try {
-                    Connection conn = new DatabaseConnection().getConnection();
-                    PreparedStatement stmt = conn.prepareStatement("UPDATE player_game SET status = "
-                            + "? WHERE player_id = (SELECT player_id FROM player WHERE username=?)");
-                    stmt.setString(1, msg.getContent());
-                    stmt.setString(2, msg.getSenderName());
-                    stmt.executeUpdate();
-
-                    // close db resources
-                    conn.close();
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-                return null;
-            }
-        };
-
-        Thread th = new Thread(task);
-        th.setDaemon(true);
-        th.start();
-    }
-
     // general method to send msg to all clients
     public void sendMessage(Message msg) {
         for (ClientHandler handler : handlers) {
@@ -240,8 +212,21 @@ public class Server {
         Message msg = new Message(MessageType.READY, App.username, ready);
 
         // update database
-        updateReady(msg);
-        
+        try {
+            Connection conn = new DatabaseConnection().getConnection();
+            PreparedStatement stmt = conn.prepareStatement("UPDATE player_game SET status = "
+                    + "? WHERE player_id = (SELECT player_id FROM player WHERE username=?)");
+            stmt.setString(1, msg.getContent());
+            stmt.setString(2, msg.getSenderName());
+            stmt.executeUpdate();
+
+            // close db resources
+            conn.close();
+            stmt.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
         // update player inside server list
         App.glc.updatePlayer(msg);
 
@@ -249,7 +234,9 @@ public class Server {
         sendMessage(msg);
 
         // if all ready, then start
-        App.glc.startGame();
+        if (App.glc.isAllReady()) {
+            App.setScene("game/MainGameArea");
+        }
     }
 
     public void sendEndGameRequest() {
