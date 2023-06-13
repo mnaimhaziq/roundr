@@ -5,9 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a70aa80d-2ccd-4253-8a2d-f9bc321a0583" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/game/roundr/game/MainGameAreaController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/game/roundr/game/MainGameAreaController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/game/roundr/network/ClientHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/game/roundr/network/ClientHandler.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/game/roundr/network/ClientListener.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/game/roundr/network/ClientListener.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -33,7 +32,10 @@
   "keyToString": {
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "last_opened_file_path": "D:/code/roundr/roundrFOUR/roundr"
+    "last_opened_file_path": "C:/Users/mnaim/Desktop/FInallll Rounder/roundr",
+    "project.structure.last.edited": "Project",
+    "project.structure.proportion": "0.0",
+    "project.structure.side.proportion": "0.0"
   }
 }]]></component>
   <component name="RunManager">

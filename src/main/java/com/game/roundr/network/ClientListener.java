@@ -150,7 +150,7 @@ public class ClientListener implements Runnable {
                                 gameLobbyController.addToTextArea(inboundMsg);
 
                             }
-                            else if( mainGameAreaController != null) {
+                            if( mainGameAreaController != null) {
                                 mainGameAreaController.addToTextArea(inboundMsg);
                             }
                             break;
