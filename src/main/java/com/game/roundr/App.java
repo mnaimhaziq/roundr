@@ -24,7 +24,7 @@ public class App extends Application {
     public static Server server;
     public static Client client;
     public static GameLobbyController glc;
-    public static MainGameAreaController mgac;
+    public static MainGameAreaController mainGameAreaController;
 
     @Override
     public void start(Stage stage) throws IOException {
