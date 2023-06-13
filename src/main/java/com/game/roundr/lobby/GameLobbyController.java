@@ -47,21 +47,22 @@ public class GameLobbyController implements Initializable {
     private TextArea textAreaChat;
 
     public void HandleMessageInput() {
+
         String messageChat = sendMessageInput.getText();
 
         if (!messageChat.isEmpty()) {
             Message message = new Message();
-            message.setSenderName("Me"); // Set the sender name
+            message.setSenderName("me"); // Set the sender name as desired
             message.setContent(messageChat);
 
             addToTextArea(message); // Add the message to the chat area
             insertChatToDatabase(message);
         }
         if (App.server != null) {
-            App.server.sendChatMessage(messageChat);
+            App.server.listener.sendChatMessage(messageChat);
 
         } else {
-            App.client.sendChatMessage(messageChat);
+            App.client.listener.sendChatMessage(messageChat);
         }
         sendMessageInput.clear();
     }
@@ -75,13 +76,20 @@ public class GameLobbyController implements Initializable {
     }
 
     public void addToTextArea(Message message) {
+
         this.addToTextArea(message.getSenderName() + ": " + message.getContent());
     }
 
     public void addToTextArea(String text) {
-        if (this.textAreaChat.getText().isEmpty()) {
-            this.textAreaChat.setText(text);
-        } else {
+        // client
+        if (App.client != null) {
+            if (this.textAreaChat.getText().isEmpty()) {
+                this.textAreaChat.setText(text);
+            } else {
+                this.textAreaChat.setText(this.textAreaChat.getText() + "\n" + text);
+            }
+        } // server
+        else if (App.server != null) {
             this.textAreaChat.setText(this.textAreaChat.getText() + "\n" + text);
         }
     }
@@ -122,21 +130,28 @@ public class GameLobbyController implements Initializable {
         }
     }
 
-    public void insertChatToDatabase(Message message) {
+    public void insertChatToDatabase(Message message){
         try {
-            int gameId = DatabaseConnection.getGameIdFromDB();
-            int playerId = DatabaseConnection.getPlayerIdFromDB();
+            int gameId = DatabaseConnection.getGameIdFromDB();        // Retrieve game_id from the database
+            int playerId = DatabaseConnection.getPlayerIdFromDB();    // Retrieve player_id from the database
 
             Connection conn = new DatabaseConnection().getConnection();
             PreparedStatement stmt = conn.prepareStatement("INSERT INTO chat "
-                    + "(game_id, player_id, message_content, timestamp) "
-                    + "VALUES (?, ?, ?, ?)",
+                            + "(game_id, player_id, message_content, timestamp) "
+                            + "VALUES (?, ?, ?, ?)",
                     Statement.RETURN_GENERATED_KEYS);
-            stmt.setInt(1, gameId);
-            stmt.setInt(2, playerId);
+            stmt.setInt(1, gameId);      // Assuming you have a method to get the game ID from the Message object
+            stmt.setInt(2, playerId);    // Assuming you have a method to get the player ID from the Message object
             stmt.setString(3, message.getContent());
             stmt.setTimestamp(4, new Timestamp(System.currentTimeMillis()));
             stmt.executeUpdate();
+
+            // Retrieve the generated keys
+            ResultSet rs = stmt.getGeneratedKeys();
+            if (rs.next()) {
+                int chatId = rs.getInt(1);  // Assuming the chat_id is the generated key column
+                // Do something with the chatId if needed
+            }
 
             conn.close();
         } catch (SQLException e) {

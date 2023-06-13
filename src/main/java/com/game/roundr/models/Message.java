@@ -29,10 +29,10 @@ public class Message implements Serializable {
         this.content = content;
     }
 
-    public Message(MessageType type, String senderName, Map<String, Integer> scores) {
+    public Message(MessageType type, String senderName, Map<String, Integer> playerScore) {
         this.msgType = type;
         this.senderName = senderName;
-        this.playerScore = scores;
+        this.playerScore = playerScore;
     }
 
     public MessageType getMsgType() {

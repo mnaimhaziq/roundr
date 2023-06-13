@@ -1,8 +1,23 @@
 package com.game.roundr.network;
 
 import com.game.roundr.App;
+import com.game.roundr.game.EndGamePopupController;
+import com.game.roundr.game.MainGameAreaController;
+import com.game.roundr.lobby.GameLobbyController;
 import com.game.roundr.models.Message;
 import com.game.roundr.models.MessageType;
+import com.game.roundr.models.Player;
+import javafx.animation.Animation;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.application.Platform;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import javafx.util.Duration;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -10,6 +25,7 @@ import java.net.ConnectException;
 import java.net.Socket;
 import java.net.SocketException;
 import java.util.Arrays;
+import java.util.Map;
 import javafx.scene.control.Alert;
 
 public class ClientListener implements Runnable {
@@ -19,10 +35,20 @@ public class ClientListener implements Runnable {
     private final Client client;
     private final int port;
 
-    public ClientListener(String address, int port, Client client) {
+    private MainGameAreaController mgac;
+    private boolean isTimerRunning = true;
+    private Timeline timer;
+
+    public ClientListener(String address, int port, Client client, MainGameAreaController mgac) {
         this.address = address;
         this.client = client;
         this.port = port;
+        this.mgac = mgac;
+    }
+
+    // Method to set MainGameAreaController instance
+    public void setMainGameAreaController(MainGameAreaController mgac) {
+        this.mgac = mgac;
     }
 
     @Override
@@ -71,8 +97,8 @@ public class ClientListener implements Runnable {
                             // fetch the list of players
                             App.glc.updatePlayers(inboundMsg);
 
-                            // add the message to the chat
-                            App.glc.addToTextArea("Server: " + client.username + " has joined");
+                            // TODO: add the message to the chat
+                            System.out.println("Chat: " + client.username + " has joined");
                             break;
                         }
                         case USER_JOINED -> {
@@ -82,8 +108,8 @@ public class ClientListener implements Runnable {
                             // fetch the list of players
                             App.glc.updatePlayers(inboundMsg);
 
-                            // add the message to the chat
-                            App.glc.addToTextArea("Server: " + inboundMsg.getSenderName() + " has joined");
+                            // TODO: add the message to the chat
+                            System.out.println("Chat: " + inboundMsg.getSenderName() + " has joined");
                             break;
                         }
                         case DISCONNECT -> {
@@ -101,8 +127,8 @@ public class ClientListener implements Runnable {
                                 // fetch the list of players
                                 App.glc.updatePlayers(inboundMsg);
 
-                                // add the message to the chat
-                                App.glc.addToTextArea("Server: " + inboundMsg.getSenderName() + " has left");
+                                // TODO: add msg to the chats
+                                System.out.println("Chat: " + inboundMsg.getSenderName() + " has left");
                             }
                             break;
                         }
@@ -118,21 +144,63 @@ public class ClientListener implements Runnable {
                         }
                         case CHAT -> {
                             // add the message to the chat textArea
-                            if (App.glc != null) {
-                                App.glc.addToTextArea(inboundMsg);
+                            GameLobbyController gameLobbyController = App.glc;
+                            MainGameAreaController mainGameAreaController = App.mainGameAreaController;
+                            if (gameLobbyController != null ) {
+                                gameLobbyController.addToTextArea(inboundMsg);
 
-                            } else if (App.mgac != null) {
-                                App.mgac.addToTextArea(inboundMsg);
+                            }
+                            else if( mainGameAreaController != null) {
+                                mainGameAreaController.addToTextArea(inboundMsg);
                             }
                             break;
                         }
                         case END_GAME -> {
-                            App.mgac.passedEndGamePopup(inboundMsg);
+                            // show modal
+                            // pause timer
+
+//                            // Handle end game message
+//                            System.out.println("Requested to end the game");
+//                            // Pause the timer and show the popup
+//                            Platform.runLater(() -> {
+//                                mgac.pauseTimer();
+//                                showEndGamePopup();
+//                            });
+//                            break;
+
+
+//                            // Update the shared variable based on the timer state
+//                            boolean timerRunning = mgac.timer.getStatus() == Animation.Status.RUNNING;
+//                            isTimerRunning = timerRunning;
+//
+//                            // Pause or resume the timer based on the updated state
+//                            if (timerRunning) {
+//                                mgac.getTimer().play();
+//                            } else {
+//                                mgac.getTimer().pause();
+//                            }
+
+
+//                            // Handle end game message
+//                            System.out.println("Requested to end the game");
+//
+//                            // Show the end game popup
+//                            Platform.runLater(this::showEndGamePopup);
+
+                            MainGameAreaController mainGameAreaController = App.mainGameAreaController;
+                            if (mainGameAreaController != null) {
+                                mainGameAreaController.passedEndGamePopup(inboundMsg);
+                                System.out.println("Client Listener: not null " + inboundMsg.getContent());
+                            } else {
+                                System.out.println("Client Listener: null " + inboundMsg.getContent());
+                            }
                             break;
                         }
                         case RANDOM_WORD -> {
-                            if (App.mgac != null) {
-                                App.mgac.generateWordPass(inboundMsg);
+                            // add the message to the chat textArea
+                            MainGameAreaController mainGameAreaController = App.mainGameAreaController;
+                            if (mainGameAreaController != null) {
+                                mainGameAreaController.generateWordPass(inboundMsg);
                                 System.out.println("Client Listener: not null " + inboundMsg.getContent());
                             } else {
                                 System.out.println("Client Listener: null " + inboundMsg.getContent());
@@ -140,8 +208,10 @@ public class ClientListener implements Runnable {
                             break;
                         }
                         case PLAYER_SCORE -> {
-                            if (App.mgac != null) {
-                                App.mgac.passedScorePass(inboundMsg);
+                            // add the message to the chat textArea
+                            MainGameAreaController mainGameAreaController = App.mainGameAreaController;
+                            if (mainGameAreaController != null) {
+                                mainGameAreaController.passedScorePass(inboundMsg);
                                 System.out.println("Client Listener PlayerScore: not null ");
                             } else {
                                 System.out.println("Client Listener PlayerScore: null ");
@@ -149,8 +219,10 @@ public class ClientListener implements Runnable {
                             break;
                         }
                         case TURN -> {
-                            if (App.mgac != null) {
-                                App.mgac.passedShiftedTurn(inboundMsg);
+                            // add the message to the chat textArea
+                            MainGameAreaController mainGameAreaController = App.mainGameAreaController;
+                            if (mainGameAreaController != null) {
+                                mainGameAreaController.passedShiftedTurn(inboundMsg);
                                 System.out.println("Client Listener Turn: not null ");
                             } else {
                                 System.out.println("Client Listener Turn: null ");
@@ -175,6 +247,133 @@ public class ClientListener implements Runnable {
             e.printStackTrace();
         } finally {
             App.client = null; // remove client socket if there is error
+        }
+    }
+
+    private void showEndGamePopup() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/game/roundr/game/EndGamePopup.fxml"));
+            Parent popupRoot = loader.load();
+            EndGamePopupController popupController = loader.getController();
+
+            // Pass the timer from MainGameAreaController to EndGamePopupController
+            popupController.initData(mgac.getTimer(), this::resumeTimer);
+
+            // Update the shared variable based on the timer state
+            boolean timerRunning = mgac.timer.getStatus() == Animation.Status.RUNNING;
+            isTimerRunning = timerRunning;
+
+            System.out.println(timerRunning);
+            System.out.println(mgac.getTimer());
+            // Pause or resume the timer based on the updated state
+            if (isTimerRunning) {
+                mgac.getTimer().pause();
+            }
+
+            Stage popupStage = new Stage();
+            popupStage.initModality(Modality.APPLICATION_MODAL);
+            popupStage.setScene(new Scene(popupRoot));
+
+            // Create a new stage as the owner of the popup stage
+            Stage ownerStage = new Stage();
+
+            // Set the owner of the popup stage
+            popupStage.initOwner(ownerStage);
+
+            popupStage.showAndWait();
+
+            // After the popup is closed, update the timer state based on the shared variable
+            if (isTimerRunning) {
+                mgac.getTimer().play();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void setTimer(Timeline timer) {
+        this.timer = timer;
+    }
+
+    public void resumeTimer() {
+        // Initialize the timer
+        timer = new Timeline(new KeyFrame(Duration.seconds(1), event -> {
+            // Timer logic here
+        }));
+        // Call the play() method
+        timer.play();
+        isTimerRunning = true;
+    }
+
+    private void sendWordMessage(Message message) {
+        try {
+            client.output.writeObject(message);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void sendWordMessage(String content) {
+        Message msg = new Message(MessageType.RANDOM_WORD, App.username, content);
+        // send the message
+        this.sendWordMessage(msg);
+    }
+
+    private void sendPlayerScore(Message message) {
+        try {
+            client.output.writeObject(message);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void sendMessage(Message message) {
+        try {
+            client.output.writeObject(message);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void sendPlayerScore(Map<String, Integer> playerScore) {
+        Message msg = new Message(MessageType.PLAYER_SCORE, App.username, playerScore);
+        // send the message
+        this.sendPlayerScore(msg);
+    }
+
+    public void sendChatMessage(String content) {
+        Message msg = new Message(MessageType.CHAT, App.username, content);
+
+        // send the message
+        this.sendMessage(msg);
+
+    }
+
+    public void sendShiftedTurn(String turn) {
+        Message msg = new Message(MessageType.TURN, App.username, turn);
+        // send the message
+        this.sendShiftedTurn(msg);
+    }
+
+    private void sendShiftedTurn(Message message) {
+        try {
+            client.output.writeObject(message);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void sendEndGameRequest() {
+        Message msg = new Message(MessageType.END_GAME, App.username, "");
+        // send the message
+        this.sendEndGameRequest(msg);
+    }
+
+    private void sendEndGameRequest(Message message) {
+        try {
+            client.output.writeObject(message);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }

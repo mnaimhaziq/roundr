@@ -2,6 +2,7 @@ package com.game.roundr.lobby;
 
 import com.game.roundr.App;
 import com.game.roundr.DatabaseConnection;
+import com.game.roundr.game.MainGameAreaController;
 import com.game.roundr.models.Game;
 import com.game.roundr.network.Client;
 import java.io.IOException;
@@ -137,7 +138,8 @@ public class JoinLobbyController implements Initializable {
     }
 
     private void joinLobby(String gameAddress) {
-        App.client = new Client(gameAddress, App.username);
+        MainGameAreaController mgac = new MainGameAreaController();
+        App.client = new Client(gameAddress, App.username, mgac);
         App.client.startClient();
     }
     
@@ -163,7 +165,8 @@ public class JoinLobbyController implements Initializable {
     }
 
     private void joinLobby(String gameCode, String gameAddress) {
-        App.client = new Client(gameAddress, App.username);
+        MainGameAreaController mgac = new MainGameAreaController();
+        App.client = new Client(gameAddress, App.username, mgac);
         App.client.startClient();
 
         // update database tables
